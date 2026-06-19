@@ -59,3 +59,48 @@ async function registeruser(req, res) {
         })
     }
 }
+
+
+async function loginuser(req, res) {
+    try {
+        const email = req.body.email?.trim()
+        const { password } = req.body
+
+        const user = await usermodel.findOne({ email })
+        if (!user) {
+            return res.json(401).status("Invalid credentials")
+        }
+
+        // todo     password check
+        const pswcheck = await bcrypt.compare(password, user.password)
+        if (!pswcheck) {
+            return res.status(401).json({
+                message: "Invalid credentials"
+            })
+        }
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" })
+        res.cookie("token", token, cookieOptions)
+
+        return res.status(200).json({
+            message: "Logged in successfully",
+            user: { id: user._id, name: user.name, email: user.email, role: user.role }
+        })
+
+    }
+    catch (e) {
+        console.log(e)
+        res.status(400).json({
+            message: e
+        })
+    }
+}
+
+async function logoutuser(req, res) {
+    res.clearcookie("token", cookieOptions)
+    return res.status(200).json({
+        message: "Logged out successfully"
+    })
+}
+
+module.exports = { registeruser, loginuser, logoutuser }
