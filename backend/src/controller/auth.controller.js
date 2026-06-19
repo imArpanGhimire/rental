@@ -1,0 +1,61 @@
+const usermodel = require("../model/user.model")
+const jwt = require("jsonwebtoken")
+const bcrypt = require("bcrypt")
+
+const cookieOptions = {
+    httpOnly: true,  //?  js cannot access this ccokie from browser
+    secure: process.env.NODE_ENV === "production",
+    samesite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,  // cookie expire time
+}
+
+
+async function registeruser(req, res) {
+    try {
+        const name = req.body.name?.trim()
+        const email = req.body.email?.trim()
+        const { password, role } = req.body
+
+        if (!username || !email || !password || !role) {
+            return res.status(400).json({ message: "All the fields should be filled" })
+        }
+        if (username.length < 3 || username.length > 20) {
+            return res.status(400).json({ message: "Username must be 3–20 characters" });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ message: "Password must be at least 6 characters" });
+        }
+
+        if (!["owner", "renter"].includes(role)) {
+            return res.status(400).json("Select either owner or renter")
+        }
+
+
+        const alreadyExists = await usermodel.findOne({ email })
+        if (alreadyExists) {
+            return res.status(400).json({
+                message: "user with this email already exists"
+            })
+        }
+
+        // password hashing
+
+        const hash = await bcrypt.hash(password, 10)
+        const user = await usermodel.create({ username, password: hash })
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+        res.cookie("token", token)
+
+        return res.status(201).json({
+            message: "user created succesfully",
+            user: { id: user._id, name: user.name, email: user.email, role: user.role }
+        })
+    }
+    catch (e) {
+        console.log(e)
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
