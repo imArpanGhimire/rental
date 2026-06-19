@@ -13,7 +13,7 @@ const cookieOptions = {
 async function registeruser(req, res) {
     try {
         const name = req.body.name?.trim()
-        const email = req.body.email?.trim()
+        const email = req.body.email?.trim().toLowerCase()
         const { password, role } = req.body
 
         if (!name || !email || !password || !role) {
@@ -65,7 +65,7 @@ async function registeruser(req, res) {
 
 async function loginuser(req, res) {
     try {
-        const email = req.body.email?.trim()
+        const email = req.body.email?.trim().toLowerCase()
         const { password } = req.body
 
         //todo email psw input check
@@ -105,7 +105,7 @@ async function loginuser(req, res) {
     catch (e) {
         console.log(e)
         res.status(500).json({
-            message: e
+            message: "Internal server error"
         })
     }
 }
