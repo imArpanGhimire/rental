@@ -18,5 +18,16 @@ const userschema = new mongoose.Schema({
         type: String,
         required: true,
 
+    },
+    role: {
+        type: String,
+        default: null,
     }
-})
+},
+
+    { timestamps: true }
+)
+
+const usermodel = mongoose.model("user", userschema)
+
+module.exports = usermodel
