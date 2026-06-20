@@ -21,7 +21,8 @@ const userschema = new mongoose.Schema({
     },
     role: {
         type: String,
-        default: null,
+        enum: ["owner", "renter"],
+        required: true
     }
 },
 
