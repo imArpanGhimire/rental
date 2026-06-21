@@ -1,13 +1,17 @@
 const express = require("express")
 const router = express.Router()
 
+// middlewares 
+const authMiddleware = require("../middleware/auth.middleware")
+const ownershipMiddleware = require("../middleware/owner.middleware")
+const verifyPropertyMiddleware = require("../middleware/verifyproperty.middleware")
 
 const propertycontroller = require("../controller/property.controller")
-const authmiddleware = require("../middleware/auth.middleware")
-const ownershipmiddleware = require("../middleware/owner.middleware")
 
-router.post("/add-property", authmiddleware, ownershipmiddleware, propertycontroller.createproperty)
+
+router.post("/add-property", authMiddleware, ownershipMiddleware, propertycontroller.createproperty)
 router.get("/get-all-properties", propertycontroller.getallproperties)
 router.get("/get-property/:id", propertycontroller.getoneproperty)
+router.put("/update-property/:id", authMiddleware, ownershipMiddleware, verifyPropertyMiddleware, propertycontroller.updateproperty)
 
 module.exports = router
