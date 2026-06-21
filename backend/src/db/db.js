@@ -7,6 +7,7 @@ async function connectDB() {
     }
     catch (e) {
         console.log(e)
+        process.exit(1)
     }
 }
 module.exports = connectDB
