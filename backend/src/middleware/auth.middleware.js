@@ -1,27 +1,22 @@
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
 function authmiddleware(req, res, next) {
-    try {
-        const token = req.body.token
+    const token = req.body.token;
 
-        if (!token) {
-            return res.status(401).json({
-                message: "Unathorized access"
-            })
-        }
-
-        const verifieduser = jwt.verify(token, process.env.JWT_SECRET)
-        req.user = verifieduser
-
-
-
-    }
-    catch (e) {
+    if (!token) {
         return res.status(401).json({
-            message: "Unathorized catch"
-        })
+            message: "Unathorized access",
+        });
+    }
+    try {
+        const verifieduser = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = verifieduser;
+        next();
+    } catch (e) {
+        return res.status(401).json({
+            message: "Unathorized catch",
+        });
     }
 }
 
-
-module.exports = authmiddleware
+module.exports = authmiddleware;
