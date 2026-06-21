@@ -26,7 +26,6 @@ async function createproperty(req, res) {
     }
 }
 
-
 async function getallproperties(req, res) {
     try {
         const allproperties = await rentalmodel.find().populate("owner", "name")
@@ -39,7 +38,6 @@ async function getallproperties(req, res) {
         })
     }
 }
-
 
 async function getoneproperty(req, res) {
     const { id } = req.params
