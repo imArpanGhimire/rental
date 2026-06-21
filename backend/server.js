@@ -1,6 +1,8 @@
-const connectdb = require("./src/db/db")
+require("dotenv").config()
+const connectDB = require("./src/db/db")
+const app = require("./src/app")
 
-connectdb()
+connectDB()
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
