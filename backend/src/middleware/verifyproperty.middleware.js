@@ -2,21 +2,26 @@ const rentalmodel = require("../model/rental.model")
 
 async function verifypropertyowner(req, res, next) {
     const { id } = req.params
-    const propertyexists = await rentalmodel.findById(id)
+    try {
+        const propertyexists = await rentalmodel.findById(id)
 
-    if (!propertyexists) {
-        return res.status(404).json({ message: "Property not found" })
+        if (!propertyexists) {
+            return res.status(404).json({ message: "Property not found" })
+        }
+
+        if (propertyexists.owner.toString() !== req.user.id) {
+            return res.status(403).json({
+                messsage: "You don't own this property"
+            })
+        }
+
+        req.property = propertyexists
+        next()
     }
-
-    if (propertyexists.owner.toString() !== req.user.id) {
-        return res.status(403).json({
-            messsage: "You don't own this property"
-        })
+    catch (e) {
+        console.error(e)
+        return res.status(400).json({ message: "Invalid property id" })
     }
-
-    req.property = propertyexists
-    next()
-
 
 }
 
