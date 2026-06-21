@@ -69,6 +69,14 @@ async function updateproperty(req, res) {
     const propertyToEdit = req.property
 
     try {
+
+        if (!id) {
+            return res.status(404).json({
+                message: "The property you are trying to update couldn't be found"
+            })
+        }
+
+
         if (!propertyToEdit) {
             return res.status(404).json({
                 message: "property not found"
@@ -76,21 +84,21 @@ async function updateproperty(req, res) {
         }
 
 
-        //  if (title) propertyToEdit.title = title
-        //         if (description) propertyToEdit.description = description
-        //         if (price) propertyToEdit.price = price
-        //         if (location) propertyToEdit.location = location
-        //         if (images) propertyToEdit.images = images
+        if (title) propertyToEdit.title = title
+        if (description) propertyToEdit.description = description
+        if (price) propertyToEdit.price = price
+        if (location) propertyToEdit.location = location
+        if (images) propertyToEdit.images = images
 
-        //         const updatedProperty = await propertyToEdit.save()   
+        const updatedProperty = await propertyToEdit.save()
 
-        //todo    yo mathi ko le pani same kaam garne ho 
+        // todo    yo tala ko le pani same kaam garne ho 
 
-        const updatedProperty = await rentalmodel.findByIdAndUpdate(
-            id, { title, description, location, price, images }, { new: true }
-        )
+        // const updatedProperty = await rentalmodel.findByIdAndUpdate(
+        //     id, { title, description, location, price, images }, { new: true }
+        // )
 
-        return res.status(201).json({
+        return res.status(200).json({
             message: "property updated successfully",
             updatedProperty
         })
@@ -104,4 +112,4 @@ async function updateproperty(req, res) {
     }
 }
 
-module.exports = { createproperty, getallproperties, getoneproperty }
+module.exports = { createproperty, getallproperties, getoneproperty, updateproperty }
