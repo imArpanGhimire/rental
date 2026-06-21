@@ -62,4 +62,46 @@ async function getoneproperty(req, res) {
 
 }
 
+async function updateproperty(req, res) {
+    const { id } = req.params
+    const { title, description, price, location, images } = req.body
+
+    const propertyToEdit = req.property
+
+    try {
+        if (!propertyToEdit) {
+            return res.status(404).json({
+                message: "property not found"
+            })
+        }
+
+
+        //  if (title) propertyToEdit.title = title
+        //         if (description) propertyToEdit.description = description
+        //         if (price) propertyToEdit.price = price
+        //         if (location) propertyToEdit.location = location
+        //         if (images) propertyToEdit.images = images
+
+        //         const updatedProperty = await propertyToEdit.save()   
+
+        //todo    yo mathi ko le pani same kaam garne ho 
+
+        const updatedProperty = await rentalmodel.findByIdAndUpdate(
+            id, { title, description, location, price, images }, { new: true }
+        )
+
+        return res.status(201).json({
+            message: "property updated successfully",
+            updatedProperty
+        })
+    }
+    catch (e) {
+        console.error(e)
+        return res.status(500).json({
+            message: "Internal server error"
+
+        })
+    }
+}
+
 module.exports = { createproperty, getallproperties, getoneproperty }
