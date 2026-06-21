@@ -20,7 +20,7 @@ async function registeruser(req, res) {
             return res.status(400).json({ message: "All the fields should be filled" })
         }
         if (name.length < 2 || name.length > 20) {
-            return res.status(400).json({ message: "name must be 3–20 characters" });
+            return res.status(400).json({ message: "name must be 2–20 characters" });
         }
 
         if (password.length < 6) {
