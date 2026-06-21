@@ -9,17 +9,30 @@ const rentalschema = new mongoose.Schema({
         type: String,
         required: true
     },
+
+
     location: {
-        type: String,
-        required: true
+        type: {
+            type: String,
+            enum: ["Point"],
+            default: "Point"
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude] — order matters, lng first
+            required: true
+        },
+        address: String // human-readable, for display
     },
+
+
     price: {
         type: Number,
         required: true
     },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user"
+        ref: "user",
+        required: true
     },
     images: [{
         type: String
