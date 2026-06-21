@@ -112,4 +112,50 @@ async function updateproperty(req, res) {
     }
 }
 
-module.exports = { createproperty, getallproperties, getoneproperty, updateproperty }
+async function deleteproperty(req, res) {
+    const { id } = req.params
+
+    try {
+        const propToDelete = req.property
+
+        if (!propToDelete) {
+            return res.status(404).json({
+                message: "Property couldn't be found to delete"
+            })
+        }
+
+        const deletedProperty = await propToDelete.deleteOne()
+        return res.status(200).json({
+            message: "deleted property",
+            propToDelete
+        })
+    }
+    catch (e) {
+        console.error(e)
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+async function getmyproperties(req, res) {
+
+    try {
+
+        const myproperties = await rentalmodel.find({ owner: req.user.id })
+
+        return res.status(200).json({
+            message: "Here are the listing of your properties",
+            myproperties
+        })
+    }
+    catch (e) {
+        console.error(e)
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+
+module.exports = { createproperty, getallproperties, getoneproperty, updateproperty, deleteproperty, getmyproperties }
