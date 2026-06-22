@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ── Color Tokens ── */
+:root {
+  --red:        #B80C09;
+  --red-dark:   #8f0907;
+  --red-light:  #f5e0e0;
+  --navy:       #373F51;
+  --navy-dark:  #272d3a;
+  --navy-light: #e8eaf0;
+  --silver:     #B7B5B3;
+  --offwhite:   #E5E7E6;
+  --nearblack:  #141301;
+
+  /* Light mode surfaces */
+  --bg-page:        #F8F8F8;
+  --bg-card:        #FFFFFF;
+  --bg-input:       #FFFFFF;
+  --bg-subtle:      #F0F0F0;
+  --border-color:   #D8D8D8;
+  --text-primary:   #141301;
+  --text-secondary: #373F51;
+  --text-muted:     #7a7a7a;
+  --text-on-red:    #FFFFFF;
+
+  --shadow-sm:  0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.12);
+
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  22px;
+  --radius-xl:  32px;
+
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --bg-page:        #0f0f0f;
+  --bg-card:        #1a1a1a;
+  --bg-input:       #242424;
+  --bg-subtle:      #222222;
+  --border-color:   #2e2e2e;
+  --text-primary:   #F0EFED;
+  --text-secondary: #B7B5B3;
+  --text-muted:     #6b6b6b;
+  --red-light:      #2a0a09;
+  --navy-light:     #1a1e28;
+  --shadow-sm:  0 1px 4px rgba(0,0,0,0.3);
+  --shadow-md:  0 4px 20px rgba(0,0,0,0.4);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.5);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.6;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+img { max-width: 100%; display: block; }
