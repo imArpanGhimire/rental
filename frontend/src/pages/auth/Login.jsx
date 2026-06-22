@@ -27,7 +27,7 @@ const IconEyeOff = () => (
     <line x1="1" y1="1" x2="23" y2="23"/>
   </svg>
 );
-const IconWarning = () => (
+const IconWarn = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
     <line x1="12" y1="9" x2="12" y2="13"/>
@@ -38,13 +38,13 @@ const IconWarning = () => (
 export default function Login() {
   const [role, setRole] = useState('renter');
   const [form, setForm] = useState({ email: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = e => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm(p => ({ ...p, [e.target.name]: e.target.value }));
     if (error) setError('');
   };
 
@@ -54,35 +54,60 @@ export default function Login() {
     setLoading(true);
     try {
       await new Promise(r => setTimeout(r, 1200));
-      navigate(role === 'owner' ? '/owner/dashboard' : '/renter/browse');
-    } catch {
-      setError('Invalid email or password. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+      navigate(role === 'owner' ? '/owner/dashboard' : '/renter/dashboard');
+    } catch { setError('Invalid email or password.'); }
+    finally { setLoading(false); }
   };
 
   return (
     <div className={styles.page}>
-      <div className={styles.orb1} /><div className={styles.orb2} /><div className={styles.orb3} />
+      {/* Ambient orbs */}
+      <div className={styles.orb1} />
+      <div className={styles.orb2} />
+      <div className={styles.orb3} />
 
-      <div className={styles.panel}>
+      {/* ── MOBILE HEADER (logo + tagline, hidden on desktop) ── */}
+      <header className={styles.mobileHeader}>
+        <div className={styles.logo}>
+          <span className={styles.logoMark}>N</span>
+          <span className={styles.logoText}>NestFind</span>
+        </div>
+        <p className={styles.mobileTagline}>Your next home is one step away.</p>
+      </header>
+
+      {/* ── LEFT PANEL (desktop only) ── */}
+      <aside className={styles.panel}>
         <div className={styles.panelGlass}>
           <div className={styles.logo}>
             <span className={styles.logoMark}>N</span>
             <span className={styles.logoText}>NestFind</span>
           </div>
+
           <div className={styles.panelContent}>
-            <h1 className={styles.panelHeading}>Your next home<br />is one step away.</h1>
-            <p className={styles.panelSub}>Browse verified rooms and connect directly with owners — no middlemen, no hidden fees.</p>
+            <h1 className={styles.panelHeading}>
+              Your next home<br />is one step away.
+            </h1>
+            <p className={styles.panelSub}>
+              Browse verified rooms and connect directly with owners — no middlemen, no hidden fees.
+            </p>
             <div className={styles.stats}>
-              <div className={styles.stat}><span className={styles.statNum}>2,400+</span><span className={styles.statLabel}>Rooms listed</span></div>
+              <div className={styles.stat}>
+                <span className={styles.statNum}>2,400+</span>
+                <span className={styles.statLabel}>Rooms listed</span>
+              </div>
               <div className={styles.statDivider} />
-              <div className={styles.stat}><span className={styles.statNum}>1,800+</span><span className={styles.statLabel}>Happy renters</span></div>
+              <div className={styles.stat}>
+                <span className={styles.statNum}>1,800+</span>
+                <span className={styles.statLabel}>Happy renters</span>
+              </div>
               <div className={styles.statDivider} />
-              <div className={styles.stat}><span className={styles.statNum}>650+</span><span className={styles.statLabel}>Verified owners</span></div>
+              <div className={styles.stat}>
+                <span className={styles.statNum}>650+</span>
+                <span className={styles.statLabel}>Verified owners</span>
+              </div>
             </div>
           </div>
+
           <div className={styles.stepIndicator}>
             <div className={`${styles.step} ${styles.stepActive}`}>
               <span className={styles.stepNum}>1</span>
@@ -95,9 +120,10 @@ export default function Login() {
             </div>
           </div>
         </div>
-      </div>
+      </aside>
 
-      <div className={styles.formSide}>
+      {/* ── RIGHT / FORM SIDE ── */}
+      <main className={styles.formSide}>
         <div className={styles.formWrapper}>
           <div className={styles.formCard}>
             <div className={styles.formHeader}>
@@ -105,51 +131,64 @@ export default function Login() {
               <p className={styles.formSub}>Sign in to your account to continue</p>
             </div>
 
-            {/* Role Toggle with sliding indicator */}
+            {/* Role toggle */}
             <div className={styles.roleToggle} role="group" aria-label="Select your role">
-              <div
-                className={styles.roleSlider}
-                style={{ transform: role === 'owner' ? 'translateX(100%)' : 'translateX(0%)' }}
-              />
-              <button type="button"
+              <button
+                type="button"
                 className={`${styles.roleBtn} ${role === 'renter' ? styles.roleActive : ''}`}
-                onClick={() => setRole('renter')}>
+                onClick={() => setRole('renter')}
+              >
                 <IconHome /> I'm a Renter
               </button>
-              <button type="button"
+              <button
+                type="button"
                 className={`${styles.roleBtn} ${role === 'owner' ? styles.roleActive : ''}`}
-                onClick={() => setRole('owner')}>
+                onClick={() => setRole('owner')}
+              >
                 <IconKey /> I'm an Owner
               </button>
             </div>
 
             <form onSubmit={handleSubmit} noValidate>
-              {error && <div className={styles.errorBox} role="alert"><IconWarning /> {error}</div>}
+              {error && (
+                <div className={styles.errorBox} role="alert">
+                  <IconWarn /> {error}
+                </div>
+              )}
+
               <div className={styles.field}>
                 <label htmlFor="email" className={styles.label}>Email address</label>
-                <input id="email" name="email" type="email" autoComplete="email"
+                <input
+                  id="email" name="email" type="email" autoComplete="email"
                   placeholder="you@example.com" className={styles.input}
-                  value={form.email} onChange={handleChange} required />
+                  value={form.email} onChange={handleChange} required
+                />
               </div>
+
               <div className={styles.field}>
                 <div className={styles.labelRow}>
                   <label htmlFor="password" className={styles.label}>Password</label>
-                  <Link to="/forgot-password" className={styles.forgotLink}>Forgot password?</Link>
+                  <Link to="/forget-password" className={styles.forgotLink}>Forgot password?</Link>
                 </div>
                 <div className={styles.inputWrap}>
-                  <input id="password" name="password"
-                    type={showPassword ? 'text' : 'password'}
+                  <input
+                    id="password" name="password"
+                    type={showPw ? 'text' : 'password'}
                     autoComplete="current-password"
                     placeholder="Enter your password"
                     className={styles.input}
-                    value={form.password} onChange={handleChange} required />
-                  <button type="button" className={styles.eyeBtn}
-                    onClick={() => setShowPassword(v => !v)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}>
-                    {showPassword ? <IconEyeOff /> : <IconEye />}
+                    value={form.password} onChange={handleChange} required
+                  />
+                  <button
+                    type="button" className={styles.eyeBtn}
+                    onClick={() => setShowPw(v => !v)}
+                    aria-label={showPw ? 'Hide password' : 'Show password'}
+                  >
+                    {showPw ? <IconEyeOff /> : <IconEye />}
                   </button>
                 </div>
               </div>
+
               <button type="submit" className={styles.submitBtn} disabled={loading}>
                 {loading && <span className={styles.spinner} aria-hidden="true" />}
                 {loading ? 'Signing in…' : `Sign in as ${role === 'renter' ? 'Renter' : 'Owner'}`}
@@ -162,7 +201,7 @@ export default function Login() {
             </p>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
