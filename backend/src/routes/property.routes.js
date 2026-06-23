@@ -5,10 +5,9 @@ const router = express.Router()
 const authMiddleware = require("../middleware/auth.middleware")
 const ownershipMiddleware = require("../middleware/owner.middleware")
 const verifyPropertyMiddleware = require("../middleware/verifyproperty.middleware")
+const verifypropertyowner = require("../middleware/verifyproperty.middleware")
 
 const propertycontroller = require("../controller/property.controller")
-const authMiddleware = require("../middleware/auth.middleware")
-const verifypropertyowner = require("../middleware/verifyproperty.middleware")
 
 
 router.post("/add-property", authMiddleware, ownershipMiddleware, propertycontroller.createproperty)
