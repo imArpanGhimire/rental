@@ -47,6 +47,7 @@ async function registeruser(req, res) {
         const user = await usermodel.create({ name, password: hash, email, role })
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" })
+
         res.cookie("token", token, cookieOptions)
 
         return res.status(201).json({
