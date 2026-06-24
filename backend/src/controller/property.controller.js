@@ -15,7 +15,8 @@ async function createproperty(req, res) {
         const property = await rentalmodel.create({ title, description, price, owner, location, images })
 
         return res.status(201).json({
-            message: "Property has been added"
+            message: "Property has been added",
+            property
         })
     }
     catch (e) {
