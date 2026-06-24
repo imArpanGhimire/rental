@@ -12,7 +12,9 @@ async function createreview() {
         if (!property) {
             return res.status(404).json({ message: "Property not found" });
         }
-
+        if (property.owner.toString() === reviewerId.toString()) {
+            return res.status(403).json({ message: "You cannot review your own property" });
+        }
     }
     catch (e) {
 
