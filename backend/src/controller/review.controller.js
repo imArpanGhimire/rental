@@ -9,7 +9,9 @@ async function createreview() {
 
         const property = await rentalmodel.findById(propertyid)
 
-
+        if (!property) {
+            return res.status(404).json({ message: "Property not found" });
+        }
 
     }
     catch (e) {
