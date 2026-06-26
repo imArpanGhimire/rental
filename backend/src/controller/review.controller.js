@@ -38,3 +38,16 @@ async function createreview(req, res) {
         return res.status(500).json({ message: "Server error", error: error.message });
     }
 }
+
+async function getpropertyreviews(req, res) {
+
+
+    const property = req.parmas.propertyid
+    try {
+        const reviews = await reviewmodel.find(property).populate("reviewer", "name email")
+
+        res.status(200).json({ reviews });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+}
