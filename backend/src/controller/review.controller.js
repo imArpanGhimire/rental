@@ -1,9 +1,9 @@
 const rentalmodel = require("../model/rental.model")
 const reviewmodel = require("../model/review.model")
 
-async function createreview() {
+async function createreview(req, res) {
     try {
-        const { rating, comment } = req.user.body
+        const { rating, comment } = req.body
         const propertyid = req.params.propertyid
         const reviewerid = req.user.id
 
@@ -23,7 +23,7 @@ async function createreview() {
         }
 
 
-        const review = await rentalmodel.create({
+        const review = await reviewmodel.create({
             property: propertyid,
             reviewer: reviewerid,
             rating, comment
@@ -32,6 +32,9 @@ async function createreview() {
     }
     catch (e) {
         console.error(e)
+        if (e.code === 11000) {
+            return res.status(400).json({ message: "You have already reviewed this property" });
+        }
         return res.status(500).json({ message: "Server error", error: error.message });
     }
 }
