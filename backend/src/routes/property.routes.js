@@ -7,7 +7,7 @@ const ownershipMiddleware = require("../middleware/owner.middleware")
 const verifyPropertyMiddleware = require("../middleware/verifyproperty.middleware")
 const verifypropertyowner = require("../middleware/verifyproperty.middleware")
 
-// controller
+// controllers
 const propertycontroller = require("../controller/property.controller")
 
 
