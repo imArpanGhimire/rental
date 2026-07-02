@@ -112,4 +112,24 @@ async function replytoreview(req, res) {
     }
 }
 
+async function editreply(req, res) {
+    const reviewid = req.params.reviewid
+    const review = await reviewmodel.findById(reviewid)
+
+    if (!review) {
+        return res.status(404).json({
+            message: "couldn't found the reply"
+        }
+        )
+    }
+
+    // const property=await rentalmodel.find({})
+
+    if (property.owner.toString() !== req.user.id) {
+        return res.status(403).json({
+            message: "not authorised to edit"
+        })
+    }
+}
+
 module.exports = { createreview, getpropertyreviews, deletereview, replytoreview }
