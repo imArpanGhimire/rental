@@ -35,7 +35,7 @@ async function createreview(req, res) {
         if (e.code === 11000) {
             return res.status(400).json({ message: "You have already reviewed this property" });
         }
-        return res.status(500).json({ message: "Server error", error: error.message });
+        return res.status(500).json({ message: "Server error", e: error.message });
     }
 }
 
