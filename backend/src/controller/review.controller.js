@@ -130,11 +130,24 @@ async function editreply(req, res) {
 
     const property = await rentalmodel.find(review.property);
 
+
+    // ownership check garya
     if (property.owner.toString() !== req.user.id.toString()) {
         return res.status(403).json({
             message: "not authorised to edit",
         });
     }
+
+
+    if (!review.ownerReply || !review.ownerReply.comment) {
+        return res.status(400).json({ message: "No existing reply to edit" });
+    }
+
+
+    review.ownerReply.comment = comment
+    review.ownerReply.repliedAt = new Date()
+
+    await review.save()
 }
 
 module.exports = {
