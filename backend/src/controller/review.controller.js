@@ -112,4 +112,4 @@ async function replytoreview(req, res) {
     }
 }
 
-module.exports = { createreview, getpropertyreviews, deletereview }
+module.exports = { createreview, getpropertyreviews, deletereview, replytoreview }
