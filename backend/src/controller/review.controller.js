@@ -39,15 +39,13 @@ async function createreview(req, res) {
     }
 }
 
+
 async function getpropertyreviews(req, res) {
-
-
-    const property = req.parmas.propertyid
     try {
-        const reviews = await reviewmodel.find(property).populate("reviewer", "name email")
-
+        const propertyid = req.params.propertyid
+        const reviews = await reviewmodel.find({ property: propertyid }).populate("reviewer", "name email")
         res.status(200).json({ reviews });
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+    } catch (e) {
+        res.status(500).json({ message: "Server error", error: e.message });
     }
 }
