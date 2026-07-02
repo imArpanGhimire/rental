@@ -80,4 +80,36 @@ async function deletereview(req, res) {
     }
 }
 
+async function replytoreview(req, res) {
+    try {
+        const reviewid = req.params.reviewid
+        const { comment } = req.body
+
+        const review = await reviewmodel.findById(reviewid)
+        if (!review) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        const property = await rentalmodel.findById(review.property)
+        if (!property) {
+            return res.status(404).json({ message: "Property not found" });
+        }
+
+        if (property.owner.toString() !== req.user.id.toString()) {
+            return res.status(403).json({ message: "Only the property owner can reply to this review" });
+        }
+
+        review.ownerReply = {
+            comment: comment,
+            repliedAt: new Date()
+        }
+
+        await review.save()
+        res.status(200).json({ message: "Reply added", review });
+
+    } catch (e) {
+        res.status(500).json({ message: "Server error", error: e.message });
+    }
+}
+
 module.exports = { createreview, getpropertyreviews, deletereview }
