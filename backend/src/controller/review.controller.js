@@ -48,3 +48,36 @@ async function getpropertyreviews(req, res) {
         res.status(500).json({ message: "Server error", error: e.message });
     }
 }
+
+async function deletereview(req, res) {
+    try {
+
+        const reviewid = req.params.id
+        const deletedreview = await reviewmodel.find({ comment: cmt })
+
+        if (!deletedreview) {
+            return res.status(404).json({
+                message: "cant find that review"
+            })
+        }
+
+        if (deletedreview.reviewer.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "you can delete only your own reviews"
+            })
+        }
+
+        const reviewtodel = await reviewmodel.findByIdAndDelete(reviewid)
+
+        return res.status(200).json({
+            message: "review deleted",
+            reviewtodel
+        })
+    }
+    catch (e) {
+        console.error(e)
+        res.status(500).json({ message: "Server error", error: e.message });
+    }
+}
+
+module.exports = { createreview, getpropertyreviews, deletereview }
