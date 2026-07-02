@@ -39,7 +39,6 @@ async function createreview(req, res) {
     }
 }
 
-
 async function getpropertyreviews(req, res) {
     try {
         const propertyid = req.params.propertyid
