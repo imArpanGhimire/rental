@@ -1,14 +1,12 @@
 const express = require("express")
 const router = express.Router()
 
-// controller 
 const reviewcontroller = require("../controller/review.controller")
 
-
-router.post("/create-review", reviewcontroller.createreview)
-router.get("/get-property-review", reviewcontroller.getpropertyreviews)
-router.delete("/delete-review", reviewcontroller.deletereview)
-router.post("/reply-review", reviewcontroller.replytoreview)
-router.patch("/edit-review", reviewcontroller.editreply)
+router.post("/create-review/:propertyid", reviewcontroller.createreview)
+router.get("/get-property-review/:propertyid", reviewcontroller.getpropertyreviews)
+router.delete("/delete-review/:reviewid", reviewcontroller.deletereview)
+router.post("/reply-review/:reviewid", reviewcontroller.replytoreview)
+router.patch("/edit-reply/:reviewid", reviewcontroller.editreply)
 
 module.exports = router
