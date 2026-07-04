@@ -159,5 +159,5 @@ module.exports = {
     createreview,
     getpropertyreviews,
     deletereview,
-    replytoreview,
+    replytoreview, editreply
 };
