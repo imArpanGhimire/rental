@@ -38,7 +38,8 @@ async function createreview(req, res) {
                 .status(400)
                 .json({ message: "You have already reviewed this property" });
         }
-        return res.status(500).json({ message: "Server error", e: error.message });
+        // fixed: catch variable is named e, not error
+        return res.status(500).json({ message: "Server error", error: e.message });
     }
 }
 
@@ -56,8 +57,10 @@ async function getpropertyreviews(req, res) {
 
 async function deletereview(req, res) {
     try {
-        const reviewid = req.params.id;
-        const deletedreview = await reviewmodel.find({ comment: cmt });
+        // fixed: route param is :reviewid, not :id
+        const reviewid = req.params.reviewid;
+        // fixed: use findById to get a single document; cmt was undefined and find() returns an array
+        const deletedreview = await reviewmodel.findById(reviewid);
 
         if (!deletedreview) {
             return res.status(404).json({
@@ -129,7 +132,8 @@ async function editreply(req, res) {
             });
         }
 
-        const property = await rentalmodel.find(review.property);
+        // fixed: use findById; find() returns an array so property.owner would be undefined
+        const property = await rentalmodel.findById(review.property);
 
         // ownership check garya
         if (property.owner.toString() !== req.user.id.toString()) {
@@ -159,5 +163,6 @@ module.exports = {
     createreview,
     getpropertyreviews,
     deletereview,
-    replytoreview, editreply
+    replytoreview,
+    editreply,
 };
