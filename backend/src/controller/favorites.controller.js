@@ -5,7 +5,7 @@ const rentalmodel = require("../model/rental.model")
 async function savefavorite(req, res) {
     try {
         const propertyid = req.params.propertyid
-        const property = await rentalmodel.findById(id)
+        const property = await rentalmodel.findById(propertyid)
 
         const renterid = req.user.id
 
