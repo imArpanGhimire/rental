@@ -3,7 +3,7 @@ const rentalmodel = require("../model/rental.model")
 
 
 async function saveproperty(req, res) {
-    const { id } = req.params
+    const propertyid = req.params.propertyid
     const property = await rentalmodel.findById(id)
 
     const isrenter = req.user.id
@@ -20,4 +20,15 @@ async function saveproperty(req, res) {
         });
     }
 
+    // check if its already saved 
+    const alreadysaved = await favoritemodel.findOne({
+        renter: renterid,
+        property: propertyid
+    })
+
+    if (alreadysaved) {
+        return res.status(400).json({
+            message: "Property already saved",
+        });
+    }
 }
