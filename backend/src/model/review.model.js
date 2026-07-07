@@ -25,7 +25,6 @@ const reviewschema = new mongoose.Schema({
     ownerReply: {
         comment: {
             type: String,
-            required: true,
             trim: true
         },
         repliedAt: {
