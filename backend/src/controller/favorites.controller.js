@@ -6,7 +6,7 @@ async function saveproperty(req, res) {
     const propertyid = req.params.propertyid
     const property = await rentalmodel.findById(id)
 
-    const isrenter = req.user.id
+    const renterid = req.user.id
 
     if (!property) {
         return res.status(404).json({
@@ -31,4 +31,14 @@ async function saveproperty(req, res) {
             message: "Property already saved",
         });
     }
+
+    // save favorite
+    const favoriteproperty = await favoritemodel.create({
+        renter: renterid,
+        property: propertyid
+    })
+    return res.status(201).json({
+        message: "Property saved successfully",
+        favoriteproperty,
+    });
 }
