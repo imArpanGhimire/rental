@@ -2,7 +2,7 @@ const favoritemodel = require("../model/favorites.model")
 const rentalmodel = require("../model/rental.model")
 
 
-async function saveproperty(req, res) {
+async function savefavorite(req, res) {
     const propertyid = req.params.propertyid
     const property = await rentalmodel.findById(id)
 
@@ -42,3 +42,5 @@ async function saveproperty(req, res) {
         favoriteproperty,
     });
 }
+
+module.exports = { savefavorite }
