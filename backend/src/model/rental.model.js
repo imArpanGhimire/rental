@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const rentalschema = new mongoose.Schema({
     title: {
         type: String,
@@ -9,8 +8,6 @@ const rentalschema = new mongoose.Schema({
         type: String,
         required: true
     },
-
-
     location: {
         type: {
             type: String,
@@ -18,13 +15,11 @@ const rentalschema = new mongoose.Schema({
             default: "Point"
         },
         coordinates: {
-            type: [Number], // [longitude, latitude] — order matters, lng first 
+            type: [Number], // [longitude, latitude] — order matters, lng first
             required: true
         },
         address: String // human-readable, for display
     },
-
-
     price: {
         type: Number,
         required: true
@@ -42,7 +37,7 @@ const rentalschema = new mongoose.Schema({
         timestamps: true
     })
 
+rentalschema.index({ location: "2dsphere" })
 
 const rentalmodel = mongoose.model("rental", rentalschema)
-
 module.exports = rentalmodel
