@@ -28,8 +28,17 @@ async function createproperty(req, res) {
 }
 
 async function getallproperties(req, res) {
+    const { minPrice, maxPrice } = req.query
+    const filter = {}
+
+    if (minPrice || maxPrice) {
+        filter.price = {}
+        if (minPrice) filter.price.$gte = Number(minPrice)
+        if (maxPrice) filter.price.$lte = Number(maxPrice)
+    }
+
     try {
-        const allproperties = await rentalmodel.find().populate("owner", "name")
+        const allproperties = await rentalmodel.find(filter).populate("owner", "name")
         return res.status(200).json(allproperties)
     }
     catch (e) {
@@ -156,5 +165,39 @@ async function getmyproperties(req, res) {
     }
 }
 
+async function getnearbyproperties(req, res) {
+    const { lng, lat, radius } = req.query
 
-module.exports = { createproperty, getallproperties, getoneproperty, updateproperty, deleteproperty, getmyproperties }
+    if (!lng || !lat) {
+        return res.status(400).json({
+            message: "longitude and latitude are required"
+        })
+    }
+
+    const maxDistance = radius ? Number(radius) * 1000 : 5000 // radius in km -> meters, default 5km
+
+    try {
+        const nearbyproperties = await rentalmodel.find({
+            location: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [Number(lng), Number(lat)]
+                    },
+                    $maxDistance: maxDistance
+                }
+            }
+        }).populate("owner", "name")
+
+        return res.status(200).json(nearbyproperties)
+    }
+    catch (e) {
+        console.error(e)
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+
+module.exports = { createproperty, getallproperties, getoneproperty, updateproperty, deleteproperty, getmyproperties, getnearbyproperties }
