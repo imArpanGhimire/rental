@@ -13,6 +13,9 @@ const propertycontroller = require("../controller/property.controller")
 
 router.post("/add-property", authMiddleware, ownershipMiddleware, propertycontroller.createproperty)
 router.get("/get-all-properties", propertycontroller.getallproperties)
+
+router.get("/nearby", propertycontroller.getnearbyproperties)
+
 router.get("/get-property/:id", propertycontroller.getoneproperty)
 router.put("/update-property/:id", authMiddleware, ownershipMiddleware, verifyPropertyMiddleware, propertycontroller.updateproperty)
 router.delete("/delete-property/:id", authMiddleware, ownershipMiddleware, verifyPropertyMiddleware, propertycontroller.deleteproperty)
