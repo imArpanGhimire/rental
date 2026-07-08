@@ -1,7 +1,7 @@
 const favoritemodel = require("../model/favorites.model");
 const rentalmodel = require("../model/rental.model");
 
-async function savefavorite(req, res) {
+async function saveForlater(req, res) {
     try {
         const propertyid = req.params.propertyid;
         const property = await rentalmodel.findById(propertyid);
@@ -51,7 +51,7 @@ async function savefavorite(req, res) {
     }
 }
 
-async function removefavorite(req, res) {
+async function removeForlater(req, res) {
     try {
         const propertyid = req.params.propertyid;
         const renterid = req.user.id;
@@ -79,4 +79,4 @@ async function removefavorite(req, res) {
     }
 }
 
-module.exports = { savefavorite, removefavorite };
+module.exports = { saveForlater, removeForlater };
