@@ -18,7 +18,7 @@ const rentalschema = new mongoose.Schema({
             default: "Point"
         },
         coordinates: {
-            type: [Number], // [longitude, latitude] — order matters, lng first
+            type: [Number], // [longitude, latitude] — order matters, lng first 
             required: true
         },
         address: String // human-readable, for display
