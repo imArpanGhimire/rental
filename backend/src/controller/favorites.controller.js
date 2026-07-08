@@ -79,4 +79,25 @@ async function removeForlater(req, res) {
     }
 }
 
-module.exports = { saveForlater, removeForlater };
+async function getForlater(req, res) {
+    try {
+        const renterid = req.user.id
+
+        const forlater = await favoritemodel.find({ renter: renterid }).populate("property", "title description price ")
+        return res.status(200).json({
+            message: "found all the for-later",
+            forlater
+        })
+
+    }
+    catch (e) {
+        return res.status(500).json({
+            message: "internal server error",
+            error: e.message
+        })
+    }
+
+
+}
+
+module.exports = { saveForlater, removeForlater, getForlater };
