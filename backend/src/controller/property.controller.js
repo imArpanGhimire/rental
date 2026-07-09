@@ -28,13 +28,17 @@ async function createproperty(req, res) {
 }
 
 async function getallproperties(req, res) {
-    const { minPrice, maxPrice } = req.query
+    const { minPrice, maxPrice, search } = req.query
     const filter = {}
 
     if (minPrice || maxPrice) {
         filter.price = {}
         if (minPrice) filter.price.$gte = Number(minPrice)
         if (maxPrice) filter.price.$lte = Number(maxPrice)
+    }
+
+    if (search) {
+        filter.title = { $regex: search, $options: "i" }
     }
 
     try {
