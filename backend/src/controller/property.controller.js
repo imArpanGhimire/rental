@@ -166,7 +166,7 @@ async function getmyproperties(req, res) {
 }
 
 async function getnearbyproperties(req, res) {
-    const { lng, lat, radius } = req.query
+    const { lng, lat, radius, minPrice, maxPrice } = req.query
 
     if (!lng || !lat) {
         return res.status(400).json({
@@ -176,18 +176,26 @@ async function getnearbyproperties(req, res) {
 
     const maxDistance = radius ? Number(radius) * 1000 : 5000 // radius in km -> meters, default 5km
 
-    try {
-        const nearbyproperties = await rentalmodel.find({
-            location: {
-                $near: {
-                    $geometry: {
-                        type: "Point",
-                        coordinates: [Number(lng), Number(lat)]
-                    },
-                    $maxDistance: maxDistance
-                }
+    const filter = {
+        location: {
+            $near: {
+                $geometry: {
+                    type: "Point",
+                    coordinates: [Number(lng), Number(lat)]
+                },
+                $maxDistance: maxDistance
             }
-        }).populate("owner", "name")
+        }
+    }
+
+    if (minPrice || maxPrice) {
+        filter.price = {}
+        if (minPrice) filter.price.$gte = Number(minPrice)
+        if (maxPrice) filter.price.$lte = Number(maxPrice)
+    }
+
+    try {
+        const nearbyproperties = await rentalmodel.find(filter).populate("owner", "name")
 
         return res.status(200).json(nearbyproperties)
     }
