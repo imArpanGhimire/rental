@@ -169,7 +169,7 @@ async function getmyproperties(req, res) {
     }
 }
 async function getnearbyproperties(req, res) {
-    const { lng, lat, radius, minPrice, maxPrice, search } = req.query
+    const { lng, lat, radius, minPrice, maxPrice, search, sort } = req.query
 
     if (!lng || !lat || isNaN(lng) || isNaN(lat)) {
         return res.status(400).json({
@@ -178,18 +178,7 @@ async function getnearbyproperties(req, res) {
     }
 
     const maxDistance = radius ? Number(radius) * 1000 : 5000
-
-    const filter = {
-        location: {
-            $near: {
-                $geometry: {
-                    type: "Point",
-                    coordinates: [Number(lng), Number(lat)]
-                },
-                $maxDistance: maxDistance
-            }
-        }
-    }
+    const filter = {}
 
     if (minPrice || maxPrice) {
         filter.price = {}
@@ -202,7 +191,31 @@ async function getnearbyproperties(req, res) {
     }
 
     try {
-        const nearbyproperties = await rentalmodel.find(filter).populate("owner", "name")
+        let nearbyproperties
+
+        if (!sort || sort === "distance") {
+            // use $near, auto-sorted by distance
+            filter.location = {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [Number(lng), Number(lat)]
+                    },
+                    $maxDistance: maxDistance
+                }
+            }
+            nearbyproperties = await rentalmodel.find(filter).populate("owner", "name")
+        } else {
+            // price/newest/oldest — no $near, just sort
+            let sortOption = {}
+            if (sort === "price_asc") sortOption.price = 1
+            else if (sort === "price_desc") sortOption.price = -1
+            else if (sort === "newest") sortOption.createdAt = -1
+            else if (sort === "oldest") sortOption.createdAt = 1
+
+            nearbyproperties = await rentalmodel.find(filter).sort(sortOption).populate("owner", "name")
+        }
+
         return res.status(200).json(nearbyproperties)
     }
     catch (e) {
