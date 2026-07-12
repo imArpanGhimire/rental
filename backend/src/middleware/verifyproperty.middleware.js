@@ -11,7 +11,7 @@ async function verifypropertyowner(req, res, next) {
 
         if (propertyexists.owner.toString() !== req.user.id) {
             return res.status(403).json({
-                messsage: "You don't own this property"
+                message: "You don't own this property"
             })
         }
 
