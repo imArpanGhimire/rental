@@ -168,17 +168,16 @@ async function getmyproperties(req, res) {
         })
     }
 }
-
 async function getnearbyproperties(req, res) {
-    const { lng, lat, radius, minPrice, maxPrice } = req.query
+    const { lng, lat, radius, minPrice, maxPrice, search } = req.query
 
-    if (!lng || !lat) {
+    if (!lng || !lat || isNaN(lng) || isNaN(lat)) {
         return res.status(400).json({
-            message: "longitude and latitude are required"
+            message: "valid longitude and latitude are required"
         })
     }
 
-    const maxDistance = radius ? Number(radius) * 1000 : 5000 // radius in km -> meters, default 5km
+    const maxDistance = radius ? Number(radius) * 1000 : 5000
 
     const filter = {
         location: {
@@ -198,9 +197,12 @@ async function getnearbyproperties(req, res) {
         if (maxPrice) filter.price.$lte = Number(maxPrice)
     }
 
+    if (search) {
+        filter.title = { $regex: search, $options: "i" }
+    }
+
     try {
         const nearbyproperties = await rentalmodel.find(filter).populate("owner", "name")
-
         return res.status(200).json(nearbyproperties)
     }
     catch (e) {
