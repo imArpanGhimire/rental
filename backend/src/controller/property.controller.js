@@ -28,7 +28,7 @@ async function createproperty(req, res) {
 }
 
 async function getallproperties(req, res) {
-    const { minPrice, maxPrice, search } = req.query
+    const { minPrice, maxPrice, search, sort } = req.query
     const filter = {}
 
     if (minPrice || maxPrice) {
@@ -41,8 +41,14 @@ async function getallproperties(req, res) {
         filter.title = { $regex: search, $options: "i" }
     }
 
+    let sortOption = {}
+    if (sort === "price_asc") sortOption.price = 1
+    else if (sort === "price_desc") sortOption.price = -1
+    else if (sort === "newest") sortOption.createdAt = -1
+    else if (sort === "oldest") sortOption.createdAt = 1
+
     try {
-        const allproperties = await rentalmodel.find(filter).populate("owner", "name")
+        const allproperties = await rentalmodel.find(filter).sort(sortOption).populate("owner", "name")
         return res.status(200).json(allproperties)
     }
     catch (e) {
@@ -104,12 +110,6 @@ async function updateproperty(req, res) {
 
         const updatedProperty = await propertyToEdit.save()
 
-        // todo    yo tala ko le pani same kaam garne ho 
-
-        // const updatedProperty = await rentalmodel.findByIdAndUpdate(
-        //     id, { title, description, location, price, images }, { new: true }
-        // )
-
         return res.status(200).json({
             message: "property updated successfully",
             updatedProperty
@@ -168,6 +168,7 @@ async function getmyproperties(req, res) {
         })
     }
 }
+
 async function getnearbyproperties(req, res) {
     const { lng, lat, radius, minPrice, maxPrice, search, sort } = req.query
 
@@ -177,7 +178,7 @@ async function getnearbyproperties(req, res) {
         })
     }
 
-    const maxDistance = radius ? Number(radius) * 1000 : 5000
+    const maxDistance = radius ? Number(radius) * 1000 : 5000 // radius in km -> meters, default 5km
     const filter = {}
 
     if (minPrice || maxPrice) {
@@ -194,7 +195,7 @@ async function getnearbyproperties(req, res) {
         let nearbyproperties
 
         if (!sort || sort === "distance") {
-            // use $near, auto-sorted by distance
+            // distance mode: use $near, auto-sorted by distance
             filter.location = {
                 $near: {
                     $geometry: {
@@ -206,7 +207,7 @@ async function getnearbyproperties(req, res) {
             }
             nearbyproperties = await rentalmodel.find(filter).populate("owner", "name")
         } else {
-            // price/newest/oldest — no $near, just sort
+            // price/newest/oldest mode: no $near, just sort
             let sortOption = {}
             if (sort === "price_asc") sortOption.price = 1
             else if (sort === "price_desc") sortOption.price = -1
