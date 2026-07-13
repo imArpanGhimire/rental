@@ -28,7 +28,7 @@ async function createproperty(req, res) {
 }
 
 async function getallproperties(req, res) {
-    const { minPrice, maxPrice, search, sort } = req.query
+    const { minPrice, maxPrice, search, sort, page, limit } = req.query
     const filter = {}
 
     if (minPrice || maxPrice) {
@@ -47,9 +47,24 @@ async function getallproperties(req, res) {
     else if (sort === "newest") sortOption.createdAt = -1
     else if (sort === "oldest") sortOption.createdAt = 1
 
+    const currentPage = Number(page) || 1
+    const currentLimit = Number(limit) || 10
+    const skip = (currentPage - 1) * currentLimit
+
     try {
-        const allproperties = await rentalmodel.find(filter).sort(sortOption).populate("owner", "name")
-        return res.status(200).json(allproperties)
+        const allproperties = await rentalmodel.find(filter).sort(sortOption).skip(skip).limit(currentLimit).populate("owner", "name")
+        const totalCount = await rentalmodel.countDocuments(filter)
+        const totalPages = Math.ceil(totalCount / currentLimit)
+
+        return res.status(200).json({
+            properties: allproperties,
+            pagination: {
+                currentPage,
+                totalPages,
+                totalCount,
+                limit: currentLimit
+            }
+        })
     }
     catch (e) {
         console.error(e)
