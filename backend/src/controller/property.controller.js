@@ -185,7 +185,7 @@ async function getmyproperties(req, res) {
 }
 
 async function getnearbyproperties(req, res) {
-    const { lng, lat, radius, minPrice, maxPrice, search, sort } = req.query
+    const { lng, lat, radius, minPrice, maxPrice, search, sort, page, limit } = req.query
 
     if (!lng || !lat || isNaN(lng) || isNaN(lat)) {
         return res.status(400).json({
@@ -206,7 +206,15 @@ async function getnearbyproperties(req, res) {
         filter.title = { $regex: search, $options: "i" }
     }
 
+    const currentPage = Number(page) || 1
+    const currentLimit = Number(limit) || 10
+    const skip = (currentPage - 1) * currentLimit
+
     try {
+        // count uses filter BEFORE $near is added — $near can't be used in countDocuments
+        const totalCount = await rentalmodel.countDocuments(filter)
+        const totalPages = Math.ceil(totalCount / currentLimit)
+
         let nearbyproperties
 
         if (!sort || sort === "distance") {
@@ -220,7 +228,7 @@ async function getnearbyproperties(req, res) {
                     $maxDistance: maxDistance
                 }
             }
-            nearbyproperties = await rentalmodel.find(filter).populate("owner", "name")
+            nearbyproperties = await rentalmodel.find(filter).skip(skip).limit(currentLimit).populate("owner", "name")
         } else {
             // price/newest/oldest mode: no $near, just sort
             let sortOption = {}
@@ -229,10 +237,18 @@ async function getnearbyproperties(req, res) {
             else if (sort === "newest") sortOption.createdAt = -1
             else if (sort === "oldest") sortOption.createdAt = 1
 
-            nearbyproperties = await rentalmodel.find(filter).sort(sortOption).populate("owner", "name")
+            nearbyproperties = await rentalmodel.find(filter).sort(sortOption).skip(skip).limit(currentLimit).populate("owner", "name")
         }
 
-        return res.status(200).json(nearbyproperties)
+        return res.status(200).json({
+            properties: nearbyproperties,
+            pagination: {
+                currentPage,
+                totalPages,
+                totalCount,
+                limit: currentLimit
+            }
+        })
     }
     catch (e) {
         console.error(e)
