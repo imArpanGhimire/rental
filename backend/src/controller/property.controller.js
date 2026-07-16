@@ -168,7 +168,6 @@ async function deleteproperty(req, res) {
 async function getmyproperties(req, res) {
 
     try {
-
         const myproperties = await rentalmodel.find({ owner: req.user.id })
 
         return res.status(200).json({
