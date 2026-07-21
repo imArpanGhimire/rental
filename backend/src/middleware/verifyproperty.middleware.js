@@ -25,5 +25,4 @@ async function verifypropertyowner(req, res, next) {
 
 }
 
-
 module.exports = verifypropertyowner
