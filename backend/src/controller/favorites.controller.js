@@ -96,8 +96,6 @@ async function getForlater(req, res) {
             error: e.message
         })
     }
-
-
 }
 
 module.exports = { saveForlater, removeForlater, getForlater };

@@ -257,5 +257,4 @@ async function getnearbyproperties(req, res) {
     }
 }
 
-
 module.exports = { createproperty, getallproperties, getoneproperty, updateproperty, deleteproperty, getmyproperties, getnearbyproperties }

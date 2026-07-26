@@ -8,7 +8,4 @@ router.post("/add-forlater/:propertyid", authmiddleware, favoritecontroller.save
 router.post("/remove-forlater/:propertyid", authmiddleware, favoritecontroller.removeForlater)
 router.get("/get-forlater", authmiddleware, favoritecontroller.getForlater)
 
-
-
-
 module.exports = router
