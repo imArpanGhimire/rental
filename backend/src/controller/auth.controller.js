@@ -21,6 +21,8 @@ async function registeruser(req, res) {
         if (password.length < 6) {
             return res.status(400).json({ message: "Password must be at least 6 characters" });
         }
+
+        // notu
         if (!["owner", "renter"].includes(role)) {
             return res.status(400).json({
                 message: "Select either owner or renter"
