@@ -1,28 +1,71 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from './context/ThemeContext';
-import { AuthProvider } from './context/AuthContext';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import ForgetPassword from './pages/auth/ForgetPassword';
-import RenterDashboard from './pages/renter/RenterDashboard';
-import OwnerDashboard from './pages/owner/OwnerDashboard';
-import './styles/globals.css';
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import Login from "./pages/auth/Login.jsx";
+import Register from "./pages/auth/Register.jsx";
+import ForgetPassword from "./pages/auth/ForgetPassword.jsx";
+import Browse from "./pages/listings/Browse.jsx";
+import ListingDetail from "./pages/listings/ListingDetail.jsx";
+import OwnerDashboard from "./pages/owner/Dashboard.jsx";
+import MyListings from "./pages/owner/MyListings.jsx";
+import CreateListing from "./pages/owner/CreateListing.jsx";
+import RenterDashboard from "./pages/renter/Dashboard.jsx";
+import SavedListings from "./pages/renter/SavedListings.jsx";
+import ProtectedRoute from "./components/routing/ProtectedRoute.jsx";
 
-export default function App() {
+function App() {
+  const location = useLocation();
+
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forget-password" element={<ForgetPassword />} />
-            <Route path="/renter/dashboard" element={<RenterDashboard />} />
-            <Route path="/owner/dashboard" element={<OwnerDashboard />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <AnimatePresence mode="wait" initial={false}>
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Browse />} />
+        <Route path="/listings/:id" element={<ListingDetail />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgetPassword />} />
+        <Route
+          path="/owner"
+          element={
+            <ProtectedRoute allowedRoles={["owner"]}>
+              <OwnerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/owner/listings"
+          element={
+            <ProtectedRoute allowedRoles={["owner"]}>
+              <MyListings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/owner/listings/new"
+          element={
+            <ProtectedRoute allowedRoles={["owner"]}>
+              <CreateListing />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/renter"
+          element={
+            <ProtectedRoute allowedRoles={["renter"]}>
+              <RenterDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/renter/saved"
+          element={
+            <ProtectedRoute allowedRoles={["renter"]}>
+              <SavedListings />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AnimatePresence>
   );
 }
+
+export default App;
