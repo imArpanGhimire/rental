@@ -1,28 +1,46 @@
-import styles from './TopBar.module.css';
+import { Link } from "react-router-dom";
+import { Sun, Moon, Globe } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext.jsx";
+import { useAuth } from "../../features/auth/AuthContext.jsx";
+import { useTranslation } from "react-i18next";
+import Button from "../ui/Button.jsx";
 
-const IconMenu = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>;
-const IconBell = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>;
+export default function TopBar() {
+  const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
+  const { i18n } = useTranslation();
 
-export default function TopBar({ title, subtitle, onMenuClick, user }) {
+  const toggleLang = () => {
+    i18n.changeLanguage(i18n.language === "en" ? "ne" : "en");
+  };
+
   return (
-    <header className={styles.topbar}>
-      <div className={styles.left}>
-        <button className={styles.menuBtn} onClick={onMenuClick} aria-label="Open menu">
-          <IconMenu />
+    <header className="flex items-center justify-between px-6 py-4 border-b border-stone">
+      <Link to="/" className="font-display text-xl text-text">
+        Rentora
+      </Link>
+
+      <div className="flex items-center gap-3">
+        <button onClick={toggleLang} aria-label="Toggle language">
+          <Globe size={18} className="text-text/70" />
         </button>
-        <div>
-          <h1 className={styles.title}>{title}</h1>
-          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
-        </div>
-      </div>
-      <div className={styles.right}>
-        <button className={styles.iconBtn} aria-label="Notifications">
-          <IconBell />
-          <span className={styles.badge} />
+        <button onClick={toggleTheme} aria-label="Toggle theme">
+          {theme === "light" ? (
+            <Moon size={18} className="text-text/70" />
+          ) : (
+            <Sun size={18} className="text-text/70" />
+          )}
         </button>
-        <div className={styles.avatar}>
-          {user?.name?.charAt(0).toUpperCase() || 'U'}
-        </div>
+
+        {user ? (
+          <Button variant="ghost" onClick={logout}>
+            Log out
+          </Button>
+        ) : (
+          <Link to="/login">
+            <Button variant="outline">Log in</Button>
+          </Link>
+        )}
       </div>
     </header>
   );
