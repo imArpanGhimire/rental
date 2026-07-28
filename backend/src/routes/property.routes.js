@@ -9,11 +9,27 @@ const upload = require("../middleware/upload.middleware")
 // controllers
 const propertycontroller = require("../controller/property.controller")
 
-router.post("/add-property", authMiddleware, ownershipMiddleware, upload.array("images", 5), propertycontroller.createproperty)
+// wraps multer/cloudinary upload so real errors are visible instead of crashing to a blank HTML page
+function handleUpload(req, res, next) {
+    console.log("HANDLE UPLOAD STARTED")
+    upload.array("images", 5)(req, res, function (err) {
+        if (err) {
+            console.error("UPLOAD ERROR:", err)
+            return res.status(400).json({
+                message: "Image upload failed",
+                error: err.message || err
+            })
+        }
+        console.log("UPLOAD SUCCEEDED")
+        next()
+    })
+}
+
+router.post("/add-property", authMiddleware, ownershipMiddleware, handleUpload, propertycontroller.createproperty)
 router.get("/get-all-properties", propertycontroller.getallproperties)
 router.get("/nearby", propertycontroller.getnearbyproperties)
 router.get("/get-property/:id", propertycontroller.getoneproperty)
-router.put("/update-property/:id", authMiddleware, ownershipMiddleware, verifyPropertyMiddleware, upload.array("images", 5), propertycontroller.updateproperty)
+router.put("/update-property/:id", authMiddleware, ownershipMiddleware, verifyPropertyMiddleware, handleUpload, propertycontroller.updateproperty)
 router.delete("/delete-property/:id", authMiddleware, ownershipMiddleware, verifyPropertyMiddleware, propertycontroller.deleteproperty)
 router.get("/view-my-listings", authMiddleware, ownershipMiddleware, verifypropertyowner, propertycontroller.getmyproperties)
 
