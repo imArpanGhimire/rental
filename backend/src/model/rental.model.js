@@ -24,7 +24,6 @@ const rentalschema = new mongoose.Schema(
     price: { type: Number, required: true },
 
     rooms: { type: Number },           // number of rooms (flats/rental rooms)
-    sizeSqft: { type: Number },        // optional, not all listings will have this
     furnished: { type: Boolean, default: false },
     genderPreference: {
       type: String,
@@ -35,8 +34,6 @@ const rentalschema = new mongoose.Schema(
       type: String,
       enum: ["municipal", "tanker", "jar", "borewell"],
     },
-
-    amenities: [{ type: String }],     // "WiFi", "Parking", "Attached Bathroom", etc.
 
     owner: {
       type: mongoose.Schema.Types.ObjectId,
