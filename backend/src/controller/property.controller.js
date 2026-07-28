@@ -2,21 +2,50 @@ const rentalmodel = require("../model/rental.model")
 
 
 async function createproperty(req, res) {
-    const { title, description, price, location } = req.body
+    const {
+        title, description, price, type,
+        rooms, furnished, genderPreference, waterSupply
+    } = req.body
     const owner = req.user.id
 
-    if (!title || !description || !price || !owner || !location) {
+    if (!title || !description || !price || !owner || !req.body.location || !type) {
         return res.status(400).json({
-            message: "All the information are required except images"
+            message: "title, description, price, location, and type are required"
         })
     }
 
-    // multer-storage-cloudinary already uploaded the files by this point;
-    // req.files gives back the Cloudinary URL in the `.path` field for each file
+    let parsedLocation
+    try {
+        parsedLocation = JSON.parse(req.body.location)
+    }
+    catch (e) {
+        return res.status(400).json({
+            message: "location must be valid JSON, e.g. {\"type\":\"Point\",\"coordinates\":[lng,lat],\"address\":\"...\"}"
+        })
+    }
+
+    const location = {
+        type: "Point",
+        coordinates: parsedLocation.coordinates,
+        address: parsedLocation.address
+    }
+
     const images = req.files ? req.files.map(file => file.path) : []
 
     try {
-        const property = await rentalmodel.create({ title, description, price, owner, location, images })
+        const property = await rentalmodel.create({
+            title,
+            description,
+            price,
+            type,
+            owner,
+            location,
+            images,
+            rooms,
+            furnished,
+            genderPreference,
+            waterSupply
+        })
 
         return res.status(201).json({
             message: "Property has been added",
@@ -26,7 +55,7 @@ async function createproperty(req, res) {
     catch (e) {
         console.error(e)
         return res.status(400).json({
-            message: "something went wrong on our side"
+            message: e.message || "something went wrong on our side"
         })
     }
 }
@@ -80,7 +109,10 @@ async function getoneproperty(req, res) {
 
 async function updateproperty(req, res) {
     const { id } = req.params
-    const { title, description, price, location } = req.body
+    const {
+        title, description, price, location, type,
+        rooms, furnished, genderPreference, waterSupply
+    } = req.body
 
     const propertyToEdit = req.property
 
@@ -103,7 +135,27 @@ async function updateproperty(req, res) {
         if (title) propertyToEdit.title = title
         if (description) propertyToEdit.description = description
         if (price) propertyToEdit.price = price
-        if (location) propertyToEdit.location = location
+        if (type) propertyToEdit.type = type
+        if (rooms) propertyToEdit.rooms = rooms
+        if (furnished !== undefined) propertyToEdit.furnished = furnished
+        if (genderPreference) propertyToEdit.genderPreference = genderPreference
+        if (waterSupply) propertyToEdit.waterSupply = waterSupply
+
+        if (location) {
+            try {
+                const parsedLocation = JSON.parse(location)
+                propertyToEdit.location = {
+                    type: "Point",
+                    coordinates: parsedLocation.coordinates,
+                    address: parsedLocation.address
+                }
+            }
+            catch (e) {
+                return res.status(400).json({
+                    message: "location must be valid JSON, e.g. {\"type\":\"Point\",\"coordinates\":[lng,lat],\"address\":\"...\"}"
+                })
+            }
+        }
 
         // only touch images if new files were actually uploaded in this request;
         // otherwise leave the existing images untouched
@@ -121,8 +173,7 @@ async function updateproperty(req, res) {
     catch (e) {
         console.error(e)
         return res.status(500).json({
-            message: "Internal server error"
-
+            message: e.message || "Internal server error"
         })
     }
 }
