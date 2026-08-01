@@ -1,5 +1,6 @@
 const express = require("express")
 const router = express.Router()
+const { body } = require("express-validator")
 
 const authcontroller = require("../controller/auth.controller")
 const authMiddleware = require("../middleware/auth.middleware")
@@ -17,8 +18,20 @@ function handleProfileUpload(req, res, next) {
     })
 }
 
-router.post("/register", authcontroller.registeruser)
-router.post("/login", authcontroller.loginuser)
+const registerValidation = [
+    body("name").trim().isLength({ min: 2, max: 20 }).withMessage("name must be 2–20 characters"),
+    body("email").isEmail().withMessage("valid email required"),
+    body("password").isLength({ min: 6 }).withMessage("password must be at least 6 characters"),
+    body("role").isIn(["owner", "renter"]).withMessage("role must be owner or renter")
+]
+
+const loginValidation = [
+    body("email").isEmail().withMessage("valid email required"),
+    body("password").notEmpty().withMessage("password is required")
+]
+
+router.post("/register", registerValidation, authcontroller.registeruser)
+router.post("/login", loginValidation, authcontroller.loginuser)
 router.post("/logout", authcontroller.logoutuser)
 router.put("/update-profile-picture", authMiddleware, handleProfileUpload, authcontroller.updateprofilepicture)
 
