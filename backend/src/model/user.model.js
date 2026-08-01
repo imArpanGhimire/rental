@@ -24,7 +24,8 @@ const userschema = new mongoose.Schema({
         type: String,
         enum: ["owner", "renter"],
         required: true
-    }
+    },
+    profilePicture: { type: String, default: "" }
 },
 
     { timestamps: true }
