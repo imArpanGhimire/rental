@@ -94,4 +94,31 @@ async function logoutuser(req, res) {
         message: "Logged out successfully"
     })
 }
-module.exports = { registeruser, loginuser, logoutuser }
+async function updateprofilepicture(req, res) {
+    if (!req.file) {
+        return res.status(400).json({ message: "No image uploaded" })
+    }
+
+    try {
+        const user = await usermodel.findById(req.user.id)
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        user.profilePicture = req.file.path
+        await user.save()
+
+        return res.status(200).json({
+            message: "Profile picture updated",
+            user: { id: user._id, name: user.name, email: user.email, role: user.role, profilePicture: user.profilePicture }
+        })
+    }
+    catch (e) {
+        console.log(e)
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+module.exports = { registeruser, loginuser, logoutuser, updateprofilepicture }
