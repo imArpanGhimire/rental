@@ -11,7 +11,6 @@ const propertycontroller = require("../controller/property.controller")
 
 // wraps multer/cloudinary upload so real errors are visible instead of crashing to a blank HTML page
 function handleUpload(req, res, next) {
-    console.log("HANDLE UPLOAD STARTED")
     upload.array("images", 5)(req, res, function (err) {
         if (err) {
             console.error("UPLOAD ERROR:", err)
@@ -20,7 +19,6 @@ function handleUpload(req, res, next) {
                 error: err.message || err
             })
         }
-        console.log("UPLOAD SUCCEEDED")
         next()
     })
 }
