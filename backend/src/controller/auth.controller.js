@@ -46,7 +46,7 @@ async function registeruser(req, res) {
         })
     }
     catch (e) {
-        console.log(e)
+        console.error(e)
         return res.status(500).json({
             message: "Internal server error"
         })
@@ -82,7 +82,7 @@ async function loginuser(req, res) {
         })
     }
     catch (e) {
-        console.log(e)
+        console.error(e)
         res.status(500).json({
             message: "Internal server error"
         })
@@ -115,7 +115,7 @@ async function updateprofilepicture(req, res) {
         })
     }
     catch (e) {
-        console.log(e)
+        console.error(e)
         return res.status(500).json({
             message: "Internal server error"
         })
