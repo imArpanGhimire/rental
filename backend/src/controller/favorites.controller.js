@@ -68,7 +68,7 @@ async function removeForlater(req, res) {
         }
 
         return res.status(200).json({
-            message: "Removed from favorites",
+            message: "Removed it from favorites",
             deletedfavorite,
         });
     } catch (e) {
@@ -82,8 +82,8 @@ async function removeForlater(req, res) {
 async function getForlater(req, res) {
     try {
         const renterid = req.user.id
-
         const forlater = await favoritemodel.find({ renter: renterid }).populate("property", "title description price ")
+
         return res.status(200).json({
             message: "found all the for-later",
             forlater
