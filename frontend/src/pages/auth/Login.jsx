@@ -4,10 +4,10 @@ import LoginForm from "../../features/auth/components/LoginForm.jsx";
 export default function Login() {
   return (
     <AuthLayout
-      title="Welcome back to Rentora"
-      subtitle="Log in to manage your listings or find your next home."
+      title="Welcome back"
+      subtitle="Log in to continue"
       topLinkLabel="Don't have an account?"
-      topLinkText="Sign Up"
+      topLinkText="Sign up"
       topLinkTo="/register"
     >
       <LoginForm />

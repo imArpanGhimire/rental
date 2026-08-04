@@ -5,7 +5,7 @@ export default function Register() {
   return (
     <AuthLayout
       title="Create your account"
-      subtitle="Join Rentora to list a home or find your next one."
+      subtitle="Find your next place, or list one"
       topLinkLabel="Already have an account?"
       topLinkText="Log in"
       topLinkTo="/login"

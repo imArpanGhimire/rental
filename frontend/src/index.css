@@ -3,3 +3,6 @@
 @import "./styles/base.css";
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.leaflet-container {
+  border-radius: inherit;
+}

@@ -23,20 +23,7 @@ const rentalschema = new mongoose.Schema(
 
     price: { type: Number, required: true },
 
-    rooms: { type: Number },           // number of rooms (flats/rental rooms)
-    sizeSqft: { type: Number },        // optional, not all listings will have this
-    furnished: { type: Boolean, default: false },
-    genderPreference: {
-      type: String,
-      enum: ["any", "male", "female"],
-      default: "any",
-    },
-    waterSupply: {
-      type: String,
-      enum: ["municipal", "tanker", "jar", "borewell"],
-    },
-
-    amenities: [{ type: String }],     // "WiFi", "Parking", "Attached Bathroom", etc.
+    amenities: [{ type: String }], // "WiFi", "Parking", "Attached Bathroom", etc.
 
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -44,7 +31,12 @@ const rentalschema = new mongoose.Schema(
       required: true,
     },
 
-    images: [{ type: String }],
+    images: [
+      {
+        url: { type: String, required: true },
+        publicId: { type: String, required: true }, // needed to delete from Cloudinary later
+      },
+    ],
   },
   { timestamps: true }
 );

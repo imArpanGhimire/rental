@@ -195,4 +195,4 @@ VITE_API_BASE_URL=http://localhost:5000/api
 - **New feature:** add a folder under `features/`, not new top-level folders
 - **API calls:** always go through `src/api/`, never `fetch`/`axios` directly inside a component
 - **Forms with 3+ fields:** use React Hook Form, not manual `useState` per field
-- **i18n:** no hardcoded UI strings — every label goes through `t()`, even if English-only for now
+- **i18n:** no hardcoded UI strings — every label goes through `t()`, even if English-only for now# Rentora

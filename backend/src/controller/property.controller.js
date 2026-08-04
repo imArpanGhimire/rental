@@ -1,18 +1,49 @@
 const rentalmodel = require("../model/rental.model")
+const cloudinary = require("../config/cloudinary")
+const streamifier = require("streamifier")
 
+function uploadBufferToCloudinary(buffer) {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { folder: "rentora/listings" },
+            (error, result) => {
+                if (error) return reject(error)
+                resolve(result)
+            }
+        )
+        streamifier.createReadStream(buffer).pipe(stream)
+    })
+}
+
+async function uploadimage(req, res) {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No image file provided" })
+        }
+        const result = await uploadBufferToCloudinary(req.file.buffer)
+        return res.status(201).json({
+            url: result.secure_url,
+            publicId: result.public_id,
+        })
+    }
+    catch (e) {
+        console.error(e)
+        return res.status(500).json({ message: "Image upload failed" })
+    }
+}
 
 async function createproperty(req, res) {
-    const { title, description, price, images, location } = req.body
+    const { title, description, type, price, images, location, amenities } = req.body
     const owner = req.user.id
 
-    if (!title || !description || !price || !owner || !location) {
+    if (!title || !description || !type || !price || !owner || !location) {
         return res.status(400).json({
             message: "All the information are required except images"
         })
     }
 
     try {
-        const property = await rentalmodel.create({ title, description, price, owner, location, images })
+        const property = await rentalmodel.create({ title, description, type, price, owner, location, images, amenities })
 
         return res.status(201).json({
             message: "Property has been added",
@@ -97,7 +128,7 @@ async function getoneproperty(req, res) {
 
 async function updateproperty(req, res) {
     const { id } = req.params
-    const { title, description, price, location, images } = req.body
+    const { title, description, type, price, location, images, amenities } = req.body
 
     const propertyToEdit = req.property
 
@@ -119,9 +150,11 @@ async function updateproperty(req, res) {
 
         if (title) propertyToEdit.title = title
         if (description) propertyToEdit.description = description
+        if (type) propertyToEdit.type = type
         if (price) propertyToEdit.price = price
         if (location) propertyToEdit.location = location
         if (images) propertyToEdit.images = images
+        if (amenities) propertyToEdit.amenities = amenities
 
         const updatedProperty = await propertyToEdit.save()
 
@@ -149,6 +182,17 @@ async function deleteproperty(req, res) {
             return res.status(404).json({
                 message: "Property couldn't be found to delete"
             })
+        }
+
+        // clean up Cloudinary images first so nothing orphans in storage
+        if (propToDelete.images && propToDelete.images.length > 0) {
+            await Promise.all(
+                propToDelete.images.map((img) =>
+                    cloudinary.uploader.destroy(img.publicId).catch((e) => {
+                        console.error(`Failed to delete Cloudinary image ${img.publicId}:`, e)
+                    })
+                )
+            )
         }
 
         const deletedProperty = await propToDelete.deleteOne()
@@ -192,7 +236,8 @@ async function getnearbyproperties(req, res) {
         })
     }
 
-    const maxDistance = radius ? Number(radius) * 1000 : 5000 // radius in km -> meters, default 5km
+    const maxDistance = radius ? Number(radius) * 1000 : 5000
+
     const filter = {}
 
     if (minPrice || maxPrice) {
@@ -210,14 +255,12 @@ async function getnearbyproperties(req, res) {
     const skip = (currentPage - 1) * currentLimit
 
     try {
-        // count uses filter BEFORE $near is added — $near can't be used in countDocuments
         const totalCount = await rentalmodel.countDocuments(filter)
         const totalPages = Math.ceil(totalCount / currentLimit)
 
         let nearbyproperties
 
         if (!sort || sort === "distance") {
-            // distance mode: use $near, auto-sorted by distance
             filter.location = {
                 $near: {
                     $geometry: {
@@ -229,7 +272,6 @@ async function getnearbyproperties(req, res) {
             }
             nearbyproperties = await rentalmodel.find(filter).skip(skip).limit(currentLimit).populate("owner", "name")
         } else {
-            // price/newest/oldest mode: no $near, just sort
             let sortOption = {}
             if (sort === "price_asc") sortOption.price = 1
             else if (sort === "price_desc") sortOption.price = -1
@@ -257,4 +299,66 @@ async function getnearbyproperties(req, res) {
     }
 }
 
-module.exports = { createproperty, getallproperties, getoneproperty, updateproperty, deleteproperty, getmyproperties, getnearbyproperties }
+module.exports = { createproperty, getallproperties, getoneproperty, updateproperty, deleteproperty, getmyproperties, getnearbyproperties, uploadimage }
+
+async function getpropertiesinpolygon(req, res) {
+    const { polygon, minPrice, maxPrice, search, sort, page, limit } = req.body
+
+    if (!polygon || polygon.type !== "Polygon" || !Array.isArray(polygon.coordinates)) {
+        return res.status(400).json({
+            message: "A valid GeoJSON Polygon is required"
+        })
+    }
+
+    const filter = {
+        location: {
+            $geoWithin: {
+                $geometry: polygon
+            }
+        }
+    }
+
+    if (minPrice || maxPrice) {
+        filter.price = {}
+        if (minPrice) filter.price.$gte = Number(minPrice)
+        if (maxPrice) filter.price.$lte = Number(maxPrice)
+    }
+
+    if (search) {
+        filter.title = { $regex: search, $options: "i" }
+    }
+
+    let sortOption = {}
+    if (sort === "price_asc") sortOption.price = 1
+    else if (sort === "price_desc") sortOption.price = -1
+    else if (sort === "newest") sortOption.createdAt = -1
+    else if (sort === "oldest") sortOption.createdAt = 1
+
+    const currentPage = Number(page) || 1
+    const currentLimit = Number(limit) || 20
+    const skip = (currentPage - 1) * currentLimit
+
+    try {
+        const properties = await rentalmodel
+            .find(filter)
+            .sort(sortOption)
+            .skip(skip)
+            .limit(currentLimit)
+            .populate("owner", "name")
+        const totalCount = await rentalmodel.countDocuments(filter)
+        const totalPages = Math.ceil(totalCount / currentLimit)
+
+        return res.status(200).json({
+            properties,
+            pagination: { currentPage, totalPages, totalCount, limit: currentLimit }
+        })
+    }
+    catch (e) {
+        console.error(e)
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+module.exports.getpropertiesinpolygon = getpropertiesinpolygon

@@ -32,10 +32,8 @@ async function registeruser(req, res) {
                 message: "user with this email already exists"
             })
         }
-        // password hashing
         const hash = await bcrypt.hash(password, 10)
         const user = await usermodel.create({ name, password: hash, email, role })
-        // added role to token payload so req.user.role is available in protected routes
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" })
         res.cookie("token", token, cookieOptions)
         return res.status(201).json({
@@ -54,7 +52,6 @@ async function loginuser(req, res) {
     try {
         const email = req.body.email?.trim().toLowerCase()
         const { password } = req.body
-        //todo email psw input check
         if (!email || !password) {
             return res.status(400).json({ message: "Email and password are required" });
         }
@@ -64,14 +61,12 @@ async function loginuser(req, res) {
                 message: "Invalid credentials"
             })
         }
-        // todo     password verify
         const pswcheck = await bcrypt.compare(password, user.password)
         if (!pswcheck) {
             return res.status(401).json({
                 message: "Invalid credentials"
             })
         }
-        // added role to token payload so req.user.role is available in protected routes
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" })
         res.cookie("token", token, cookieOptions)
         return res.status(200).json({
@@ -92,4 +87,23 @@ async function logoutuser(req, res) {
         message: "Logged out successfully"
     })
 }
-module.exports = { registeruser, loginuser, logoutuser }
+async function getme(req, res) {
+    try {
+        const user = await usermodel.findById(req.user.id).select("-password")
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+        return res.status(200).json({
+            user: { id: user._id, name: user.name, email: user.email, role: user.role }
+        })
+    }
+    catch (e) {
+        console.log(e)
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+module.exports = { registeruser, loginuser, logoutuser, getme }
