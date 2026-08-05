@@ -1,18 +1,20 @@
 /* frontend/src/index.css */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 @theme {
   --color-ink: #14141a;
-  --color-ivory: #f7f4ee;
-  --color-bg: #ffffff;
+  --color-ivory: #efe8d8;
+  --color-bg: #fffcf5;
   --color-text: #14141a;
-  --color-stone: #e5e1d8;
+  --color-stone: #e2dccc;
   --color-brass: #b08b57;
   --color-brass-light: #f1e6d3;
   --font-display: "Georgia", "Times New Roman", serif;
 
   --ease-honey: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-honey-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-honey-slow: cubic-bezier(0.19, 1, 0.22, 1);
   --animate-bubble-drop: bubble-drop 480ms var(--ease-honey-soft) both;
   --animate-hint-drop: hint-drop 280ms var(--ease-honey-soft) both;
   --animate-draw-stroke: draw-stroke 480ms var(--ease-honey-soft) forwards;
@@ -31,6 +33,16 @@
 @keyframes draw-stroke {
   from { stroke-dashoffset: 2000; }
   to { stroke-dashoffset: 0; }
+}
+
+@keyframes panel-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .app-backdrop {
@@ -400,4 +412,153 @@
   padding: 9px 16px;
   font-size: 13px;
   text-decoration: none;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  color: var(--color-text);
+}
+
+* {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 320ms;
+  transition-timing-function: var(--ease-honey);
+}
+
+button, a {
+  transition-duration: 280ms;
+}
+
+.honey-lift {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 420ms;
+  transition-timing-function: var(--ease-honey-soft);
+}
+
+.logo__name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.filter-bar__search--highlight {
+  border-color: var(--color-stone);
+  transition: border-color 150ms var(--ease-honey), box-shadow 150ms var(--ease-honey);
+}
+
+.filter-bar__search--highlight:focus-within {
+  border-color: var(--color-brass);
+  box-shadow: 0 0 0 3px var(--color-brass-light);
+}
+
+.filter-dropdown--wide {
+  min-width: 260px;
+}
+
+.filter-dropdown__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+}
+
+body,
+input,
+button,
+textarea,
+select {
+  font-family: var(--font-sans);
+}
+
+.topbar {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: none;
+  box-shadow: 0 1px 0 rgba(20, 20, 26, 0.06), 0 12px 24px -16px rgba(20, 20, 26, 0.12);
+  padding: 14px 32px;
+}
+
+.topbar__nav {
+  display: flex;
+  gap: 2px;
+  background: var(--color-ivory);
+  padding: 4px;
+  border-radius: 9999px;
+}
+
+.topbar__link {
+  padding: 9px 18px;
+  border-radius: 9999px;
+  opacity: 0.6;
+  font-weight: 500;
+  transition: background-color 200ms var(--ease-honey), color 200ms var(--ease-honey),
+    box-shadow 200ms var(--ease-honey), opacity 200ms var(--ease-honey);
+}
+
+.topbar__link:hover {
+  opacity: 1;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(20, 20, 26, 0.08);
+}
+
+.topbar__link.is-active {
+  opacity: 1;
+  background: var(--color-ink);
+  color: var(--color-ivory);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(20, 20, 26, 0.18);
+}
+
+.topbar__user {
+  gap: 16px;
+}
+
+.topbar__avatar {
+  width: 34px;
+  height: 34px;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px var(--color-stone);
+}
+
+.topbar__username {
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.topbar__logout {
+  padding: 7px 12px;
+  border-radius: 9999px;
+}
+
+.topbar__logout:hover {
+  opacity: 1;
+  background: var(--color-ivory);
+}
+
+.topbar__bell {
+  transition: transform 200ms var(--ease-honey), background-color 200ms var(--ease-honey);
+}
+
+.topbar__bell:hover {
+  transform: translateY(-1px);
+  background: var(--color-brass-light);
+}
+
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-text);
+  transition: background-color 9999s ease-in-out 0s;
+  box-shadow: 0 0 0 1000px var(--color-bg) inset;
 }
