@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/ui/Icon';
+import DropdownMenu from '../../../components/ui/DropdownMenu';
 
 export default function FeaturedListingPanel({ listings = [], isLoading }) {
   const [selected, setSelected] = useState(null);
@@ -93,12 +94,31 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
               >
                 Show contacts <Icon name="arrowRight" size={16} />
               </button>
-              <button
-                className="w-11 flex items-center justify-center rounded-full border border-stone hover:bg-ivory transition-colors duration-200"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Icon name="dots" size={16} />
-              </button>
+              <DropdownMenu
+                trigger={
+                  <button
+                    className="w-11 h-11 flex items-center justify-center rounded-full border border-stone hover:bg-ivory transition-colors duration-200"
+                    aria-label="More actions"
+                  >
+                    <Icon name="dots" size={16} />
+                  </button>
+                }
+                items={[
+                  {
+                    label: "Copy link",
+                    onSelect: () => {
+                      navigator.clipboard.writeText(`${window.location.origin}/listings/${selected._id}`);
+                    },
+                  },
+                  {
+                    label: "Report listing",
+                    danger: true,
+                    onSelect: () => {
+                      console.log("report listing", selected._id);
+                    },
+                  },
+                ]}
+              />
             </div>
           </div>
         </div>

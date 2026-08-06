@@ -109,7 +109,7 @@ async function getallproperties(req, res) {
 async function getoneproperty(req, res) {
     const { id } = req.params
     try {
-        const property = await rentalmodel.findById(id).populate("owner", "name")
+        const property = await rentalmodel.findById(id).populate("owner", "name phone")
 
         if (!property) {
             return res.status(404).json({

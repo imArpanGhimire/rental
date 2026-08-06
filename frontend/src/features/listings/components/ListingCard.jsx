@@ -6,12 +6,14 @@ export default function ListingCard({ listing, selected, onClick, onToggleFavori
     <button className={`listing-card ${selected ? 'is-selected' : ''}`} onClick={onClick}>
       <div className="listing-card__image">
         <img src={listing.images?.[0]} alt={listing.title} loading="lazy" />
-        <span
-          className={`listing-card__heart ${isFavorited ? 'is-active' : ''}`}
-          onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(listing._id); }}
-        >
-          <Icon name="heart" filled={isFavorited} size={16} />
-        </span>
+        {onToggleFavorite && (
+          <span
+            className={`listing-card__heart ${isFavorited ? 'is-active' : ''}`}
+            onClick={(e) => { e.stopPropagation(); onToggleFavorite(listing._id); }}
+          >
+            <Icon name="heart" filled={isFavorited} size={16} />
+          </span>
+        )}
       </div>
       <div className="listing-card__body">
         <div className="listing-card__price-row">

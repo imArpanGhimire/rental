@@ -12,7 +12,9 @@ import ReviewCard from "../../features/reviews/components/ReviewCard.jsx";
 import ReviewForm from "../../features/reviews/components/ReviewForm.jsx";
 import { useReviews, useCreateReview, useDeleteReview } from "../../features/reviews/hooks/useReviews.js";
 import { useListing } from "../../features/listings/hooks/useListing.js";
+import { useFavorites, useToggleFavorite } from "../../features/favorites/hooks/useFavorites.js";
 import { getNearbyProperties } from "../../api/listings.api.js";
+import { createVisitRequest } from "../../api/visitRequests.api.js";
 import { useAuth } from "../../features/auth/AuthContext.jsx";
 import { formatPrice } from "../../utils/formatPrice.js";
 
@@ -33,11 +35,28 @@ function VisitRequestModal({ listing, onClose }) {
   const [time, setTime] = useState("");
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("visit request", { listingId: listing._id, date, time, message });
-    setSent(true);
+    setSubmitError(null);
+    setIsSubmitting(true);
+    const composedMessage = [
+      date ? `Preferred date: ${date}` : null,
+      time ? `Preferred time: ${time}` : null,
+      message?.trim() || null,
+    ]
+      .filter(Boolean)
+      .join(" | ");
+    try {
+      await createVisitRequest({ propertyId: listing._id, message: composedMessage });
+      setSent(true);
+    } catch (err) {
+      setSubmitError(err?.response?.data?.message || "Couldn't send request. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -101,8 +120,18 @@ function VisitRequestModal({ listing, onClose }) {
               />
             </label>
 
-            <button type="submit" className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full mt-1">
-              Send request
+            {submitError && (
+              <p role="alert" className="text-sm text-red-600">
+                {submitError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full mt-1 disabled:opacity-60"
+            >
+              {isSubmitting ? "Sending..." : "Send request"}
             </button>
           </form>
         )}
@@ -117,6 +146,8 @@ export default function ListingDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: listing, isLoading, error } = useListing(id);
+  const { favoriteIds } = useFavorites({ enabled: user?.role === "renter" });
+  const { toggle } = useToggleFavorite();
   const [expanded, setExpanded] = useState(false);
   const [visitModalOpen, setVisitModalOpen] = useState(false);
 
@@ -175,7 +206,7 @@ export default function ListingDetail() {
     <AppShell>
       <div className="max-w-7xl mx-auto pb-24 lg:pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.15fr] gap-6 lg:gap-8">
-          <div className="lg:sticky lg:top-6 h-[420px] lg:h-[calc(100vh-96px)]">
+          <div className="lg:sticky lg:top-6 lg:self-start h-[420px] lg:h-[calc(100vh-96px)]">
             {coordinates ? (
               <ListingMap
                 coordinates={coordinates}
@@ -200,12 +231,16 @@ export default function ListingDetail() {
                 >
                   <Share2 size={16} />
                 </button>
-                <button
-                  className="w-10 h-10 rounded-full border border-stone flex items-center justify-center text-text hover:bg-brass-light transition-colors"
-                  aria-label="Save listing"
-                >
-                  <Heart size={16} />
-                </button>
+                {user?.role === "renter" && (
+                  <button
+                    type="button"
+                    onClick={() => toggle(listing._id, favoriteIds.includes(listing._id))}
+                    className={`w-10 h-10 rounded-full border border-stone flex items-center justify-center transition-colors ${favoriteIds.includes(listing._id) ? "bg-brass-light text-brass" : "text-text hover:bg-brass-light"}`}
+                    aria-label="Save listing"
+                  >
+                    <Heart size={16} fill={favoriteIds.includes(listing._id) ? "currentColor" : "none"} />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -273,13 +308,25 @@ export default function ListingDetail() {
                 {formatPrice(listing.price)}
                 <span className="text-sm text-text/50 font-normal"> /Month</span>
               </p>
-              <button
-                type="button"
-                onClick={() => setVisitModalOpen(true)}
-                className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full hover:opacity-90 transition-opacity shrink-0"
-              >
-                {t("listing.requestVisit", "Request to visit")}
-              </button>
+              {!isOwnerOfThis && (
+                <div className="flex items-center gap-2 shrink-0">
+                  {listing.owner?.phone && (
+                    <a
+                      href={`tel:${listing.owner.phone}`}
+                      className="border border-stone text-text text-sm font-medium px-5 py-3 rounded-full hover:bg-ivory transition-colors"
+                    >
+                      {t("listing.contact", "Contact")} · {listing.owner.phone}
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setVisitModalOpen(true)}
+                    className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full hover:opacity-90 transition-opacity"
+                  >
+                    {t("listing.requestVisit", "Request to visit")}
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="pt-2 border-t border-stone">
@@ -330,13 +377,15 @@ export default function ListingDetail() {
           {formatPrice(listing.price)}
           <span className="text-xs text-text/50 font-normal block leading-none">/Month</span>
         </p>
-        <button
-          type="button"
-          onClick={() => setVisitModalOpen(true)}
-          className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full flex-1"
-        >
-          {t("listing.bookNow", "Book Now")}
-        </button>
+        {!isOwnerOfThis && (
+          <button
+            type="button"
+            onClick={() => setVisitModalOpen(true)}
+            className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full flex-1"
+          >
+            {t("listing.bookNow", "Book Now")}
+          </button>
+        )}
       </div>
     </AppShell>
   );

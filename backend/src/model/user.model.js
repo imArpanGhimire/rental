@@ -23,6 +23,12 @@ const userschema = new mongoose.Schema({
         type: String,
         enum: ["owner", "renter"],
         required: true
+    },
+    phone: {
+        type: String,
+        required: true,
+        trim: true,
+        match: [/^9[678]\d{8}$/, "Enter a valid 10-digit Nepali mobile number"]
     }
 },
 

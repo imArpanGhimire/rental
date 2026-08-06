@@ -3,17 +3,21 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const cookieOptions = {
     httpOnly: true,  //?  js cannot access this ccokie from browser
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true,       // ngrok always serves over HTTPS, so this must be true
+    sameSite: "none",   // required for cross-origin cookies (frontend + backend on different ngrok domains)
     maxAge: 7 * 24 * 60 * 60 * 1000,  // cookie ko expire hune time
 }
 async function registeruser(req, res) {
     try {
         const name = req.body.name?.trim()
         const email = req.body.email?.trim().toLowerCase()
+        const phone = req.body.phone?.trim()
         const { password, role } = req.body
-        if (!name || !email || !password || !role) {
+        if (!name || !email || !password || !role || !phone) {
             return res.status(400).json({ message: "All the fields should be filled" })
+        }
+        if (!/^9[678]\d{8}$/.test(phone)) {
+            return res.status(400).json({ message: "Enter a valid 10-digit Nepali mobile number" });
         }
         if (name.length < 2 || name.length > 20) {
             return res.status(400).json({ message: "name must be 2–20 characters" });
@@ -33,12 +37,12 @@ async function registeruser(req, res) {
             })
         }
         const hash = await bcrypt.hash(password, 10)
-        const user = await usermodel.create({ name, password: hash, email, role })
+        const user = await usermodel.create({ name, password: hash, email, role, phone })
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" })
         res.cookie("token", token, cookieOptions)
         return res.status(201).json({
             message: "user created succesfully",
-            user: { id: user._id, name: user.name, email: user.email, role: user.role }
+            user: { id: user._id, name: user.name, email: user.email, role: user.role, phone: user.phone }
         })
     }
     catch (e) {
@@ -71,7 +75,7 @@ async function loginuser(req, res) {
         res.cookie("token", token, cookieOptions)
         return res.status(200).json({
             message: "Logged in successfully",
-            user: { id: user._id, name: user.name, email: user.email, role: user.role }
+            user: { id: user._id, name: user.name, email: user.email, role: user.role, phone: user.phone }
         })
     }
     catch (e) {
@@ -96,7 +100,7 @@ async function getme(req, res) {
             })
         }
         return res.status(200).json({
-            user: { id: user._id, name: user.name, email: user.email, role: user.role }
+            user: { id: user._id, name: user.name, email: user.email, role: user.role, phone: user.phone }
         })
     }
     catch (e) {
