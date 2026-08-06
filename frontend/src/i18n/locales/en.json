@@ -1,0 +1,37 @@
+{
+  "auth": {
+    "login": {
+      "title": "Log in"
+    },
+    "register": {
+      "title": "Create an account"
+    }
+  },
+  "listings": {
+    "filters": {
+      "priceRange": "Price range"
+    }
+  },
+  "dashboard": {
+  "loading": "Loading...",
+  "error": "Something went wrong.",
+  "retry": "Retry",
+  "viewAll": "View all",
+  "browse": "Browse listings",
+  "renter": {
+    "title": "Renter Dashboard",
+    "savedTitle": "Saved Listings",
+    "savedCount": "Saved listings",
+    "recent": "Recently saved",
+    "empty": "You haven't saved any listings yet."
+  },
+  "owner": {
+    "title": "Owner Dashboard",
+    "myListingsTitle": "My Listings",
+    "totalListings": "Total listings",
+    "newListing": "New listing",
+    "recent": "Recent listings",
+    "empty": "You haven't posted any listings yet."
+  }
+}
+}
