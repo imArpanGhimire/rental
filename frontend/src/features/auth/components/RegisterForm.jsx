@@ -10,6 +10,7 @@ export default function RegisterForm() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     role: "renter",
   });
@@ -49,6 +50,15 @@ export default function RegisterForm() {
         name="email"
         value={form.email}
         onChange={handleChange}
+        required
+      />
+      <AuthField
+        label="Phone Number"
+        type="tel"
+        name="phone"
+        value={form.phone}
+        onChange={handleChange}
+        placeholder="98XXXXXXXX"
         required
       />
       <PasswordInput

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, LogOut, X, ChevronDown } from 'lucide-react';
 import Logo from '../ui/Logo';
@@ -6,9 +7,9 @@ import Icon from '../ui/Icon';
 import { useAuth } from '../../features/auth/AuthContext.jsx';
 
 function LogoutConfirmModal({ onConfirm, onCancel }) {
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/40 backdrop-blur-sm px-4 honey-lift">
-      <div className="bg-bg rounded-2xl w-full max-w-sm p-6 relative">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/50 backdrop-blur-md px-4 animate-[overlay-fade-in_220ms_var(--ease-honey-soft)_both]">
+      <div className="bg-bg rounded-2xl w-full max-w-sm p-6 relative shadow-[0_24px_64px_rgba(20,20,26,0.28)] animate-[modal-pop-in_260ms_var(--ease-honey-soft)_both]">
         <button
           onClick={onCancel}
           className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-ivory transition-colors"
@@ -35,7 +36,8 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

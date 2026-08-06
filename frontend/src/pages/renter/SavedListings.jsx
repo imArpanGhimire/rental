@@ -3,7 +3,7 @@ import AppShell from "../../components/layout/AppShell.jsx";
 import Sidebar from "../../components/layout/Sidebar.jsx";
 import ListingCard from "../../features/listings/components/ListingCard.jsx";
 import { StaggerGrid, StaggerItem } from "../../components/ui/StaggerGrid.jsx";
-import { useFavorites } from "../../features/favorites/hooks/useFavorites.js";
+import { useFavorites, useToggleFavorite } from "../../features/favorites/hooks/useFavorites.js";
 
 const links = [
   { to: "/renter", label: "Overview" },
@@ -12,8 +12,8 @@ const links = [
 
 export default function SavedListings() {
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch } = useFavorites();
-  const listings = data?.listings ?? [];
+  const { listings, isLoading, isError, refetch } = useFavorites();
+  const { toggle } = useToggleFavorite();
 
   return (
     <AppShell sidebar={<Sidebar links={links} />}>
@@ -41,7 +41,11 @@ export default function SavedListings() {
       <StaggerGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {listings.map((listing) => (
           <StaggerItem key={listing._id}>
-            <ListingCard listing={listing} />
+            <ListingCard
+              listing={listing}
+              isFavorited={true}
+              onToggleFavorite={(id) => toggle(id, true)}
+            />
           </StaggerItem>
         ))}
       </StaggerGrid>

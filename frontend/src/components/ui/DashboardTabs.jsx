@@ -4,6 +4,16 @@ export default function DashboardTabs({ tabs = [], children }) {
   const [active, setActive] = useState(tabs[0]?.id);
   const activeTab = tabs.find((t) => t.id === active);
 
+  function renderContent() {
+    if (activeTab?.content !== undefined) {
+      return activeTab.content;
+    }
+    if (activeTab?.id === tabs[0]?.id) {
+      return children;
+    }
+    return <p className="text-sm text-text/50 py-8 text-center">Coming soon.</p>;
+  }
+
   return (
     <div>
       <div className="flex gap-6 border-b border-stone mb-4 overflow-x-auto no-scrollbar">
@@ -22,11 +32,7 @@ export default function DashboardTabs({ tabs = [], children }) {
         ))}
       </div>
 
-      {activeTab?.id === tabs[0]?.id ? (
-        children
-      ) : (
-        <p className="text-sm text-text/50 py-8 text-center">Coming soon.</p>
-      )}
+      {renderContent()}
     </div>
   );
 }
