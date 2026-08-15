@@ -1,11 +1,17 @@
-import { formatAddress } from '../../../utils/formatAddress';
-import { useState } from 'react';
-import PolygonSearchMap from './PolygonSearchMap';
-import ListingCard from './ListingCard';
-import Icon from '../../../components/ui/Icon';
-import 'leaflet/dist/leaflet.css';
+import { formatAddress } from "../../../utils/formatAddress";
+import { useState } from "react";
+import PolygonSearchMap from "./PolygonSearchMap";
+import ListingCard from "./ListingCard";
+import Icon from "../../../components/ui/Icon";
+import "leaflet/dist/leaflet.css";
 
-export default function ListingsMapPanel({ listings, selected, onSelect, favorites = [], onToggleFavorite }) {
+export default function ListingsMapPanel({
+  listings,
+  selected,
+  onSelect,
+  favorites = [],
+  onToggleFavorite,
+}) {
   const [center] = useState([27.7172, 85.324]);
 
   return (
@@ -29,7 +35,11 @@ export default function ListingsMapPanel({ listings, selected, onSelect, favorit
           </div>
 
           <div className="map-panel__hero-wrap">
-            <img className="map-panel__hero" src={selected.images?.[0]} alt={selected.title} />
+            <img
+              className="map-panel__hero"
+              src={selected.images?.[0]?.url}
+              alt={selected.title}
+            />
           </div>
 
           <h2 className="map-panel__title">{selected.title}</h2>
@@ -38,9 +48,18 @@ export default function ListingsMapPanel({ listings, selected, onSelect, favorit
           </p>
 
           <div className="map-panel__specs">
-            <span><Icon name="bed" size={15} />{selected.rooms}</span>
-            <span><Icon name="bath" size={15} />{selected.bathrooms ?? 1}</span>
-            <span><Icon name="ruler" size={15} />{selected.sizeSqft} m²</span>
+            <span>
+              <Icon name="bed" size={15} />
+              {selected.rooms}
+            </span>
+            <span>
+              <Icon name="bath" size={15} />
+              {selected.bathrooms ?? 1}
+            </span>
+            <span>
+              <Icon name="ruler" size={15} />
+              {selected.sizeSqft} m²
+            </span>
           </div>
 
           <p className="map-panel__desc">{selected.description}</p>
