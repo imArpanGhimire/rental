@@ -81,6 +81,7 @@ async function seed() {
       email: "owner.seed@rentora.test",
       password: hash,
       role: "owner",
+      phone: "9812345678",
     });
     console.log("Created seed owner:", owner.email);
   } else {
