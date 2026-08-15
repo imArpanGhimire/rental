@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 
 const variants = {
-  primary: "bg-brass text-[#F7F4EE] hover:opacity-90",
-  outline: "border border-text text-text hover:bg-brass-light hover:text-ink hover:border-brass",
-  ghost: "text-text hover:bg-brass-light hover:text-ink",
+  primary: "bg-brass text-white hover:opacity-90",
+  outline:
+    "border border-stone text-text hover:bg-brass-light hover:text-brass hover:border-brass",
+  ghost: "text-text hover:bg-brass-light hover:text-brass",
   dark: "bg-ink text-ivory hover:opacity-90",
 };
 
