@@ -1,16 +1,26 @@
 /* frontend/src/index.css */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
+/*
+  Design tokens — "Signal & Paper"
+  Grounded in the app's core interaction: map pins + list search.
+  Neutral paper/ink base so listing photos stay the focus; one confident
+  teal accent ties the map price-pins, active nav state, and CTAs together.
+  A muted brick tone (Kathmandu's own brick architecture) is reserved
+  strictly for property-type badges, so it never competes with the accent.
+*/
 @theme {
-  --color-ink: #14141a;
-  --color-ivory: #efe8d8;
-  --color-bg: #fffcf5;
-  --color-text: #14141a;
-  --color-stone: #e2dccc;
-  --color-brass: #b08b57;
-  --color-brass-light: #f1e6d3;
-  --font-display: "Georgia", "Times New Roman", serif;
+  --color-ink: #14171f;
+  --color-ivory: #edece6;
+  --color-bg: #faf9f6;
+  --color-text: #14171f;
+  --color-stone: #e2e0d8;
+  --color-brass: #0f7a6c;
+  --color-brass-light: #e2f1ee;
+  --color-brick: #b5502e;
+  --color-brick-light: #f4e6df;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --ease-honey: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-honey-soft: cubic-bezier(0.16, 1, 0.3, 1);
@@ -21,28 +31,61 @@
 }
 
 @keyframes bubble-drop {
-  from { opacity: 0; transform: translate(-50%, -80%) scale(0.7); }
-  to { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+  from {
+    opacity: 0;
+    transform: translate(-50%, -80%) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1);
+  }
 }
 
 @keyframes hint-drop {
-  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 @keyframes draw-stroke {
-  from { stroke-dashoffset: 2000; }
-  to { stroke-dashoffset: 0; }
+  from {
+    stroke-dashoffset: 2000;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes panel-fade-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes pop-in {
-  from { opacity: 0; transform: translateY(6px) scale(0.94); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .app-backdrop {
@@ -138,9 +181,9 @@
 
 .logo__name {
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .filter-bar {
@@ -281,6 +324,7 @@
   border-radius: 8px;
   font-size: 13px;
   cursor: pointer;
+  gap: 8px;
 }
 
 .filter-dropdown__option:hover {
@@ -377,19 +421,6 @@
   text-decoration: none;
 }
 
-.topbar__avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 9999px;
-  background: var(--color-brass-light);
-  color: var(--color-brass);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-}
-
 .topbar__logout {
   display: flex;
   align-items: center;
@@ -430,7 +461,8 @@ body {
   transition-timing-function: var(--ease-honey);
 }
 
-button, a {
+button,
+a {
   transition-duration: 280ms;
 }
 
@@ -438,13 +470,6 @@ button, a {
   transition-property: color, background-color, border-color, box-shadow, transform, opacity;
   transition-duration: 420ms;
   transition-timing-function: var(--ease-honey-soft);
-}
-
-.logo__name {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
 }
 
 .filter-bar__search--highlight {
@@ -459,17 +484,6 @@ button, a {
 
 .filter-dropdown--wide {
   min-width: 260px;
-}
-
-.filter-dropdown__option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-@theme {
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
 }
 
 body,
@@ -527,6 +541,14 @@ select {
 .topbar__avatar {
   width: 34px;
   height: 34px;
+  border-radius: 9999px;
+  background: var(--color-brass-light);
+  color: var(--color-brass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
   box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px var(--color-stone);
 }
 
@@ -545,15 +567,10 @@ select {
   background: var(--color-ivory);
 }
 
-.topbar__bell {
-  transition: transform 200ms var(--ease-honey), background-color 200ms var(--ease-honey);
-}
-
 .topbar__bell:hover {
   transform: translateY(-1px);
   background: var(--color-brass-light);
 }
-
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -564,11 +581,23 @@ input:-webkit-autofill:focus {
 }
 
 @keyframes overlay-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes modal-pop-in {
-  from { opacity: 0; transform: scale(0.94) translateY(8px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
