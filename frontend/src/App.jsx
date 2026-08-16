@@ -11,60 +11,64 @@ import CreateListing from "./pages/owner/CreateListing.jsx";
 import RenterDashboard from "./pages/renter/Dashboard.jsx";
 import SavedListings from "./pages/renter/SavedListings.jsx";
 import ProtectedRoute from "./components/routing/ProtectedRoute.jsx";
+import Footer from "./components/Footer.jsx";
 
 function App() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Browse />} />
-        <Route path="/listings/:id" element={<ListingDetail />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgetPassword />} />
-        <Route
-          path="/owner"
-          element={
-            <ProtectedRoute allowedRoles={["owner"]}>
-              <OwnerDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/owner/listings"
-          element={
-            <ProtectedRoute allowedRoles={["owner"]}>
-              <MyListings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/owner/listings/new"
-          element={
-            <ProtectedRoute allowedRoles={["owner"]}>
-              <CreateListing />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/renter"
-          element={
-            <ProtectedRoute allowedRoles={["renter"]}>
-              <RenterDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/renter/saved"
-          element={
-            <ProtectedRoute allowedRoles={["renter"]}>
-              <SavedListings />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </AnimatePresence>
+    <>
+      <AnimatePresence mode="wait" initial={false}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Browse />} />
+          <Route path="/listings/:id" element={<ListingDetail />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgetPassword />} />
+          <Route
+            path="/owner"
+            element={
+              <ProtectedRoute allowedRoles={["owner"]}>
+                <OwnerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner/listings"
+            element={
+              <ProtectedRoute allowedRoles={["owner"]}>
+                <MyListings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner/listings/new"
+            element={
+              <ProtectedRoute allowedRoles={["owner"]}>
+                <CreateListing />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/renter"
+            element={
+              <ProtectedRoute allowedRoles={["renter"]}>
+                <RenterDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/renter/saved"
+            element={
+              <ProtectedRoute allowedRoles={["renter"]}>
+                <SavedListings />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AnimatePresence>
+      <Footer />
+    </>
   );
 }
 
