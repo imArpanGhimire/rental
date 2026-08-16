@@ -25,7 +25,7 @@ import {
 
 function LogoutConfirmModal({ onConfirm, onCancel }) {
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/50 backdrop-blur-md px-4">
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-ink/50 backdrop-blur-md px-4">
       <div className="bg-bg rounded-2xl w-full max-w-sm p-6 relative shadow-[0_24px_64px_rgba(20,20,26,0.28)]">
         <button
           onClick={onCancel}
@@ -96,7 +96,7 @@ function NotificationPanel({
   onOpenNotification,
 }) {
   return (
-    <div className="absolute right-0 top-full mt-3 w-[360px] max-w-[calc(100vw-24px)] bg-bg border border-stone rounded-2xl shadow-[0_20px_60px_rgba(20,20,26,0.18)] overflow-hidden z-[70]">
+    <div className="absolute right-0 top-full mt-3 w-[360px] max-w-[calc(100vw-24px)] bg-bg border border-stone rounded-2xl shadow-[0_20px_60px_rgba(20,20,26,0.18)] overflow-hidden z-[10000]">
       <div className="px-4 py-3.5 border-b border-stone flex items-center justify-between gap-3">
         <div>
           <h3 className="font-display text-base text-text">Notifications</h3>
@@ -375,6 +375,7 @@ export default function TopBar() {
     next.add(notification.key);
 
     setSeenKeys(next);
+
     saveSeenNotificationKeys(userId, next);
 
     setNotificationsOpen(false);
@@ -443,222 +444,217 @@ export default function TopBar() {
     : "";
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-[0_1px_0_rgba(20,20,26,0.06),0_12px_24px_-16px_rgba(20,20,26,0.12)]">
-      {/* =========================================================
-          MAIN NAVBAR
-      ========================================================= */}
-      <div className="flex items-center h-[68px] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-[82px]">
-        {/* LOGO */}
-        <div className="flex-1 flex items-center min-w-0">
-          <NavLink
-            to="/"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 text-ink no-underline shrink-0"
-          >
-            <Logo />
-          </NavLink>
-        </div>
-
-        {/* =====================================================
-            DESKTOP NAV
-        ===================================================== */}
-        <nav className="hidden md:flex items-center gap-0.5 bg-ivory p-1 rounded-full shrink-0">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                `px-3 lg:px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap no-underline transition-all duration-200 ${
-                  isActive
-                    ? "bg-ink text-ivory font-semibold shadow-[0_4px_12px_rgba(20,20,26,0.18)]"
-                    : "text-ink/60 hover:text-ink hover:bg-white hover:shadow-[0_1px_3px_rgba(20,20,26,0.08)]"
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* =====================================================
-            RIGHT SIDE
-        ===================================================== */}
-        <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3 min-w-0">
-          {/* LOADING */}
-          {isLoading ? (
-            <>
-              <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
-
-              <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
-            </>
-          ) : isAuthenticated ? (
-            <>
-              {/* =================================================
-                  NOTIFICATIONS
-              ================================================= */}
-              <div className="relative" ref={notificationRef}>
-                <button
-                  type="button"
-                  aria-label="Notifications"
-                  aria-expanded={notificationsOpen}
-                  onClick={() => {
-                    setNotificationsOpen((value) => !value);
-
-                    setMenuOpen(false);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`relative flex items-center justify-center w-9 h-9 rounded-full border transition-all duration-200 ${
-                    notificationsOpen
-                      ? "border-brass bg-brass-light text-brass"
-                      : "border-stone text-ink hover:bg-brass-light hover:-translate-y-0.5"
-                  }`}
-                >
-                  <Bell size={16} />
-
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#c0533e] text-white text-[9px] font-bold flex items-center justify-center border-2 border-white">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </button>
-
-                {notificationsOpen && (
-                  <NotificationPanel
-                    notifications={notifications}
-                    unreadCount={unreadCount}
-                    onMarkAllRead={markAllNotificationsRead}
-                    onOpenNotification={openNotification}
-                  />
-                )}
-              </div>
-
-              {/* =================================================
-                  USER MENU
-              ================================================= */}
-              <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => {
-                    setMenuOpen((value) => !value);
-
-                    setMobileMenuOpen(false);
-                    setNotificationsOpen(false);
-                  }}
-                  title={user?.name}
-                  className="flex items-center gap-1 pl-0.5 pr-1.5 py-0.5 rounded-full hover:bg-ivory transition-colors"
-                >
-                  <span className="flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-ink bg-gradient-to-br from-brass-light to-brass shadow-[0_0_0_2px_#ffffff,0_0_0_3px_var(--color-stone)]">
-                    {initials}
-                  </span>
-
-                  <ChevronDown
-                    size={14}
-                    className={`hidden sm:block text-ink/40 transition-transform duration-200 ${
-                      menuOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {menuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-bg border border-stone rounded-2xl shadow-lg overflow-hidden z-[80]">
-                    <div className="px-4 py-3 border-b border-stone">
-                      <p className="text-sm font-semibold text-ink truncate">
-                        {user?.name}
-                      </p>
-
-                      <p className="text-xs text-ink/50 capitalize">{role}</p>
-                    </div>
-
-                    <NavLink
-                      to={`/${role}`}
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-ivory transition-colors"
-                    >
-                      <LayoutDashboard size={15} className="text-ink/50" />
-                      Dashboard
-                    </NavLink>
-
-                    <button
-                      onClick={() => {
-                        setMenuOpen(false);
-                        setConfirmOpen(true);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#c0533e] hover:bg-red-50 transition-colors"
-                    >
-                      <LogOut size={15} />
-                      Log out
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* =================================================
-                  MOBILE HAMBURGER
-              ================================================= */}
-              <button
-                type="button"
-                aria-label="Toggle navigation menu"
-                aria-expanded={mobileMenuOpen}
-                onClick={() => {
-                  setMobileMenuOpen((value) => !value);
-
-                  setMenuOpen(false);
-                  setNotificationsOpen(false);
-                }}
-                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full border border-stone text-ink hover:bg-ivory transition-colors"
-              >
-                {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-              </button>
-            </>
-          ) : (
-            <>
-              {/* =================================================
-                  LOGIN
-              ================================================= */}
-              <NavLink
-                to="/login"
-                className="text-sm font-medium text-ink/65 no-underline hover:text-ink transition-colors"
-              >
-                Log in
-              </NavLink>
-
-              {/* =================================================
-                  REGISTER
-              ================================================= */}
-              <NavLink
-                to="/register"
-                className="hidden sm:flex items-center gap-1.5 bg-ink text-ivory rounded-full px-4 py-2.5 text-sm font-semibold no-underline hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
-              >
-                List your property
-              </NavLink>
-
-              {/* =================================================
-                  MOBILE HAMBURGER
-              ================================================= */}
-              <button
-                type="button"
-                aria-label="Toggle navigation menu"
-                aria-expanded={mobileMenuOpen}
-                onClick={() => {
-                  setMobileMenuOpen((value) => !value);
-
-                  setMenuOpen(false);
-                  setNotificationsOpen(false);
-                }}
-                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full border border-stone text-ink hover:bg-ivory transition-colors"
-              >
-                {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-              </button>
-            </>
-          )}
-        </div>
+    <header className="sticky top-0 z-[9999] flex items-center gap-8 px-4 sm:px-6 md:px-10 lg:px-[82px] py-4 lg:py-5 bg-white/85 backdrop-blur-md shadow-[0_1px_0_rgba(20,20,26,0.06),0_12px_24px_-16px_rgba(20,20,26,0.12)]">
+      {/* =====================================================
+          LOGO
+      ===================================================== */}
+      <div className="flex-1 flex items-center">
+        <NavLink
+          to="/"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center gap-2 text-ink no-underline shrink-0"
+        >
+          <Logo />
+        </NavLink>
       </div>
 
-      {/* =========================================================
+      {/* =====================================================
+          DESKTOP NAV
+      ===================================================== */}
+      <nav className="hidden md:flex gap-0.5 bg-ivory p-1 rounded-full shrink-0">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === "/"}
+            className={({ isActive }) =>
+              `px-4 py-2.5 rounded-full text-sm font-medium no-underline transition-all duration-200 ${
+                isActive
+                  ? "bg-ink text-ivory font-semibold shadow-[0_4px_12px_rgba(20,20,26,0.18)]"
+                  : "text-ink/60 hover:text-ink hover:bg-white hover:shadow-[0_1px_3px_rgba(20,20,26,0.08)]"
+              }`
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+
+      {/* =====================================================
+          RIGHT SIDE
+      ===================================================== */}
+      <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3">
+        {isLoading ? (
+          <>
+            <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
+            <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
+          </>
+        ) : isAuthenticated ? (
+          <>
+            {/* =================================================
+                NOTIFICATIONS
+            ================================================= */}
+            <div className="relative" ref={notificationRef}>
+              <button
+                type="button"
+                aria-label="Notifications"
+                aria-expanded={notificationsOpen}
+                onClick={() => {
+                  setNotificationsOpen((value) => !value);
+
+                  setMenuOpen(false);
+                  setMobileMenuOpen(false);
+                }}
+                className={`relative flex items-center justify-center w-9 h-9 rounded-full border transition-all duration-200 ${
+                  notificationsOpen
+                    ? "border-brass bg-brass-light text-brass"
+                    : "border-stone text-ink hover:bg-brass-light hover:-translate-y-0.5"
+                }`}
+              >
+                <Bell size={16} />
+
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#c0533e] text-white text-[9px] font-bold flex items-center justify-center border-2 border-white">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {notificationsOpen && (
+                <NotificationPanel
+                  notifications={notifications}
+                  unreadCount={unreadCount}
+                  onMarkAllRead={markAllNotificationsRead}
+                  onOpenNotification={openNotification}
+                />
+              )}
+            </div>
+
+            {/* =================================================
+                USER MENU
+            ================================================= */}
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => {
+                  setMenuOpen((value) => !value);
+
+                  setNotificationsOpen(false);
+                  setMobileMenuOpen(false);
+                }}
+                title={user?.name}
+                className="flex items-center gap-1 pl-0.5 pr-1.5 py-0.5 rounded-full hover:bg-ivory transition-colors"
+              >
+                <span className="flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-ink bg-gradient-to-br from-brass-light to-brass shadow-[0_0_0_2px_#ffffff,0_0_0_3px_var(--color-stone)]">
+                  {initials}
+                </span>
+
+                <ChevronDown
+                  size={14}
+                  className={`hidden sm:block text-ink/40 transition-transform duration-200 ${
+                    menuOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 bg-bg border border-stone rounded-2xl shadow-lg overflow-hidden z-[10000]">
+                  <div className="px-4 py-3 border-b border-stone">
+                    <p className="text-sm font-semibold text-ink truncate">
+                      {user?.name}
+                    </p>
+
+                    <p className="text-xs text-ink/50 capitalize">{role}</p>
+                  </div>
+
+                  <NavLink
+                    to={`/${role}`}
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-ivory transition-colors"
+                  >
+                    <LayoutDashboard size={15} className="text-ink/50" />
+                    Dashboard
+                  </NavLink>
+
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setConfirmOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#c0533e] hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut size={15} />
+                    Log out
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* =================================================
+                MOBILE MENU BUTTON
+            ================================================= */}
+            <button
+              type="button"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => {
+                setMobileMenuOpen((value) => !value);
+
+                setMenuOpen(false);
+                setNotificationsOpen(false);
+              }}
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-full border border-stone text-ink hover:bg-ivory transition-colors"
+            >
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </>
+        ) : (
+          <>
+            {/* =================================================
+                LOGIN
+            ================================================= */}
+            <NavLink
+              to="/login"
+              className="text-sm font-medium text-ink/65 no-underline hover:opacity-100 transition-opacity"
+            >
+              Log in
+            </NavLink>
+
+            {/* =================================================
+                REGISTER
+            ================================================= */}
+            <NavLink
+              to="/register"
+              className="hidden sm:flex items-center gap-1.5 bg-ink text-ivory rounded-full px-4 py-2.5 text-sm font-semibold no-underline hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
+            >
+              List your property
+            </NavLink>
+
+            {/* =================================================
+                MOBILE MENU BUTTON
+            ================================================= */}
+            <button
+              type="button"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => {
+                setMobileMenuOpen((value) => !value);
+
+                setMenuOpen(false);
+                setNotificationsOpen(false);
+              }}
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-full border border-stone text-ink hover:bg-ivory transition-colors"
+            >
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* =====================================================
           MOBILE NAVIGATION
-      ========================================================= */}
+      ===================================================== */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-stone bg-white px-4 sm:px-6 py-3 shadow-[0_12px_24px_-16px_rgba(20,20,26,0.18)]">
+        <div className="absolute left-0 right-0 top-full md:hidden border-t border-stone bg-white px-4 sm:px-6 py-3 shadow-[0_12px_24px_-16px_rgba(20,20,26,0.18)] z-[9998]">
           <nav className="flex flex-col gap-1">
             {navItems.map((item) => (
               <NavLink
@@ -678,7 +674,6 @@ export default function TopBar() {
               </NavLink>
             ))}
 
-            {/* AUTHENTICATED MOBILE OPTIONS */}
             {isAuthenticated && (
               <>
                 <div className="my-2 border-t border-stone" />
@@ -705,7 +700,6 @@ export default function TopBar() {
               </>
             )}
 
-            {/* UNAUTHENTICATED MOBILE REGISTER */}
             {!isAuthenticated && (
               <NavLink
                 to="/register"
@@ -719,7 +713,9 @@ export default function TopBar() {
         </div>
       )}
 
-      {/* LOGOUT MODAL */}
+      {/* =====================================================
+          LOGOUT MODAL
+      ===================================================== */}
       {confirmOpen && (
         <LogoutConfirmModal
           onConfirm={handleLogout}

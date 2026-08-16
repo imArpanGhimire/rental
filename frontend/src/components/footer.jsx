@@ -1,10 +1,6 @@
 import { Link } from "react-router-dom";
-import { MapPin } from "lucide-react";
-
 import { useAuth } from "../features/auth/AuthContext.jsx";
 
-// Neighborhoods link to your properties page filtered by area.
-// Adjust the query param name if your search page uses something else.
 const neighborhoods = ["Baneshwor", "Patan", "Boudha", "Jhamsikhel", "Kalanki"];
 
 const support = [
@@ -16,8 +12,6 @@ const support = [
 export default function Footer() {
   const { isAuthenticated, role } = useAuth();
 
-  // Owner already logged in -> straight to the create-listing form.
-  // Everyone else (logged out, or logged in as a renter) -> register/upgrade.
   const listPropertyTo =
     isAuthenticated && role === "owner" ? "/owner/listings/new" : "/register";
 
@@ -30,33 +24,40 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="footer__inner">
+        {/* BRAND */}
         <div className="footer__brand">
           <div className="footer__logo">Rentora</div>
+
           <p className="footer__tagline">
-            Rental search for the Kathmandu valley, built around the map —
-            find a place, not just a listing.
+            Rental search for the Kathmandu valley, built around the map — find
+            a place, not just a listing.
           </p>
         </div>
 
         <div className="footer__cols">
+          {/* =================================================
+              FIND RENT IN
+              THESE ARE PLAIN TEXT — NOT LINKS
+          ================================================= */}
           <div>
-            <div className="footer__col-title">Explore</div>
+            <div className="footer__col-title">Find rent in</div>
+
             <div className="footer__col-list">
               {neighborhoods.map((area) => (
-                <Link
-                  key={area}
-                  to={`/properties?location=${area}`}
-                  className="footer__link"
-                >
-                  <MapPin size={12} className="footer__pin" />
+                <p key={area} className="footer__location">
                   {area}
-                </Link>
+                </p>
               ))}
             </div>
           </div>
 
+          {/* =================================================
+              COMPANY
+              THESE ARE ACTUAL LINKS
+          ================================================= */}
           <div>
             <div className="footer__col-title">Company</div>
+
             <div className="footer__col-list">
               {company.map((item) => (
                 <Link key={item.label} to={item.to} className="footer__link">
@@ -66,8 +67,13 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* =================================================
+              SUPPORT
+              THESE ARE ACTUAL LINKS
+          ================================================= */}
           <div>
             <div className="footer__col-title">Support</div>
+
             <div className="footer__col-list">
               {support.map((item) => (
                 <Link key={item.label} to={item.to} className="footer__link">
@@ -79,9 +85,13 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* =====================================================
+          BOTTOM
+      ===================================================== */}
       <div className="footer__bottom">
         <span>© {new Date().getFullYear()} Rentora. Built in Kathmandu.</span>
-        
+
+        <a
           href="https://github.com/imArpanGhimire/rental"
           target="_blank"
           rel="noreferrer"

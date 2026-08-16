@@ -603,7 +603,18 @@ input:-webkit-autofill:focus {
 }
 
 /* Footer */
+.page-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-content {
+  flex: 1 0 auto;
+}
+
 .footer {
+  flex-shrink: 0;
   background: var(--color-ink);
   color: var(--color-ivory);
   padding: 56px 32px 28px;
@@ -674,6 +685,16 @@ input:-webkit-autofill:focus {
   color: var(--color-brass);
 }
 
+.footer__link--static {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.footer__link--static:hover {
+  opacity: 0.6;
+  color: var(--color-ivory);
+}
+
 .footer__pin {
   color: var(--color-brass);
   flex-shrink: 0;
@@ -700,4 +721,13 @@ input:-webkit-autofill:focus {
 .footer__bottom a:hover {
   opacity: 1;
   text-decoration: underline;
+}
+
+.footer__location {
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  cursor: default;
 }
