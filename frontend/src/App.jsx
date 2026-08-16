@@ -12,6 +12,11 @@ import RenterDashboard from "./pages/renter/Dashboard.jsx";
 import SavedListings from "./pages/renter/SavedListings.jsx";
 import ProtectedRoute from "./components/routing/ProtectedRoute.jsx";
 import Footer from "./components/Footer.jsx";
+import About from "./pages/static/About.jsx";
+import HowItWorks from "./pages/static/HowItWorks.jsx";
+import Help from "./pages/static/Help.jsx";
+import Privacy from "./pages/static/Privacy.jsx";
+import Terms from "./pages/static/Terms.jsx";
 
 function App() {
   const location = useLocation();
@@ -25,6 +30,11 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgetPassword />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route
             path="/owner"
             element={

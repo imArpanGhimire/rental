@@ -6,12 +6,12 @@ import {
   LayoutDashboard,
   LogOut,
   X,
+  Menu,
   ChevronDown,
   Bell,
   Check,
   Clock,
   CalendarDays,
-  ExternalLink,
 } from "lucide-react";
 
 import Logo from "../ui/Logo";
@@ -195,6 +195,7 @@ export default function TopBar() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [seenKeys, setSeenKeys] = useState(() =>
     getSeenNotificationKeys(user?.id || user?._id),
@@ -256,6 +257,13 @@ export default function TopBar() {
   }, []);
 
   /*
+   * Close mobile menu when route changes.
+   */
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  /*
    * Build notification objects from your existing visit-request API.
    */
   const notifications = useMemo(() => {
@@ -272,21 +280,27 @@ export default function TopBar() {
 
           return {
             key,
+
             type:
               request.status === "accepted"
                 ? "accepted"
                 : request.status === "declined"
                   ? "declined"
                   : "pending",
+
             title:
               request.status === "pending"
                 ? "New visit request"
                 : `Visit request ${request.status}`,
+
             message: `${renterName} requested a visit for ${propertyTitle}.`,
+
             date: request.createdAt
               ? new Date(request.createdAt).toLocaleDateString()
               : "Recently",
+
             unread: !seenKeys.has(key),
+
             request,
           };
         })
@@ -311,16 +325,22 @@ export default function TopBar() {
 
           return {
             key,
+
             type: request.status,
+
             title:
               request.status === "accepted"
                 ? "Visit request accepted"
                 : "Visit request declined",
+
             message: `Your visit request for ${propertyTitle} was ${request.status}.`,
+
             date: request.createdAt
               ? new Date(request.createdAt).toLocaleDateString()
               : "Recently",
+
             unread: !seenKeys.has(key),
+
             request,
           };
         })
@@ -351,6 +371,7 @@ export default function TopBar() {
 
   function openNotification(notification) {
     const next = new Set(seenKeys);
+
     next.add(notification.key);
 
     setSeenKeys(next);
@@ -378,6 +399,7 @@ export default function TopBar() {
     setConfirmOpen(false);
     setMenuOpen(false);
     setNotificationsOpen(false);
+    setMobileMenuOpen(false);
 
     navigate("/");
   };
@@ -421,151 +443,283 @@ export default function TopBar() {
     : "";
 
   return (
-    <header className="sticky top-0 z-50 flex items-center gap-8 px-6  sm:px-82 py-5 bg-white/85 backdrop-blur-md shadow-[0_1px_0_rgba(20,20,26,0.06),0_12px_24px_-16px_rgba(20,20,26,0.12)]">
-      <div className="flex-1 flex items-center">
-        <NavLink
-          to="/"
-          className="flex items-center gap-2 text-ink no-underline shrink-0"
-        >
-          <Logo />
-        </NavLink>
-      </div>
-
-      <nav className="hidden md:flex gap-0.5 bg-ivory p-1 rounded-full shrink-0">
-        {navItems.map((item) => (
+    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-[0_1px_0_rgba(20,20,26,0.06),0_12px_24px_-16px_rgba(20,20,26,0.12)]">
+      {/* =========================================================
+          MAIN NAVBAR
+      ========================================================= */}
+      <div className="flex items-center h-[68px] px-4 sm:px-6 md:px-8 lg:px-10 xl:px-[82px]">
+        {/* LOGO */}
+        <div className="flex-1 flex items-center min-w-0">
           <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === "/"}
-            className={({ isActive }) =>
-              `px-4 py-2.5 rounded-full text-sm font-medium no-underline transition-all duration-200 ${
-                isActive
-                  ? "bg-ink text-ivory font-semibold shadow-[0_4px_12px_rgba(20,20,26,0.18)]"
-                  : "text-ink/60 hover:text-ink hover:bg-white hover:shadow-[0_1px_3px_rgba(20,20,26,0.08)]"
-              }`
-            }
+            to="/"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 text-ink no-underline shrink-0"
           >
-            {item.label}
+            <Logo />
           </NavLink>
-        ))}
-      </nav>
+        </div>
 
-      <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3">
-        {isLoading ? (
-          <>
-            <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
-            <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
-          </>
-        ) : isAuthenticated ? (
-          <>
-            {/* NOTIFICATIONS */}
-            <div className="relative" ref={notificationRef}>
-              <button
-                type="button"
-                aria-label="Notifications"
-                aria-expanded={notificationsOpen}
-                onClick={() => {
-                  setNotificationsOpen((value) => !value);
-                  setMenuOpen(false);
-                }}
-                className={`relative flex items-center justify-center w-9 h-9 rounded-full border transition-all duration-200 ${
-                  notificationsOpen
-                    ? "border-brass bg-brass-light text-brass"
-                    : "border-stone text-ink hover:bg-brass-light hover:-translate-y-0.5"
-                }`}
-              >
-                <Bell size={16} />
+        {/* =====================================================
+            DESKTOP NAV
+        ===================================================== */}
+        <nav className="hidden md:flex items-center gap-0.5 bg-ivory p-1 rounded-full shrink-0">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === "/"}
+              className={({ isActive }) =>
+                `px-3 lg:px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap no-underline transition-all duration-200 ${
+                  isActive
+                    ? "bg-ink text-ivory font-semibold shadow-[0_4px_12px_rgba(20,20,26,0.18)]"
+                    : "text-ink/60 hover:text-ink hover:bg-white hover:shadow-[0_1px_3px_rgba(20,20,26,0.08)]"
+                }`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
 
-                {unreadCount > 0 && (
-                  <>
+        {/* =====================================================
+            RIGHT SIDE
+        ===================================================== */}
+        <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3 min-w-0">
+          {/* LOADING */}
+          {isLoading ? (
+            <>
+              <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
+
+              <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
+            </>
+          ) : isAuthenticated ? (
+            <>
+              {/* =================================================
+                  NOTIFICATIONS
+              ================================================= */}
+              <div className="relative" ref={notificationRef}>
+                <button
+                  type="button"
+                  aria-label="Notifications"
+                  aria-expanded={notificationsOpen}
+                  onClick={() => {
+                    setNotificationsOpen((value) => !value);
+
+                    setMenuOpen(false);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`relative flex items-center justify-center w-9 h-9 rounded-full border transition-all duration-200 ${
+                    notificationsOpen
+                      ? "border-brass bg-brass-light text-brass"
+                      : "border-stone text-ink hover:bg-brass-light hover:-translate-y-0.5"
+                  }`}
+                >
+                  <Bell size={16} />
+
+                  {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#c0533e] text-white text-[9px] font-bold flex items-center justify-center border-2 border-white">
                       {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
-                  </>
+                  )}
+                </button>
+
+                {notificationsOpen && (
+                  <NotificationPanel
+                    notifications={notifications}
+                    unreadCount={unreadCount}
+                    onMarkAllRead={markAllNotificationsRead}
+                    onOpenNotification={openNotification}
+                  />
                 )}
-              </button>
+              </div>
 
-              {notificationsOpen && (
-                <NotificationPanel
-                  notifications={notifications}
-                  unreadCount={unreadCount}
-                  onMarkAllRead={markAllNotificationsRead}
-                  onOpenNotification={openNotification}
-                />
-              )}
-            </div>
+              {/* =================================================
+                  USER MENU
+              ================================================= */}
+              <div className="relative" ref={menuRef}>
+                <button
+                  onClick={() => {
+                    setMenuOpen((value) => !value);
 
-            {/* USER MENU */}
-            <div className="relative" ref={menuRef}>
-              <button
-                onClick={() => setMenuOpen((value) => !value)}
-                title={user?.name}
-                className="flex items-center gap-1 pl-0.5 pr-1.5 py-0.5 rounded-full hover:bg-ivory transition-colors"
-              >
-                <span className="flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-ink bg-gradient-to-br from-brass-light to-brass shadow-[0_0_0_2px_#ffffff,0_0_0_3px_var(--color-stone)]">
-                  {initials}
-                </span>
+                    setMobileMenuOpen(false);
+                    setNotificationsOpen(false);
+                  }}
+                  title={user?.name}
+                  className="flex items-center gap-1 pl-0.5 pr-1.5 py-0.5 rounded-full hover:bg-ivory transition-colors"
+                >
+                  <span className="flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-ink bg-gradient-to-br from-brass-light to-brass shadow-[0_0_0_2px_#ffffff,0_0_0_3px_var(--color-stone)]">
+                    {initials}
+                  </span>
 
-                <ChevronDown
-                  size={14}
-                  className={`hidden sm:block text-ink/40 transition-transform duration-200 ${
-                    menuOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
+                  <ChevronDown
+                    size={14}
+                    className={`hidden sm:block text-ink/40 transition-transform duration-200 ${
+                      menuOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
 
-              {menuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-bg border border-stone rounded-2xl shadow-lg overflow-hidden">
-                  <div className="px-4 py-3 border-b border-stone">
-                    <p className="text-sm font-semibold text-ink truncate">
-                      {user?.name}
-                    </p>
+                {menuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-bg border border-stone rounded-2xl shadow-lg overflow-hidden z-[80]">
+                    <div className="px-4 py-3 border-b border-stone">
+                      <p className="text-sm font-semibold text-ink truncate">
+                        {user?.name}
+                      </p>
 
-                    <p className="text-xs text-ink/50 capitalize">{role}</p>
+                      <p className="text-xs text-ink/50 capitalize">{role}</p>
+                    </div>
+
+                    <NavLink
+                      to={`/${role}`}
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-ivory transition-colors"
+                    >
+                      <LayoutDashboard size={15} className="text-ink/50" />
+                      Dashboard
+                    </NavLink>
+
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setConfirmOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#c0533e] hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut size={15} />
+                      Log out
+                    </button>
                   </div>
+                )}
+              </div>
 
-                  <NavLink
-                    to={`/${role}`}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-ivory transition-colors"
-                  >
-                    <LayoutDashboard size={15} className="text-ink/50" />
-                    Dashboard
-                  </NavLink>
+              {/* =================================================
+                  MOBILE HAMBURGER
+              ================================================= */}
+              <button
+                type="button"
+                aria-label="Toggle navigation menu"
+                aria-expanded={mobileMenuOpen}
+                onClick={() => {
+                  setMobileMenuOpen((value) => !value);
 
-                  <button
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setConfirmOpen(true);
-                    }}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#c0533e] hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut size={15} />
-                    Log out
-                  </button>
-                </div>
-              )}
-            </div>
-          </>
-        ) : (
-          <>
-            <NavLink
-              to="/login"
-              className="text-sm font-medium text-ink/65 no-underline hover:opacity-100 transition-opacity"
-            >
-              Log in
-            </NavLink>
+                  setMenuOpen(false);
+                  setNotificationsOpen(false);
+                }}
+                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full border border-stone text-ink hover:bg-ivory transition-colors"
+              >
+                {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
+            </>
+          ) : (
+            <>
+              {/* =================================================
+                  LOGIN
+              ================================================= */}
+              <NavLink
+                to="/login"
+                className="text-sm font-medium text-ink/65 no-underline hover:text-ink transition-colors"
+              >
+                Log in
+              </NavLink>
 
-            <NavLink
-              to="/register"
-              className="hidden sm:flex items-center gap-1.5 bg-ink text-ivory rounded-full px-4 py-2.5 text-sm font-semibold no-underline hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
-            >
-              List your property
-            </NavLink>
-          </>
-        )}
+              {/* =================================================
+                  REGISTER
+              ================================================= */}
+              <NavLink
+                to="/register"
+                className="hidden sm:flex items-center gap-1.5 bg-ink text-ivory rounded-full px-4 py-2.5 text-sm font-semibold no-underline hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
+              >
+                List your property
+              </NavLink>
+
+              {/* =================================================
+                  MOBILE HAMBURGER
+              ================================================= */}
+              <button
+                type="button"
+                aria-label="Toggle navigation menu"
+                aria-expanded={mobileMenuOpen}
+                onClick={() => {
+                  setMobileMenuOpen((value) => !value);
+
+                  setMenuOpen(false);
+                  setNotificationsOpen(false);
+                }}
+                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full border border-stone text-ink hover:bg-ivory transition-colors"
+              >
+                {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
+      {/* =========================================================
+          MOBILE NAVIGATION
+      ========================================================= */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-stone bg-white px-4 sm:px-6 py-3 shadow-[0_12px_24px_-16px_rgba(20,20,26,0.18)]">
+          <nav className="flex flex-col gap-1">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `px-4 py-3 rounded-xl text-sm font-medium no-underline transition-colors ${
+                    isActive
+                      ? "bg-ink text-ivory font-semibold"
+                      : "text-ink/70 hover:bg-ivory hover:text-ink"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+
+            {/* AUTHENTICATED MOBILE OPTIONS */}
+            {isAuthenticated && (
+              <>
+                <div className="my-2 border-t border-stone" />
+
+                <NavLink
+                  to={`/${role}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium text-ink/70 hover:bg-ivory hover:text-ink no-underline"
+                >
+                  <LayoutDashboard size={16} />
+                  Dashboard
+                </NavLink>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setConfirmOpen(true);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium text-[#c0533e] hover:bg-red-50 transition-colors"
+                >
+                  <LogOut size={16} />
+                  Log out
+                </button>
+              </>
+            )}
+
+            {/* UNAUTHENTICATED MOBILE REGISTER */}
+            {!isAuthenticated && (
+              <NavLink
+                to="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="sm:hidden flex items-center justify-center bg-ink text-ivory rounded-xl px-4 py-3 text-sm font-semibold no-underline mt-1"
+              >
+                List your property
+              </NavLink>
+            )}
+          </nav>
+        </div>
+      )}
+
+      {/* LOGOUT MODAL */}
       {confirmOpen && (
         <LogoutConfirmModal
           onConfirm={handleLogout}
