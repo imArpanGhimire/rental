@@ -421,15 +421,17 @@ export default function TopBar() {
     : "";
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between gap-6 px-4 sm:px-8 py-3.5 bg-white/85 backdrop-blur-md shadow-[0_1px_0_rgba(20,20,26,0.06),0_12px_24px_-16px_rgba(20,20,26,0.12)]">
-      <NavLink
-        to="/"
-        className="flex items-center gap-2 text-ink no-underline shrink-0"
-      >
-        <Logo />
-      </NavLink>
+    <header className="sticky top-0 z-50 flex items-center gap-8 px-6  sm:px-82 py-5 bg-white/85 backdrop-blur-md shadow-[0_1px_0_rgba(20,20,26,0.06),0_12px_24px_-16px_rgba(20,20,26,0.12)]">
+      <div className="flex-1 flex items-center">
+        <NavLink
+          to="/"
+          className="flex items-center gap-2 text-ink no-underline shrink-0"
+        >
+          <Logo />
+        </NavLink>
+      </div>
 
-      <nav className="hidden md:flex gap-0.5 bg-ivory p-1 rounded-full">
+      <nav className="hidden md:flex gap-0.5 bg-ivory p-1 rounded-full shrink-0">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -448,7 +450,7 @@ export default function TopBar() {
         ))}
       </nav>
 
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3">
         {isLoading ? (
           <>
             <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
