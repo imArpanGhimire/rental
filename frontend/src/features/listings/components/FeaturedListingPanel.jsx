@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-
 import { useNavigate } from "react-router-dom";
 
-import Icon from "../../../components/ui/Icon";
+import { useAuth } from "../../auth/AuthContext.jsx";
+import {
+  useFavorites,
+  useToggleFavorite,
+} from "../../favorites/hooks/useFavorites.js";
 
+import Icon from "../../../components/ui/Icon";
 import DropdownMenu from "../../../components/ui/DropdownMenu";
 
-/*
- * Detect mobile devices so that phones use the native
- * share sheet while desktop browsers use Copy Link.
- */
 function isMobileDevice() {
   if (typeof navigator === "undefined") {
     return false;
@@ -23,18 +23,14 @@ function isMobileDevice() {
 async function copyToClipboard(text) {
   if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(text);
-
     return true;
   }
 
   const textarea = document.createElement("textarea");
 
   textarea.value = text;
-
   textarea.style.position = "fixed";
-
   textarea.style.left = "-999999px";
-
   textarea.style.top = "0";
 
   document.body.appendChild(textarea);
@@ -57,17 +53,24 @@ async function copyToClipboard(text) {
 
 export default function FeaturedListingPanel({ listings = [], isLoading }) {
   const [selected, setSelected] = useState(null);
-
   const [copied, setCopied] = useState(false);
 
   const navigate = useNavigate();
+
+  const { user } = useAuth();
+
+  const { favoriteIds } = useFavorites({
+    enabled: user?.role === "renter",
+  });
+
+  const { toggle } = useToggleFavorite();
 
   useEffect(() => {
     if (!selected && listings.length > 0) {
       setSelected(listings[0]);
     }
 
-    if (selected && !listings.find((l) => l._id === selected._id)) {
+    if (selected && !listings.find((listing) => listing._id === selected._id)) {
       setSelected(listings[0] || null);
     }
   }, [listings, selected]);
@@ -80,25 +83,19 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
     const url = `${window.location.origin}/listings/${listing._id}`;
 
     /*
-     * MOBILE:
-     *
-     * Open Android/iOS native share sheet.
+     * MOBILE
+     * Use the native share sheet when available.
      */
     if (isMobileDevice() && typeof navigator.share === "function") {
       try {
         await navigator.share({
           title: listing.title || "Rentora listing",
-
           text: `Check out ${listing.title || "this property"} on Rentora.`,
-
           url,
         });
 
         return;
       } catch (error) {
-        /*
-         * Closing the share sheet is not an error.
-         */
         if (error?.name === "AbortError") {
           return;
         }
@@ -106,9 +103,8 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
     }
 
     /*
-     * DESKTOP:
-     *
-     * Copy listing URL.
+     * DESKTOP
+     * Copy the listing URL.
      */
     try {
       const success = await copyToClipboard(url);
@@ -141,6 +137,27 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
     );
   }
 
+  const isSaved =
+    favoriteIds?.some(
+      (favoriteId) => String(favoriteId) === String(selected?._id),
+    ) ?? false;
+
+  function handleSave() {
+    if (!selected?._id) {
+      return;
+    }
+
+    /*
+     * Guests must log in before saving.
+     */
+    if (user?.role !== "renter") {
+      navigate("/login");
+      return;
+    }
+
+    toggle(selected._id, isSaved);
+  }
+
   return (
     <div className="p-1">
       {selected && (
@@ -160,7 +177,6 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
               }`}
               onClick={(e) => {
                 e.stopPropagation();
-
                 handleShare(selected);
               }}
             >
@@ -274,21 +290,12 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                 }
                 items={[
                   {
-                    label: "Copy link",
-
-                    onSelect: () => {
-                      handleShare(selected);
-                    },
+                    label: isSaved ? "Remove from saved" : "Save listing",
+                    onSelect: handleSave,
                   },
-
                   {
-                    label: "Report listing",
-
-                    danger: true,
-
-                    onSelect: () => {
-                      console.log("report listing", selected._id);
-                    },
+                    label: "Copy link",
+                    onSelect: () => handleShare(selected),
                   },
                 ]}
               />
@@ -306,20 +313,20 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {listings
-              .filter((l) => l._id !== selected?._id)
+              .filter((listing) => listing._id !== selected?._id)
               .slice(0, 4)
-              .map((l) => (
+              .map((listing) => (
                 <button
-                  key={l._id}
+                  key={listing._id}
                   type="button"
-                  onClick={() => navigate(`/listings/${l._id}`)}
+                  onClick={() => navigate(`/listings/${listing._id}`)}
                   className="text-left rounded-2xl bg-bg border border-stone overflow-hidden honey-lift hover:shadow-[0_8px_24px_rgba(20,20,26,0.08)] hover:-translate-y-0.5"
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-ivory border-b border-stone">
-                    {l.images?.[0]?.url ? (
+                    {listing.images?.[0]?.url ? (
                       <img
-                        src={l.images[0].url}
-                        alt={l.title}
+                        src={listing.images[0].url}
+                        alt={listing.title}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -330,10 +337,12 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                   </div>
 
                   <div className="p-3">
-                    <p className="font-semibold text-sm truncate">{l.title}</p>
+                    <p className="font-semibold text-sm truncate">
+                      {listing.title}
+                    </p>
 
                     <p className="text-xs text-neutral-500 mt-1">
-                      Rs {l.price?.toLocaleString("en-IN")} /mo
+                      Rs {listing.price?.toLocaleString("en-IN")} /mo
                     </p>
                   </div>
                 </button>

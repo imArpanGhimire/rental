@@ -1,15 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+
 import { useTranslation } from "react-i18next";
+
 import { useQuery } from "@tanstack/react-query";
+
 import { MapPin, Wifi, Car, Droplet, Zap, Check, X } from "lucide-react";
 
 import AppShell from "../../components/layout/AppShell.jsx";
+
 import ListingGallery from "../../features/listings/components/ListingGallery.jsx";
+
 import ListingMap from "../../features/listings/components/ListingMap.jsx";
+
 import Badge from "../../components/ui/Badge.jsx";
+
 import ErrorState from "../../components/ui/ErrorState.jsx";
+
 import ReviewCard from "../../features/reviews/components/ReviewCard.jsx";
+
 import ReviewForm from "../../features/reviews/components/ReviewForm.jsx";
 
 import {
@@ -22,46 +31,65 @@ import {
 
 import { useListing } from "../../features/listings/hooks/useListing.js";
 
-import {
-  useFavorites,
-  useToggleFavorite,
-} from "../../features/favorites/hooks/useFavorites.js";
-
 import { getNearbyProperties } from "../../api/listings.api.js";
+
 import { createVisitRequest } from "../../api/visitRequests.api.js";
 
 import { useAuth } from "../../features/auth/AuthContext.jsx";
+
 import { formatPrice } from "../../utils/formatPrice.js";
 
+/* =========================================================
+   AMENITY ICONS
+========================================================= */
+
 const AMENITY_ICONS = [
-  { match: /wifi|internet/i, icon: Wifi },
-  { match: /park/i, icon: Car },
-  { match: /water/i, icon: Droplet },
-  { match: /electric|backup|power/i, icon: Zap },
+  {
+    match: /wifi|internet/i,
+    icon: Wifi,
+  },
+  {
+    match: /park/i,
+    icon: Car,
+  },
+  {
+    match: /water/i,
+    icon: Droplet,
+  },
+  {
+    match: /electric|backup|power/i,
+    icon: Zap,
+  },
 ];
 
 function amenityIcon(label) {
-  const found = AMENITY_ICONS.find((a) => a.match.test(label));
+  const found = AMENITY_ICONS.find((amenity) => amenity.match.test(label));
 
   return found ? found.icon : Check;
 }
 
-/* -------------------------------------------------------
+/* =========================================================
    VISIT REQUEST MODAL
-------------------------------------------------------- */
+========================================================= */
 
 function VisitRequestModal({ listing, onClose }) {
   const [date, setDate] = useState("");
+
   const [time, setTime] = useState("");
+
   const [message, setMessage] = useState("");
+
   const [sent, setSent] = useState(false);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [submitError, setSubmitError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setSubmitError(null);
+
     setIsSubmitting(true);
 
     const composedMessage = [
@@ -94,6 +122,8 @@ function VisitRequestModal({ listing, onClose }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/40 backdrop-blur-sm px-4">
       <div className="bg-bg rounded-2xl w-full max-w-md p-6 relative shadow-2xl">
+        {/* CLOSE */}
+
         <button
           type="button"
           onClick={onClose}
@@ -102,6 +132,10 @@ function VisitRequestModal({ listing, onClose }) {
         >
           <X size={16} />
         </button>
+
+        {/* =================================================
+            SUCCESS
+        ================================================= */}
 
         {sent ? (
           <div className="py-6 text-center">
@@ -124,12 +158,18 @@ function VisitRequestModal({ listing, onClose }) {
             </button>
           </div>
         ) : (
+          /* =================================================
+             FORM
+          ================================================= */
+
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <p className="font-display text-lg text-text">Request to visit</p>
 
               <p className="text-sm text-text/60 mt-1">{listing.title}</p>
             </div>
+
+            {/* DATE */}
 
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-medium text-text/70">Date</span>
@@ -143,6 +183,8 @@ function VisitRequestModal({ listing, onClose }) {
               />
             </label>
 
+            {/* TIME */}
+
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-medium text-text/70">Time</span>
 
@@ -154,6 +196,8 @@ function VisitRequestModal({ listing, onClose }) {
                 className="border border-stone rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brass bg-transparent"
               />
             </label>
+
+            {/* MESSAGE */}
 
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-medium text-text/70">
@@ -169,11 +213,15 @@ function VisitRequestModal({ listing, onClose }) {
               />
             </label>
 
+            {/* ERROR */}
+
             {submitError && (
               <p role="alert" className="text-sm text-red-600">
                 {submitError}
               </p>
             )}
+
+            {/* SUBMIT */}
 
             <button
               type="submit"
@@ -189,9 +237,9 @@ function VisitRequestModal({ listing, onClose }) {
   );
 }
 
-/* -------------------------------------------------------
+/* =========================================================
    LISTING DETAIL
-------------------------------------------------------- */
+========================================================= */
 
 export default function ListingDetail() {
   const { t } = useTranslation();
@@ -204,19 +252,13 @@ export default function ListingDetail() {
 
   const { data: listing, isLoading, error } = useListing(id);
 
-  const { favoriteIds } = useFavorites({
-    enabled: user?.role === "renter",
-  });
-
-  const { toggle } = useToggleFavorite();
-
   const [expanded, setExpanded] = useState(false);
 
   const [visitModalOpen, setVisitModalOpen] = useState(false);
 
-  /* -----------------------------------------------------
+  /* =======================================================
      REVIEWS
-  ----------------------------------------------------- */
+  ======================================================= */
 
   const {
     data: reviewData,
@@ -232,9 +274,9 @@ export default function ListingDetail() {
 
   const editReplyMutation = useEditReply(id);
 
-  /* -----------------------------------------------------
+  /* =======================================================
      NEARBY PROPERTIES
-  ----------------------------------------------------- */
+  ======================================================= */
 
   const coordinates = listing?.location?.coordinates;
 
@@ -254,9 +296,9 @@ export default function ListingDetail() {
 
   const nearbyListings = nearbyData?.properties ?? [];
 
-  /* -----------------------------------------------------
+  /* =======================================================
      REVIEW DATA
-  ----------------------------------------------------- */
+  ======================================================= */
 
   const reviews = reviewData?.reviews ?? [];
 
@@ -281,9 +323,9 @@ export default function ListingDetail() {
     return (sum / validRatings.length).toFixed(1);
   }, [reviews]);
 
-  /* -----------------------------------------------------
+  /* =======================================================
      LOADING
-  ----------------------------------------------------- */
+  ======================================================= */
 
   if (isLoading) {
     return (
@@ -297,9 +339,9 @@ export default function ListingDetail() {
     );
   }
 
-  /* -----------------------------------------------------
+  /* =======================================================
      ERROR
-  ----------------------------------------------------- */
+  ======================================================= */
 
   if (error || !listing) {
     return (
@@ -313,9 +355,9 @@ export default function ListingDetail() {
     );
   }
 
-  /* -----------------------------------------------------
+  /* =======================================================
      LISTING DATA
-  ----------------------------------------------------- */
+  ======================================================= */
 
   const description = listing.description;
 
@@ -328,19 +370,9 @@ export default function ListingDetail() {
 
   const amenities = listing.amenities ?? [];
 
-  /* -----------------------------------------------------
+  /* =======================================================
      OWNER CHECK
-
-     Your old code only checked user.id.
-
-     Depending on your auth response, the user may have
-     either:
-       user.id
-     or:
-       user._id
-
-     This handles both.
-  ----------------------------------------------------- */
+  ======================================================= */
 
   const currentUserId = user?.id || user?._id;
 
@@ -354,20 +386,9 @@ export default function ListingDetail() {
 
   const canReview = user?.role === "renter" && !isOwnerOfThis;
 
-  /* -----------------------------------------------------
-     FAVORITE STATE
-  ----------------------------------------------------- */
-
-  const isSaved =
-    favoriteIds?.some(
-      (favoriteId) => String(favoriteId) === String(listing._id),
-    ) ?? false;
-
-  /* -----------------------------------------------------
+  /* =======================================================
      REVIEW OWNERSHIP
-
-     Again, support both id and _id.
-  ----------------------------------------------------- */
+  ======================================================= */
 
   const isOwnReview = (review) => {
     const reviewerId = review?.reviewer?._id || review?.reviewer?.id;
@@ -378,6 +399,10 @@ export default function ListingDetail() {
       String(currentUserId) === String(reviewerId)
     );
   };
+
+  /* =======================================================
+     RENDER
+  ======================================================= */
 
   return (
     <AppShell>
@@ -415,12 +440,8 @@ export default function ListingDetail() {
             <ListingGallery
               photos={images}
               rating={avgRating}
-              saved={isSaved}
-              onToggleSave={
-                user?.role === "renter"
-                  ? () => toggle(listing._id, isSaved)
-                  : undefined
-              }
+              listingId={listing._id}
+              title={listing.title}
             />
 
             {/* =================================================
@@ -459,12 +480,12 @@ export default function ListingDetail() {
             {amenities.length > 0 && (
               <div className="rounded-2xl bg-gradient-to-br from-brass-light/70 to-brass-light/30 border border-brass/20 py-5 px-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-5 gap-x-2">
-                  {amenities.map((a) => {
-                    const AmenityIcon = amenityIcon(a);
+                  {amenities.map((amenity) => {
+                    const AmenityIcon = amenityIcon(amenity);
 
                     return (
                       <div
-                        key={a}
+                        key={amenity}
                         className="flex flex-col items-center gap-2 text-center"
                       >
                         <span className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-brass to-[#8f6d3f]">
@@ -476,7 +497,7 @@ export default function ListingDetail() {
                         </span>
 
                         <span className="text-xs font-medium text-text/80">
-                          {a}
+                          {amenity}
                         </span>
                       </div>
                     );
@@ -505,7 +526,7 @@ export default function ListingDetail() {
 
                 <button
                   type="button"
-                  onClick={() => setExpanded((e) => !e)}
+                  onClick={() => setExpanded((previous) => !previous)}
                   className="text-sm text-text font-medium mt-1 underline underline-offset-2 hover:text-brass transition-colors"
                 >
                   {expanded
@@ -573,6 +594,7 @@ export default function ListingDetail() {
               </div>
 
               {/* REVIEW ERROR */}
+
               {reviewsError && <ErrorState onRetry={refetchReviews} />}
 
               {/* =================================================
@@ -612,21 +634,8 @@ export default function ListingDetail() {
                     <ReviewCard
                       key={review._id}
                       review={review}
-                      /*
-                       * ONLY the owner of THIS
-                       * property receives the
-                       * owner reply controls.
-                       */
                       isOwner={Boolean(isOwnerOfThis)}
                       isOwnReview={isOwnReview(review)}
-                      /*
-                       * Previously this was:
-                       *
-                       * onReply={() => {}}
-                       *
-                       * which meant the Reply
-                       * button literally did nothing.
-                       */
                       onReply={(reviewId, comment) =>
                         replyToReviewMutation.mutate({
                           reviewId,
