@@ -12,11 +12,14 @@ import {
   Check,
   Clock,
   CalendarDays,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 import Logo from "../ui/Logo";
 
 import { useAuth } from "../../features/auth/AuthContext.jsx";
+import { useTheme } from "../../context/ThemeContext.jsx";
 
 import {
   useMyVisitRequests,
@@ -198,6 +201,27 @@ function NotificationPanel({
         )}
       </div>
     </div>
+  );
+}
+
+/* =========================================================
+   THEME TOGGLE
+========================================================= */
+
+function ThemeToggleButton({ className = "" }) {
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      className={`flex items-center justify-center w-9 h-9 rounded-full border border-stone text-ink hover:bg-brass-light hover:-translate-y-0.5 transition-all duration-200 ${className}`}
+    >
+      {isDark ? <Sun size={16} /> : <Moon size={16} />}
+    </button>
   );
 }
 
@@ -508,7 +532,7 @@ export default function TopBar() {
   };
 
   return (
-    <header className="sticky top-0 z-[9999] bg-white/90 backdrop-blur-md shadow-[0_1px_0_rgba(20,20,26,0.06),0_12px_24px_-16px_rgba(20,20,26,0.12)]">
+    <header className="sticky top-0 z-[9999] bg-bg/90 backdrop-blur-md shadow-[0_1px_0_rgba(20,20,26,0.06),0_12px_24px_-16px_rgba(20,20,26,0.12)]">
       {/* =====================================================
           MAIN HEADER
       ===================================================== */}
@@ -564,6 +588,12 @@ export default function TopBar() {
             </>
           ) : isAuthenticated ? (
             <>
+              {/* =============================================
+                  THEME TOGGLE
+              ============================================= */}
+
+              <ThemeToggleButton className="hidden sm:flex" />
+
               {/* =============================================
                   NOTIFICATIONS
               ============================================= */}
@@ -701,6 +731,12 @@ export default function TopBar() {
           ) : (
             <>
               {/* =============================================
+                  THEME TOGGLE
+              ============================================= */}
+
+              <ThemeToggleButton className="hidden sm:flex" />
+
+              {/* =============================================
                   LOGIN
               ============================================= */}
 
@@ -763,6 +799,13 @@ export default function TopBar() {
 
           <div className="absolute left-0 right-0 top-full md:hidden bg-bg border-t border-stone shadow-[0_20px_40px_rgba(20,20,26,0.12)] z-[9998]">
             <nav className="px-4 sm:px-6 py-4">
+              {/* THEME TOGGLE */}
+
+              <div className="flex items-center justify-between px-4 min-h-[48px] mb-1">
+                <span className="text-sm font-medium text-ink/70">Theme</span>
+                <ThemeToggleButton />
+              </div>
+
               {/* MAIN NAVIGATION */}
 
               <div className="space-y-1">
