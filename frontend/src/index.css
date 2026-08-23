@@ -2,6 +2,13 @@
 @import "tailwindcss";
 
 /*
+  Class-based dark mode. Tailwind v4 defaults `dark:` to a media query;
+  this repoints it to the `.dark` class that ThemeContext toggles on
+  <html>, so the toggle actually controls the theme instead of the OS.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
   Design tokens — "Signal & Paper"
   Grounded in the app's core interaction: map pins + list search.
   Neutral paper/ink base so listing photos stay the focus; one confident
@@ -28,6 +35,28 @@
   --animate-bubble-drop: bubble-drop 480ms var(--ease-honey-soft) both;
   --animate-hint-drop: hint-drop 280ms var(--ease-honey-soft) both;
   --animate-draw-stroke: draw-stroke 480ms var(--ease-honey-soft) forwards;
+}
+
+/*
+  Dark theme token overrides.
+  Same variable names, swapped values — every utility class already
+  written against --color-ink / --color-bg / --color-ivory / --color-stone
+  etc. picks these up automatically, no per-component dark: classes needed.
+*/
+.dark {
+  --color-ink: #f3f2ee;
+  --color-ivory: #1c1f26;
+  --color-bg: #14161b;
+  --color-text: #edece6;
+  --color-stone: #2c2f38;
+  --color-brass: #4fb8a4;
+  --color-brass-light: #1d3430;
+  --color-brick: #d97a54;
+  --color-brick-light: #3a2620;
+}
+
+.dark img {
+  filter: brightness(0.92) contrast(1.02);
 }
 
 @keyframes bubble-drop {
@@ -615,8 +644,8 @@ input:-webkit-autofill:focus {
 
 .footer {
   flex-shrink: 0;
-  background: var(--color-ink);
-  color: var(--color-ivory);
+  background: var(--color-ivory);
+  color: var(--color-ink);
   padding: 56px 32px 28px;
 }
 
@@ -638,7 +667,7 @@ input:-webkit-autofill:focus {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.015em;
-  color: var(--color-ivory);
+  color: var(--color-ink);
 }
 
 .footer__tagline {
@@ -674,7 +703,7 @@ input:-webkit-autofill:focus {
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: var(--color-ivory);
+  color: var(--color-ink);
   text-decoration: none;
   opacity: 0.75;
   transition: opacity 150ms var(--ease-honey), color 150ms var(--ease-honey);
@@ -692,7 +721,7 @@ input:-webkit-autofill:focus {
 
 .footer__link--static:hover {
   opacity: 0.6;
-  color: var(--color-ivory);
+  color: var(--color-ink);
 }
 
 .footer__pin {
@@ -704,7 +733,7 @@ input:-webkit-autofill:focus {
   max-width: 1280px;
   margin: 40px auto 0;
   padding-top: 20px;
-  border-top: 1px solid rgba(237, 236, 230, 0.12);
+  border-top: 1px solid var(--color-stone);
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -714,7 +743,7 @@ input:-webkit-autofill:focus {
 }
 
 .footer__bottom a {
-  color: var(--color-ivory);
+  color: var(--color-ink);
   text-decoration: none;
 }
 
