@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { MapPin, Wifi, Car, Droplet, Zap, Check, X } from "lucide-react";
+import { MapPin, Wifi, Car, Droplet, Zap, Check, X, Heart } from "lucide-react";
 
 import AppShell from "../../components/layout/AppShell.jsx";
 
@@ -30,6 +30,11 @@ import {
 } from "../../features/reviews/hooks/useReviews.js";
 
 import { useListing } from "../../features/listings/hooks/useListing.js";
+
+import {
+  useFavorites,
+  useToggleFavorite,
+} from "../../features/favorites/hooks/useFavorites.js";
 
 import { getNearbyProperties } from "../../api/listings.api.js";
 
@@ -255,6 +260,33 @@ export default function ListingDetail() {
   const [expanded, setExpanded] = useState(false);
 
   const [visitModalOpen, setVisitModalOpen] = useState(false);
+
+  /* =======================================================
+     FAVORITES / SAVE
+  ======================================================= */
+
+  const { favoriteIds } = useFavorites({
+    enabled: user?.role === "renter",
+  });
+
+  const { toggle, add, remove } = useToggleFavorite();
+
+  const isSaved =
+    favoriteIds?.some((favoriteId) => String(favoriteId) === String(id)) ??
+    false;
+
+  const isSaving = add.isPending || remove.isPending;
+
+  function handleToggleSave() {
+    if (!listing?._id) return;
+
+    if (user?.role !== "renter") {
+      navigate("/login");
+      return;
+    }
+
+    toggle(listing._id, isSaved);
+  }
 
   /* =======================================================
      REVIEWS
@@ -552,6 +584,23 @@ export default function ListingDetail() {
 
               {!isOwnerOfThis && (
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleToggleSave}
+                    disabled={isSaving}
+                    aria-pressed={isSaved}
+                    className={`flex items-center justify-center gap-1.5 border text-sm font-medium px-5 py-3 rounded-full transition-colors disabled:opacity-60 ${
+                      isSaved
+                        ? "border-brass bg-brass-light text-brass"
+                        : "border-stone text-text hover:bg-ivory"
+                    }`}
+                  >
+                    <Heart size={16} className={isSaved ? "fill-brass" : ""} />
+                    {isSaved
+                      ? t("listing.saved", "Saved")
+                      : t("listing.save", "Save")}
+                  </button>
+
                   {listing.owner?.phone && (
                     <a
                       href={`tel:${listing.owner.phone}`}
@@ -685,13 +734,30 @@ export default function ListingDetail() {
         </p>
 
         {!isOwnerOfThis && (
-          <button
-            type="button"
-            onClick={() => setVisitModalOpen(true)}
-            className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full flex-1 hover:opacity-90 transition-opacity"
-          >
-            {t("listing.bookNow", "Book Now")}
-          </button>
+          <div className="flex items-center gap-2 flex-1">
+            <button
+              type="button"
+              onClick={handleToggleSave}
+              disabled={isSaving}
+              aria-pressed={isSaved}
+              aria-label={isSaved ? "Remove from saved" : "Save listing"}
+              className={`w-12 h-12 shrink-0 flex items-center justify-center rounded-full border transition-colors disabled:opacity-60 ${
+                isSaved
+                  ? "border-brass bg-brass-light text-brass"
+                  : "border-stone text-text"
+              }`}
+            >
+              <Heart size={18} className={isSaved ? "fill-brass" : ""} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setVisitModalOpen(true)}
+              className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full flex-1 hover:opacity-90 transition-opacity"
+            >
+              {t("listing.bookNow", "Book Now")}
+            </button>
+          </div>
         )}
       </div>
     </AppShell>
