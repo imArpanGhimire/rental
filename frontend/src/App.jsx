@@ -15,6 +15,8 @@ import CreateListing from "./pages/owner/CreateListing.jsx";
 import RenterDashboard from "./pages/renter/Dashboard.jsx";
 import SavedListings from "./pages/renter/SavedListings.jsx";
 
+import ProfileSettings from "./pages/settings/ProfileSettings.jsx";
+
 import ProtectedRoute from "./components/routing/ProtectedRoute.jsx";
 import Footer from "./components/footer.jsx";
 
@@ -83,6 +85,15 @@ function App() {
               }
             />
 
+            <Route
+              path="/owner/settings"
+              element={
+                <ProtectedRoute allowedRoles={["owner"]}>
+                  <ProfileSettings />
+                </ProtectedRoute>
+              }
+            />
+
             {/* RENTER ROUTES */}
             <Route
               path="/renter"
@@ -98,6 +109,15 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={["renter"]}>
                   <SavedListings />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/renter/settings"
+              element={
+                <ProtectedRoute allowedRoles={["renter"]}>
+                  <ProfileSettings />
                 </ProtectedRoute>
               }
             />
