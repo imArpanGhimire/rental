@@ -1,5 +1,16 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { loginUser, logoutUser, registerUser, getProfile } from "../../api/auth.api";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+import {
+  loginUser,
+  logoutUser,
+  registerUser,
+  getProfile,
+} from "../../api/auth.api";
 import { setUnauthorizedHandler } from "../../api/client";
 
 const AuthContext = createContext(null);
@@ -49,6 +60,12 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  // Merge a partial update into the current user (e.g. after editing the
+  // name, or after an avatar upload/removal succeeds) without a refetch.
+  const updateUser = useCallback((patch) => {
+    setUser((prev) => (prev ? { ...prev, ...patch } : prev));
+  }, []);
+
   const value = {
     user,
     role: user?.role || null,
@@ -57,6 +74,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
