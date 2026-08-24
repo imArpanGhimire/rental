@@ -14,6 +14,7 @@ import {
   CalendarDays,
   Sun,
   Moon,
+  UserCog,
 } from "lucide-react";
 
 import Logo from "../ui/Logo";
@@ -845,6 +846,17 @@ export default function TopBar() {
                       {role}
                     </p>
                   </div>
+
+                  {/* PERSONAL INFORMATION */}
+
+                  <NavLink
+                    to={`/${role}/settings`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 min-h-[48px] px-4 rounded-xl text-sm font-medium text-ink/70 hover:bg-ivory hover:text-ink active:bg-ivory no-underline"
+                  >
+                    <UserCog size={17} />
+                    Personal information
+                  </NavLink>
 
                   {/* DASHBOARD */}
 
