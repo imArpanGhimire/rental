@@ -1,35 +1,44 @@
-const express = require("express")
-const app = express()
-const cookieParser = require("cookie-parser")
-const cors = require("cors")
-const helmet = require("helmet")
-const rateLimit = require("express-rate-limit")
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
+const authRoutes = require("./routes/auth.routes");
+const propertyRoutes = require("./routes/property.routes");
+const reviewRoutes = require("./routes/review.routes");
+const favoritesRoutes = require("./routes/favorites.routes");
+const visitRequestRoutes = require("./routes/visitRequest.routes");
+
+const app = express();
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,                 // limit each IP to 100 requests per window
-  message: "Too many requests, please try again later"
-})
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests, please try again later",
+});
 
 app.use(cors({
-  origin: true, // reflects the request origin; safe here since the API is proxied through the frontend's single origin
+  origin: true,
   credentials: true,
-}))
-app.use(express.json())
-app.use(cookieParser())
-app.use(helmet())
-app.use(limiter)
+}));
 
-const authroutes = require("./routes/auth.routes")
-const propertyroutes = require("./routes/property.routes")
-const reviewroutes = require("./routes/review.routes")
-const favoritesroutes = require("./routes/favorites.routes")
-const visitrequestroutes = require("./routes/visitRequest.routes")
+app.use(express.json());
+app.use(cookieParser());
+app.use(helmet());
+app.use(limiter);
 
-app.use("/api/auth", authroutes)
-app.use("/api/properties", propertyroutes)
-app.use("/api/reviews", reviewroutes)
-app.use("/api/favorites", favoritesroutes)
-app.use("/api/visit-requests", visitrequestroutes)
+app.use("/api/auth", authRoutes);
+app.use("/api/properties", propertyRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/favorites", favoritesRoutes);
+app.use("/api/visit-requests", visitRequestRoutes);
 
-module.exports = app
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Rentora backend is running",
+  });
+});
+
+module.exports = app;
