@@ -2,6 +2,7 @@ const usermodel = require("../model/user.model")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const { validationResult } = require("express-validator")
+const cloudinary = require("../config/cloudinary")
 
 const cookieOptions = {
     httpOnly: true,
@@ -219,6 +220,128 @@ async function getme(req, res) {
     }
 }
 
+async function updateprofile(req, res) {
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array()
+        })
+    }
+
+    try {
+        const name = req.body.name?.trim()
+
+        if (!name) {
+            return res.status(400).json({
+                message: "Name is required"
+            })
+        }
+
+        if (name.length < 2 || name.length > 20) {
+            return res.status(400).json({
+                message: "name must be 2–20 characters"
+            })
+        }
+
+        const user = await usermodel.findById(req.user.id)
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        user.name = name
+
+        await user.save()
+
+        return res.status(200).json({
+            message: "Profile updated",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                phone: user.phone,
+                profilePicture: user.profilePicture
+            }
+        })
+    }
+    catch (e) {
+        console.error(e)
+
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+async function updatepassword(req, res) {
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array()
+        })
+    }
+
+    try {
+        const { currentPassword, newPassword } = req.body
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                message: "Current and new password are required"
+            })
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                message: "New password must be at least 6 characters"
+            })
+        }
+
+        const user = await usermodel.findById(req.user.id)
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        const pswcheck = await bcrypt.compare(currentPassword, user.password)
+
+        if (!pswcheck) {
+            return res.status(401).json({
+                message: "Current password is incorrect"
+            })
+        }
+
+        const samePassword = await bcrypt.compare(newPassword, user.password)
+
+        if (samePassword) {
+            return res.status(400).json({
+                message: "New password must be different from current password"
+            })
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10)
+
+        await user.save()
+
+        return res.status(200).json({
+            message: "Password updated successfully"
+        })
+    }
+    catch (e) {
+        console.error(e)
+
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
 async function updateprofilepicture(req, res) {
     if (!req.file) {
         return res.status(400).json({
@@ -235,12 +358,65 @@ async function updateprofilepicture(req, res) {
             })
         }
 
+        const oldPublicId = user.profilePicturePublicId
+
         user.profilePicture = req.file.path
+        user.profilePicturePublicId = req.file.filename
 
         await user.save()
 
+        if (oldPublicId) {
+            cloudinary.uploader.destroy(oldPublicId, (err) => {
+                if (err) console.error("Couldn't delete old Cloudinary image:", err.message)
+            })
+        }
+
         return res.status(200).json({
             message: "Profile picture updated",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                phone: user.phone,
+                profilePicture: user.profilePicture
+            }
+        })
+    }
+    catch (e) {
+        console.error(e)
+
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+async function removeprofilepicture(req, res) {
+    try {
+        const user = await usermodel.findById(req.user.id)
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        const publicId = user.profilePicturePublicId
+
+        user.profilePicture = ""
+        user.profilePicturePublicId = ""
+
+        await user.save()
+
+        if (publicId) {
+            cloudinary.uploader.destroy(publicId, (err) => {
+                if (err) console.error("Couldn't delete Cloudinary image:", err.message)
+            })
+        }
+
+        return res.status(200).json({
+            message: "Profile picture removed",
             user: {
                 id: user._id,
                 name: user.name,
@@ -265,5 +441,8 @@ module.exports = {
     loginuser,
     logoutuser,
     getme,
-    updateprofilepicture
+    updateprofile,
+    updatepassword,
+    updateprofilepicture,
+    removeprofilepicture
 }

@@ -82,10 +82,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
 
     const url = `${window.location.origin}/listings/${listing._id}`;
 
-    /*
-     * MOBILE
-     * Use the native share sheet when available.
-     */
+    // MOBILE
     if (isMobileDevice() && typeof navigator.share === "function") {
       try {
         await navigator.share({
@@ -102,10 +99,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
       }
     }
 
-    /*
-     * DESKTOP
-     * Copy the listing URL.
-     */
+    // DESKTOP
     try {
       const success = await copyToClipboard(url);
 
@@ -147,9 +141,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
       return;
     }
 
-    /*
-     * Guests must log in before saving.
-     */
+    // Guests must log in before saving.
     if (user?.role !== "renter") {
       navigate("/login");
       return;
@@ -161,27 +153,36 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
   return (
     <div className="p-1">
       {selected && (
-        <div className="rounded-2xl bg-bg border border-stone shadow-[0_1px_2px_rgba(20,20,26,0.04),0_8px_24px_rgba(20,20,26,0.05)] overflow-hidden">
-          {/* HEADER */}
-          <div className="flex items-center justify-between px-5 pt-5">
-            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-neutral-500">
-              Most popular
-            </span>
+        <div className="relative rounded-2xl bg-bg border border-stone shadow-[0_1px_2px_rgba(20,20,26,0.04),0_8px_24px_rgba(20,20,26,0.05)] overflow-visible">
+          {/* TOPBAR */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-stone/70">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-brass shrink-0" />
+
+                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">
+                  Featured listing
+                </span>
+              </div>
+
+              <p className="text-sm font-semibold text-ink mt-1 truncate">
+                {selected.title}
+              </p>
+            </div>
 
             <button
               type="button"
-              className={`flex items-center gap-1.5 text-xs transition-colors duration-200 ${
-                copied
-                  ? "text-brass font-semibold"
-                  : "text-neutral-500 hover:text-neutral-900"
-              }`}
               onClick={(e) => {
                 e.stopPropagation();
                 handleShare(selected);
               }}
+              className={`shrink-0 ml-4 flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium transition-all duration-200 ${
+                copied
+                  ? "bg-brass-light text-brass"
+                  : "text-neutral-500 hover:text-ink hover:bg-ivory"
+              }`}
             >
               <Icon name="share" size={14} />
-
               {copied ? "Copied!" : "Share"}
             </button>
           </div>
@@ -198,7 +199,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
               }
             }}
           >
-            <div className="px-5 pt-3">
+            <div className="px-5 pt-5">
               <div className="aspect-[16/10] rounded-xl overflow-hidden bg-ivory border border-stone">
                 {selected.images?.[0]?.url ? (
                   <img
@@ -215,7 +216,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
             </div>
 
             <div className="px-5 pt-4">
-              <h2 className="text-xl font-bold tracking-tight leading-snug hover:underline">
+              <h2 className="text-xl font-bold tracking-tight leading-snug">
                 {selected.title}
               </h2>
 
@@ -223,32 +224,29 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                 <Icon
                   name="pin"
                   size={13}
-                  className="text-neutral-400 flex-shrink-0"
+                  className="text-neutral-400 shrink-0"
                 />
 
-                {selected.location?.address || "Location unavailable"}
+                <span className="truncate">
+                  {selected.location?.address || "Location unavailable"}
+                </span>
               </p>
             </div>
           </div>
 
           {/* PROPERTY DETAILS */}
           <div className="px-5 pb-4">
-            <div className="flex gap-5 text-sm text-neutral-500 my-3.5">
+            <div className="flex items-center gap-6 text-sm text-neutral-500 my-4">
               <span className="flex items-center gap-1.5">
                 <Icon name="bed" size={15} className="text-neutral-400" />
-
                 {selected.rooms ?? "—"}
+                <span className="text-xs text-neutral-400">rooms</span>
               </span>
 
               <span className="flex items-center gap-1.5">
                 <Icon name="bath" size={15} className="text-neutral-400" />
-
                 {selected.bathrooms ?? 1}
-              </span>
-
-              <span className="flex items-center gap-1.5">
-                <Icon name="ruler" size={15} className="text-neutral-400" />
-                {selected.sizeSqft ?? "—"} sqft
+                <span className="text-xs text-neutral-400">bath</span>
               </span>
             </div>
 
@@ -264,13 +262,12 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
             </p>
 
             {/* ACTIONS */}
-            <div className="flex gap-2 mt-4">
+            <div className="relative flex gap-2 mt-4">
               <button
                 type="button"
                 className="flex-1 flex items-center justify-center gap-1.5 bg-ink text-ivory rounded-full py-3 font-semibold text-sm honey-lift hover:shadow-lg hover:-translate-y-px active:translate-y-0 active:shadow-sm active:duration-150"
                 onClick={(e) => {
                   e.stopPropagation();
-
                   navigate(`/listings/${selected._id}`);
                 }}
               >
@@ -278,27 +275,29 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                 <Icon name="arrowRight" size={16} />
               </button>
 
-              <DropdownMenu
-                trigger={
-                  <button
-                    type="button"
-                    className="w-11 h-11 flex items-center justify-center rounded-full border border-stone hover:bg-ivory transition-colors duration-200"
-                    aria-label="More actions"
-                  >
-                    <Icon name="dots" size={16} />
-                  </button>
-                }
-                items={[
-                  {
-                    label: isSaved ? "Remove from saved" : "Save listing",
-                    onSelect: handleSave,
-                  },
-                  {
-                    label: "Copy link",
-                    onSelect: () => handleShare(selected),
-                  },
-                ]}
-              />
+              <div className="relative z-50 shrink-0">
+                <DropdownMenu
+                  trigger={
+                    <button
+                      type="button"
+                      className="w-11 h-11 flex items-center justify-center rounded-full border border-stone bg-bg text-neutral-500 hover:text-ink hover:bg-ivory hover:border-neutral-300 transition-all duration-200"
+                      aria-label="More actions"
+                    >
+                      <Icon name="dots" size={16} />
+                    </button>
+                  }
+                  items={[
+                    {
+                      label: isSaved ? "Remove from saved" : "Save listing",
+                      onSelect: handleSave,
+                    },
+                    {
+                      label: "Copy link",
+                      onSelect: () => handleShare(selected),
+                    },
+                  ]}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -306,10 +305,16 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
 
       {/* MORE NEARBY */}
       {listings.length > 1 && (
-        <div className="mt-6">
-          <h3 className="text-lg font-bold mb-3 px-1 tracking-tight">
-            More nearby
-          </h3>
+        <div className="mt-7">
+          <div className="flex items-end justify-between mb-3 px-1">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400">
+                Explore
+              </p>
+
+              <h3 className="text-lg font-bold tracking-tight">More nearby</h3>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {listings

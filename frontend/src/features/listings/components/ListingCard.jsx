@@ -71,11 +71,6 @@ export default function ListingCard({
               <Icon name="bath" size={14} />
               {listing.bathrooms ?? 1}
             </span>
-
-            <span className="flex items-center gap-1.5">
-              <Icon name="ruler" size={14} />
-              {listing.sizeSqft ?? "—"} sqft
-            </span>
           </div>
 
           <p className="text-sm font-semibold mt-3">
@@ -125,15 +120,10 @@ export default function ListingCard({
       </div>
 
       <div className="p-4">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-base font-semibold">
-            Rs {listing.price?.toLocaleString("en-IN")}
-            <span className="text-xs font-normal text-neutral-500">
-              {" "}
-              / month
-            </span>
-          </span>
-        </div>
+        <span className="text-base font-semibold">
+          Rs {listing.price?.toLocaleString("en-IN")}
+          <span className="text-xs font-normal text-neutral-500"> / month</span>
+        </span>
 
         <h3 className="font-semibold text-sm mt-2 truncate">{listing.title}</h3>
 
@@ -151,11 +141,6 @@ export default function ListingCard({
           <span className="flex items-center gap-1.5">
             <Icon name="bath" size={14} />
             {listing.bathrooms ?? 1}
-          </span>
-
-          <span className="flex items-center gap-1.5">
-            <Icon name="ruler" size={14} />
-            {listing.sizeSqft ?? "—"} sqft
           </span>
         </div>
       </div>

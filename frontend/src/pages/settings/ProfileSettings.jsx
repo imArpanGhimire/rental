@@ -378,7 +378,7 @@ export default function ProfileSettings() {
             <AvatarUploader
               user={user}
               onUploaded={(data) =>
-                updateUser({ avatarUrl: data?.avatarUrl ?? data?.url })
+                updateUser({ avatarUrl: data?.user?.profilePicture })
               }
               onRemoved={() => updateUser({ avatarUrl: null })}
             />

@@ -33,39 +33,47 @@ import {
 
 function LogoutConfirmModal({ onConfirm, onCancel }) {
   return createPortal(
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-ink/50 backdrop-blur-md px-4">
-      <div className="bg-bg rounded-2xl w-full max-w-sm p-6 relative shadow-[0_24px_64px_rgba(20,20,26,0.28)]">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-ivory transition-colors"
-          aria-label="Cancel"
-        >
-          <X size={16} />
-        </button>
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-ink/45 backdrop-blur-[6px] px-4">
+      <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-stone bg-bg shadow-[0_24px_70px_rgba(20,20,26,0.22)]">
+        <div className="p-6 sm:p-7">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="font-display text-xl tracking-tight text-ink">
+                Log out?
+              </p>
 
-        <p className="font-display text-lg text-ink mb-2">Log out?</p>
+              <p className="mt-2 text-sm leading-relaxed text-ink/55">
+                You'll need to log in again to access your account.
+              </p>
+            </div>
 
-        <p className="text-sm text-ink/60 mb-6">
-          You'll need to log in again to access your account.
-        </p>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-ink/45 transition-all duration-200 hover:bg-ivory hover:text-ink"
+              aria-label="Cancel"
+            >
+              <X size={17} strokeWidth={1.8} />
+            </button>
+          </div>
 
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex-1 border border-stone text-ink text-sm font-medium py-2.5 rounded-full hover:bg-ivory transition-colors"
-          >
-            Cancel
-          </button>
+          <div className="mt-7 flex gap-2.5">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 rounded-xl border border-stone bg-bg py-2.5 text-sm font-medium text-ink transition-all duration-200 hover:border-ink/20 hover:bg-ivory"
+            >
+              Cancel
+            </button>
 
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="flex-1 bg-ink text-ivory text-sm font-semibold py-2.5 rounded-full hover:opacity-90 transition-opacity"
-          >
-            Log out
-          </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              className="flex-1 rounded-xl bg-ink py-2.5 text-sm font-semibold text-ivory transition-all duration-200 hover:-translate-y-px hover:opacity-90"
+            >
+              Log out
+            </button>
+          </div>
         </div>
       </div>
     </div>,
@@ -115,37 +123,55 @@ function NotificationPanel({
   onOpenNotification,
 }) {
   return (
-    <div className="absolute right-0 top-full mt-3 w-[360px] max-w-[calc(100vw-24px)] bg-bg border border-stone rounded-2xl shadow-[0_20px_60px_rgba(20,20,26,0.18)] overflow-hidden z-[10000]">
-      <div className="px-4 py-3.5 border-b border-stone flex items-center justify-between gap-3">
-        <div>
-          <h3 className="font-display text-base text-text">Notifications</h3>
+    <div className="absolute right-0 top-[calc(100%+10px)] z-[10000] w-[370px] max-w-[calc(100vw-24px)] overflow-hidden rounded-2xl border border-stone bg-bg shadow-[0_20px_55px_rgba(20,20,26,0.15)]">
+      {/* HEADER */}
 
-          <p className="text-[11px] text-text/45 mt-0.5">
-            {unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up"}
-          </p>
+      <div className="flex items-center justify-between gap-3 border-b border-stone px-5 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brass-light text-brass">
+            <Bell size={16} strokeWidth={1.8} />
+          </div>
+
+          <div>
+            <h3 className="font-display text-[15px] tracking-tight text-text">
+              Notifications
+            </h3>
+
+            <p className="mt-0.5 text-[11px] text-text/45">
+              {unreadCount > 0
+                ? `${unreadCount} unread notification${
+                    unreadCount === 1 ? "" : "s"
+                  }`
+                : "You're all caught up"}
+            </p>
+          </div>
         </div>
 
         {unreadCount > 0 && (
           <button
             type="button"
             onClick={onMarkAllRead}
-            className="text-xs font-medium text-brass hover:text-ink transition-colors"
+            className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-brass transition-colors hover:bg-brass-light hover:text-ink"
           >
             Mark all read
           </button>
         )}
       </div>
 
-      <div className="max-h-[420px] overflow-y-auto">
+      {/* CONTENT */}
+
+      <div className="max-h-[430px] overflow-y-auto">
         {notifications.length === 0 ? (
-          <div className="px-6 py-10 text-center">
-            <div className="mx-auto w-11 h-11 rounded-full bg-brass-light flex items-center justify-center mb-3">
-              <Bell size={18} className="text-brass" />
+          <div className="px-6 py-12 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brass-light">
+              <Bell size={19} className="text-brass" strokeWidth={1.8} />
             </div>
 
-            <p className="text-sm font-medium text-text">No notifications</p>
+            <p className="mt-4 text-sm font-semibold text-text">
+              No notifications
+            </p>
 
-            <p className="text-xs text-text/45 mt-1">
+            <p className="mt-1 text-xs text-text/45">
               New activity will appear here.
             </p>
           </div>
@@ -155,12 +181,16 @@ function NotificationPanel({
               key={notification.key}
               type="button"
               onClick={() => onOpenNotification(notification)}
-              className={`w-full text-left px-4 py-3.5 flex gap-3 border-b border-stone last:border-b-0 hover:bg-ivory transition-colors ${
-                notification.unread ? "bg-brass-light/35" : "bg-transparent"
+              className={`group flex w-full gap-3.5 border-b border-stone px-5 py-4 text-left transition-all duration-200 last:border-b-0 ${
+                notification.unread
+                  ? "bg-brass-light/25 hover:bg-brass-light/45"
+                  : "bg-transparent hover:bg-ivory"
               }`}
             >
+              {/* ICON */}
+
               <span
-                className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${
+                className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
                   notification.type === "accepted"
                     ? "bg-green-100 text-green-700"
                     : notification.type === "declined"
@@ -169,31 +199,33 @@ function NotificationPanel({
                 }`}
               >
                 {notification.type === "accepted" ? (
-                  <Check size={16} />
+                  <Check size={16} strokeWidth={2} />
                 ) : notification.type === "declined" ? (
-                  <X size={16} />
+                  <X size={16} strokeWidth={2} />
                 ) : (
-                  <CalendarDays size={16} />
+                  <CalendarDays size={16} strokeWidth={1.8} />
                 )}
               </span>
 
+              {/* TEXT */}
+
               <span className="min-w-0 flex-1">
-                <span className="flex items-start justify-between gap-2">
-                  <span className="text-sm font-semibold text-text">
+                <span className="flex items-start justify-between gap-3">
+                  <span className="text-[13px] font-semibold leading-snug text-text">
                     {notification.title}
                   </span>
 
                   {notification.unread && (
-                    <span className="w-2 h-2 rounded-full bg-[#c0533e] shrink-0 mt-1.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brass" />
                   )}
                 </span>
 
-                <span className="block text-xs text-text/55 mt-1 leading-relaxed">
+                <span className="mt-1 block text-xs leading-relaxed text-text/52">
                   {notification.message}
                 </span>
 
-                <span className="flex items-center gap-1.5 text-[10px] text-text/35 mt-2">
-                  <Clock size={10} />
+                <span className="mt-2.5 flex items-center gap-1.5 text-[10px] text-text/35">
+                  <Clock size={10} strokeWidth={1.8} />
                   {notification.date}
                 </span>
               </span>
@@ -219,9 +251,21 @@ function ThemeToggleButton({ className = "" }) {
       onClick={toggleTheme}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      className={`flex items-center justify-center w-9 h-9 rounded-full border border-stone text-ink hover:bg-brass-light hover:-translate-y-0.5 transition-all duration-200 ${className}`}
+      className={`group flex h-9 w-9 items-center justify-center rounded-full border border-stone bg-bg text-ink/55 transition-all duration-200 hover:border-ink/20 hover:bg-ivory hover:text-ink ${className}`}
     >
-      {isDark ? <Sun size={16} /> : <Moon size={16} />}
+      {isDark ? (
+        <Sun
+          size={16}
+          strokeWidth={1.8}
+          className="transition-transform duration-300 group-hover:rotate-12"
+        />
+      ) : (
+        <Moon
+          size={16}
+          strokeWidth={1.8}
+          className="transition-transform duration-300 group-hover:-rotate-12"
+        />
+      )}
     </button>
   );
 }
@@ -237,11 +281,8 @@ export default function TopBar() {
   const location = useLocation();
 
   const [confirmOpen, setConfirmOpen] = useState(false);
-
   const [menuOpen, setMenuOpen] = useState(false);
-
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [seenKeys, setSeenKeys] = useState(() =>
@@ -533,253 +574,319 @@ export default function TopBar() {
   };
 
   return (
-    <header className="sticky top-0 z-[9999] bg-bg/90 backdrop-blur-md shadow-[0_1px_0_rgba(20,20,26,0.06),0_12px_24px_-16px_rgba(20,20,26,0.12)]">
-      {/* =====================================================
-          MAIN HEADER
-      ===================================================== */}
-
-      <div className="flex items-center gap-3 sm:gap-6 md:gap-8 px-4 sm:px-6 md:px-10 lg:px-[82px] py-3.5 sm:py-4 lg:py-5">
+    <>
+      <header className="sticky top-0 z-[9999] border-b border-stone/80 bg-bg/95 backdrop-blur-xl">
         {/* ===================================================
-            LOGO
+            MAIN HEADER
         =================================================== */}
 
-        <div className="flex-1 flex items-center min-w-0">
-          <NavLink
-            to="/"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 text-ink no-underline shrink-0"
-          >
-            <Logo />
-          </NavLink>
-        </div>
+        <div className="mx-auto flex h-[68px] w-full items-center gap-4 px-4 sm:px-6 md:h-[72px] md:px-10 lg:px-[82px]">
+          {/* =================================================
+              LOGO
+          ================================================= */}
 
-        {/* ===================================================
-            DESKTOP NAVIGATION
-        =================================================== */}
-
-        <nav className="hidden md:flex gap-0.5 bg-ivory p-1 rounded-full shrink-0">
-          {navItems.map((item) => (
+          <div className="flex min-w-0 items-center">
             <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                `px-4 py-2.5 rounded-full text-sm font-medium no-underline transition-all duration-200 ${
-                  isActive
-                    ? "bg-ink text-ivory font-semibold shadow-[0_4px_12px_rgba(20,20,26,0.18)]"
-                    : "text-ink/60 hover:text-ink hover:bg-white hover:shadow-[0_1px_3px_rgba(20,20,26,0.08)]"
-                }`
-              }
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="group flex shrink-0 items-center text-ink no-underline"
             >
-              {item.label}
+              <Logo />
             </NavLink>
-          ))}
-        </nav>
+          </div>
 
-        {/* ===================================================
-            RIGHT SIDE
-        =================================================== */}
+          {/* =================================================
+              DESKTOP NAVIGATION
+          ================================================= */}
 
-        <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3">
-          {isLoading ? (
-            <>
-              <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
+          <nav className="ml-4 hidden items-center gap-1 rounded-full border border-stone/70 bg-bg/70 p-1 md:flex">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) =>
+                  `relative rounded-full px-4 py-2 text-[13px] font-medium no-underline transition-all duration-200 ${
+                    isActive
+                      ? "bg-ink text-ivory shadow-sm"
+                      : "text-ink/55 hover:bg-ivory hover:text-ink"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
 
-              <div className="w-9 h-9 rounded-full bg-ivory animate-pulse" />
-            </>
-          ) : isAuthenticated ? (
-            <>
-              {/* =============================================
-                  THEME TOGGLE
-              ============================================= */}
+          {/* =================================================
+              RIGHT SIDE
+          ================================================= */}
 
-              <ThemeToggleButton className="hidden sm:flex" />
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+            {isLoading ? (
+              <>
+                <div className="h-9 w-9 animate-pulse rounded-full bg-ivory" />
+                <div className="h-9 w-9 animate-pulse rounded-full bg-ivory" />
+              </>
+            ) : isAuthenticated ? (
+              <>
+                {/* =========================================
+                    THEME
+                ========================================= */}
 
-              {/* =============================================
-                  NOTIFICATIONS
-              ============================================= */}
+                <ThemeToggleButton className="hidden sm:flex" />
 
-              <div className="relative" ref={notificationRef}>
-                <button
-                  type="button"
-                  aria-label="Notifications"
-                  aria-expanded={notificationsOpen}
-                  onClick={() => {
-                    setNotificationsOpen((value) => !value);
+                {/* =========================================
+                    NOTIFICATIONS
+                ========================================= */}
 
-                    setMenuOpen(false);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`relative flex items-center justify-center w-9 h-9 rounded-full border transition-all duration-200 ${
-                    notificationsOpen
-                      ? "border-brass bg-brass-light text-brass"
-                      : "border-stone text-ink hover:bg-brass-light hover:-translate-y-0.5"
-                  }`}
-                >
-                  <Bell size={16} />
+                <div className="relative" ref={notificationRef}>
+                  <button
+                    type="button"
+                    aria-label="Notifications"
+                    aria-expanded={notificationsOpen}
+                    onClick={() => {
+                      setNotificationsOpen((value) => !value);
 
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#c0533e] text-white text-[9px] font-bold flex items-center justify-center border-2 border-white">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
+                      setMenuOpen(false);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`group relative flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-200 ${
+                      notificationsOpen
+                        ? "border-ink/20 bg-ink text-ivory shadow-sm"
+                        : "border-stone bg-bg text-ink/55 hover:border-ink/20 hover:bg-ivory hover:text-ink"
+                    }`}
+                  >
+                    <Bell
+                      size={17}
+                      strokeWidth={1.8}
+                      className="transition-transform duration-200 group-hover:-rotate-6"
+                    />
+
+                    {unreadCount > 0 && (
+                      <span className="absolute -right-0.5 -top-0.5 flex min-h-[17px] min-w-[17px] items-center justify-center rounded-full border-2 border-bg bg-brass px-1 text-[9px] font-bold leading-none text-ivory">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {notificationsOpen && (
+                    <NotificationPanel
+                      notifications={notifications}
+                      unreadCount={unreadCount}
+                      onMarkAllRead={markAllNotificationsRead}
+                      onOpenNotification={openNotification}
+                    />
                   )}
-                </button>
+                </div>
 
-                {notificationsOpen && (
-                  <NotificationPanel
-                    notifications={notifications}
-                    unreadCount={unreadCount}
-                    onMarkAllRead={markAllNotificationsRead}
-                    onOpenNotification={openNotification}
-                  />
-                )}
-              </div>
+                {/* =========================================
+                    DESKTOP USER MENU
+                ========================================= */}
 
-              {/* =============================================
-                  DESKTOP USER MENU
-              ============================================= */}
+                <div className="relative hidden sm:block" ref={menuRef}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen((value) => !value);
 
-              <div className="relative hidden sm:block" ref={menuRef}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen((value) => !value);
+                      setNotificationsOpen(false);
+                      setMobileMenuOpen(false);
+                    }}
+                    title={user?.name}
+                    className={`group flex items-center gap-2 rounded-full border py-1 pl-1 pr-2 transition-all duration-200 ${
+                      menuOpen
+                        ? "border-ink/20 bg-ivory"
+                        : "border-transparent hover:border-stone hover:bg-ivory/60"
+                    }`}
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full border border-brass/30 bg-brass-light text-[11px] font-bold tracking-wide text-ink">
+                      {initials}
+                    </span>
 
-                    setNotificationsOpen(false);
+                    <span className="hidden max-w-[100px] truncate text-[12px] font-medium text-ink/65 lg:block">
+                      {user?.name}
+                    </span>
 
-                    setMobileMenuOpen(false);
-                  }}
-                  title={user?.name}
-                  className="flex items-center gap-1 pl-0.5 pr-1.5 py-0.5 rounded-full hover:bg-ivory transition-colors"
-                >
-                  <span className="flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-ink bg-gradient-to-br from-brass-light to-brass shadow-[0_0_0_2px_#ffffff,0_0_0_3px_var(--color-stone)]">
+                    <ChevronDown
+                      size={13}
+                      strokeWidth={2}
+                      className={`text-ink/35 transition-transform duration-200 ${
+                        menuOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {menuOpen && (
+                    <div className="absolute right-0 top-[calc(100%+10px)] z-[10000] w-60 overflow-hidden rounded-2xl border border-stone bg-bg shadow-[0_20px_55px_rgba(20,20,26,0.15)]">
+                      {/* USER HEADER */}
+
+                      <div className="border-b border-stone bg-ivory/35 px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brass/30 bg-brass-light text-xs font-bold text-ink">
+                            {initials}
+                          </span>
+
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-ink">
+                              {user?.name}
+                            </p>
+
+                            <p className="mt-0.5 text-[11px] capitalize text-ink/45">
+                              {role}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* DASHBOARD */}
+
+                      <div className="p-1.5">
+                        <NavLink
+                          to={`/${role}`}
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink/65 no-underline transition-colors hover:bg-ivory hover:text-ink"
+                        >
+                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-ivory text-ink/50">
+                            <LayoutDashboard size={14} strokeWidth={1.8} />
+                          </span>
+                          Dashboard
+                        </NavLink>
+
+                        {/* SETTINGS */}
+
+                        <NavLink
+                          to={`/${role}/settings`}
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink/65 no-underline transition-colors hover:bg-ivory hover:text-ink"
+                        >
+                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-ivory text-ink/50">
+                            <UserCog size={14} strokeWidth={1.8} />
+                          </span>
+                          Personal information
+                        </NavLink>
+
+                        <div className="my-1 border-t border-stone" />
+
+                        {/* LOGOUT */}
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMenuOpen(false);
+                            setConfirmOpen(true);
+                          }}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium text-[#B5502E] transition-colors hover:bg-[#B5502E]/[0.06]"
+                        >
+                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#B5502E]/[0.07]">
+                            <LogOut size={14} strokeWidth={1.8} />
+                          </span>
+                          Log out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* =========================================
+                    MOBILE USER AVATAR
+                ========================================= */}
+
+                <div className="sm:hidden">
+                  <span
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-brass/30 bg-brass-light text-[10px] font-bold tracking-wide text-ink"
+                    aria-label={user?.name}
+                  >
                     {initials}
                   </span>
+                </div>
 
-                  <ChevronDown
-                    size={14}
-                    className={`text-ink/40 transition-transform duration-200 ${
-                      menuOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
+                {/* =========================================
+                    MOBILE MENU BUTTON
+                ========================================= */}
 
-                {menuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-bg border border-stone rounded-2xl shadow-lg overflow-hidden z-[10000]">
-                    <div className="px-4 py-3 border-b border-stone">
-                      <p className="text-sm font-semibold text-ink truncate">
-                        {user?.name}
-                      </p>
-
-                      <p className="text-xs text-ink/50 capitalize">{role}</p>
-                    </div>
-
-                    <NavLink
-                      to={`/${role}`}
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-ivory transition-colors"
-                    >
-                      <LayoutDashboard size={15} className="text-ink/50" />
-                      Dashboard
-                    </NavLink>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMenuOpen(false);
-                        setConfirmOpen(true);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#c0533e] hover:bg-red-50 transition-colors"
-                    >
-                      <LogOut size={15} />
-                      Log out
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* =============================================
-                  MOBILE USER AVATAR
-              ============================================= */}
-
-              <div className="sm:hidden">
-                <span
-                  className="flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-ink bg-gradient-to-br from-brass-light to-brass shadow-[0_0_0_2px_#ffffff,0_0_0_3px_var(--color-stone)]"
-                  aria-label={user?.name}
+                <button
+                  type="button"
+                  aria-label={
+                    mobileMenuOpen
+                      ? "Close navigation menu"
+                      : "Open navigation menu"
+                  }
+                  aria-expanded={mobileMenuOpen}
+                  onClick={toggleMobileMenu}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-200 md:hidden ${
+                    mobileMenuOpen
+                      ? "border-ink/20 bg-ink text-ivory"
+                      : "border-stone bg-bg text-ink/60 hover:bg-ivory hover:text-ink"
+                  }`}
                 >
-                  {initials}
-                </span>
-              </div>
+                  {mobileMenuOpen ? (
+                    <X size={18} strokeWidth={1.8} />
+                  ) : (
+                    <Menu size={18} strokeWidth={1.8} />
+                  )}
+                </button>
+              </>
+            ) : (
+              <>
+                {/* =========================================
+                    THEME
+                ========================================= */}
 
-              {/* =============================================
-                  MOBILE MENU BUTTON
-              ============================================= */}
+                <ThemeToggleButton className="hidden sm:flex" />
 
-              <button
-                type="button"
-                aria-label={
-                  mobileMenuOpen
-                    ? "Close navigation menu"
-                    : "Open navigation menu"
-                }
-                aria-expanded={mobileMenuOpen}
-                onClick={toggleMobileMenu}
-                className="md:hidden flex items-center justify-center w-10 h-10 rounded-full border border-stone text-ink bg-bg hover:bg-ivory active:scale-95 transition-all"
-              >
-                {mobileMenuOpen ? <X size={19} /> : <Menu size={19} />}
-              </button>
-            </>
-          ) : (
-            <>
-              {/* =============================================
-                  THEME TOGGLE
-              ============================================= */}
+                {/* =========================================
+                    LOGIN
+                ========================================= */}
 
-              <ThemeToggleButton className="hidden sm:flex" />
+                <NavLink
+                  to="/login"
+                  className="rounded-full px-3 py-2 text-[13px] font-medium text-ink/55 no-underline transition-colors hover:bg-ivory hover:text-ink"
+                >
+                  Log in
+                </NavLink>
 
-              {/* =============================================
-                  LOGIN
-              ============================================= */}
+                {/* =========================================
+                    REGISTER
+                ========================================= */}
 
-              <NavLink
-                to="/login"
-                className="text-sm font-medium text-ink/65 no-underline hover:text-ink transition-colors"
-              >
-                Log in
-              </NavLink>
+                <NavLink
+                  to="/register"
+                  className="hidden items-center rounded-full bg-ink px-4 py-2.5 text-[13px] font-semibold text-ivory no-underline shadow-sm transition-all duration-200 hover:-translate-y-px hover:opacity-90 sm:flex"
+                >
+                  List your property
+                </NavLink>
 
-              {/* =============================================
-                  REGISTER DESKTOP
-              ============================================= */}
+                {/* =========================================
+                    MOBILE MENU
+                ========================================= */}
 
-              <NavLink
-                to="/register"
-                className="hidden sm:flex items-center gap-1.5 bg-ink text-ivory rounded-full px-4 py-2.5 text-sm font-semibold no-underline hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
-              >
-                List your property
-              </NavLink>
-
-              {/* =============================================
-                  MOBILE MENU BUTTON
-              ============================================= */}
-
-              <button
-                type="button"
-                aria-label={
-                  mobileMenuOpen
-                    ? "Close navigation menu"
-                    : "Open navigation menu"
-                }
-                aria-expanded={mobileMenuOpen}
-                onClick={toggleMobileMenu}
-                className="md:hidden flex items-center justify-center w-10 h-10 rounded-full border border-stone text-ink bg-bg hover:bg-ivory active:scale-95 transition-all"
-              >
-                {mobileMenuOpen ? <X size={19} /> : <Menu size={19} />}
-              </button>
-            </>
-          )}
+                <button
+                  type="button"
+                  aria-label={
+                    mobileMenuOpen
+                      ? "Close navigation menu"
+                      : "Open navigation menu"
+                  }
+                  aria-expanded={mobileMenuOpen}
+                  onClick={toggleMobileMenu}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-200 md:hidden ${
+                    mobileMenuOpen
+                      ? "border-ink/20 bg-ink text-ivory"
+                      : "border-stone bg-bg text-ink/60 hover:bg-ivory hover:text-ink"
+                  }`}
+                >
+                  {mobileMenuOpen ? (
+                    <X size={18} strokeWidth={1.8} />
+                  ) : (
+                    <Menu size={18} strokeWidth={1.8} />
+                  )}
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* =====================================================
           MOBILE NAVIGATION
@@ -793,21 +900,28 @@ export default function TopBar() {
             type="button"
             aria-label="Close mobile navigation"
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-0 top-[64px] bg-ink/10 backdrop-blur-[1px] md:hidden z-[9997]"
+            className="fixed inset-0 top-[68px] z-[9997] bg-ink/10 backdrop-blur-[2px] md:hidden"
           />
 
           {/* MENU PANEL */}
 
-          <div className="absolute left-0 right-0 top-full md:hidden bg-bg border-t border-stone shadow-[0_20px_40px_rgba(20,20,26,0.12)] z-[9998]">
-            <nav className="px-4 sm:px-6 py-4">
-              {/* THEME TOGGLE */}
+          <div className="absolute left-0 right-0 top-[68px] z-[9998] border-b border-stone bg-bg shadow-[0_20px_45px_rgba(20,20,26,0.12)] md:hidden">
+            <nav className="px-4 py-4 sm:px-6">
+              {/* THEME */}
 
-              <div className="flex items-center justify-between px-4 min-h-[48px] mb-1">
-                <span className="text-sm font-medium text-ink/70">Theme</span>
+              <div className="mb-2 flex min-h-[50px] items-center justify-between rounded-xl px-4">
+                <div>
+                  <p className="text-sm font-medium text-ink">Appearance</p>
+
+                  <p className="mt-0.5 text-[11px] text-ink/40">
+                    Switch between light and dark mode
+                  </p>
+                </div>
+
                 <ThemeToggleButton />
               </div>
 
-              {/* MAIN NAVIGATION */}
+              {/* NAVIGATION */}
 
               <div className="space-y-1">
                 {navItems.map((item) => (
@@ -817,10 +931,10 @@ export default function TopBar() {
                     end={item.to === "/"}
                     onClick={() => setMobileMenuOpen(false)}
                     className={({ isActive }) =>
-                      `flex items-center min-h-[48px] px-4 rounded-xl text-sm font-medium no-underline transition-colors ${
+                      `flex min-h-[48px] items-center rounded-xl px-4 text-sm font-medium no-underline transition-all duration-200 ${
                         isActive
-                          ? "bg-ink text-ivory font-semibold"
-                          : "text-ink/70 hover:bg-ivory hover:text-ink active:bg-ivory"
+                          ? "bg-ink font-semibold text-ivory shadow-sm"
+                          : "text-ink/65 hover:bg-ivory hover:text-ink"
                       }`
                     }
                   >
@@ -829,22 +943,28 @@ export default function TopBar() {
                 ))}
               </div>
 
-              {/* AUTHENTICATED USER OPTIONS */}
+              {/* AUTHENTICATED OPTIONS */}
 
               {isAuthenticated && (
                 <>
                   <div className="my-3 border-t border-stone" />
 
-                  {/* USER INFO */}
+                  {/* USER */}
 
-                  <div className="px-4 py-2.5 mb-1">
-                    <p className="text-sm font-semibold text-ink truncate">
-                      {user?.name}
-                    </p>
+                  <div className="mb-1 flex items-center gap-3 rounded-xl px-4 py-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-brass/30 bg-brass-light text-[10px] font-bold text-ink">
+                      {initials}
+                    </span>
 
-                    <p className="text-xs text-ink/50 capitalize mt-0.5">
-                      {role}
-                    </p>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-ink">
+                        {user?.name}
+                      </p>
+
+                      <p className="mt-0.5 text-[11px] capitalize text-ink/40">
+                        {role}
+                      </p>
+                    </div>
                   </div>
 
                   {/* PERSONAL INFORMATION */}
@@ -852,9 +972,9 @@ export default function TopBar() {
                   <NavLink
                     to={`/${role}/settings`}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 min-h-[48px] px-4 rounded-xl text-sm font-medium text-ink/70 hover:bg-ivory hover:text-ink active:bg-ivory no-underline"
+                    className="flex min-h-[48px] items-center gap-3 rounded-xl px-4 text-sm font-medium text-ink/65 no-underline transition-colors hover:bg-ivory hover:text-ink"
                   >
-                    <UserCog size={17} />
+                    <UserCog size={17} strokeWidth={1.8} />
                     Personal information
                   </NavLink>
 
@@ -863,9 +983,9 @@ export default function TopBar() {
                   <NavLink
                     to={`/${role}`}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 min-h-[48px] px-4 rounded-xl text-sm font-medium text-ink/70 hover:bg-ivory hover:text-ink active:bg-ivory no-underline"
+                    className="flex min-h-[48px] items-center gap-3 rounded-xl px-4 text-sm font-medium text-ink/65 no-underline transition-colors hover:bg-ivory hover:text-ink"
                   >
-                    <LayoutDashboard size={17} />
+                    <LayoutDashboard size={17} strokeWidth={1.8} />
                     Dashboard
                   </NavLink>
 
@@ -875,18 +995,17 @@ export default function TopBar() {
                     type="button"
                     onClick={() => {
                       setMobileMenuOpen(false);
-
                       setConfirmOpen(true);
                     }}
-                    className="w-full flex items-center gap-3 min-h-[48px] px-4 rounded-xl text-sm font-medium text-[#c0533e] hover:bg-red-50 active:bg-red-50 transition-colors"
+                    className="flex min-h-[48px] w-full items-center gap-3 rounded-xl px-4 text-left text-sm font-medium text-[#B5502E] transition-colors hover:bg-[#B5502E]/[0.06]"
                   >
-                    <LogOut size={17} />
+                    <LogOut size={17} strokeWidth={1.8} />
                     Log out
                   </button>
                 </>
               )}
 
-              {/* UNAUTHENTICATED USER OPTIONS */}
+              {/* UNAUTHENTICATED OPTIONS */}
 
               {!isAuthenticated && (
                 <>
@@ -895,7 +1014,7 @@ export default function TopBar() {
                   <NavLink
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center min-h-[48px] px-4 rounded-xl text-sm font-medium text-ink border border-stone hover:bg-ivory no-underline"
+                    className="flex min-h-[48px] items-center justify-center rounded-xl border border-stone text-sm font-medium text-ink no-underline transition-all hover:bg-ivory"
                   >
                     Log in
                   </NavLink>
@@ -903,7 +1022,7 @@ export default function TopBar() {
                   <NavLink
                     to="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center min-h-[48px] px-4 rounded-xl text-sm font-semibold bg-ink text-ivory hover:opacity-90 no-underline mt-2"
+                    className="mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-ink text-sm font-semibold text-ivory no-underline shadow-sm transition-opacity hover:opacity-90"
                   >
                     List your property
                   </NavLink>
@@ -924,6 +1043,6 @@ export default function TopBar() {
           onCancel={() => setConfirmOpen(false)}
         />
       )}
-    </header>
+    </>
   );
 }

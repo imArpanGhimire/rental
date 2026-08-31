@@ -64,6 +64,28 @@ const loginValidation = [
         .withMessage("password is required")
 ]
 
+const updateProfileValidation = [
+    body("name")
+        .trim()
+        .isLength({
+            min: 2,
+            max: 20
+        })
+        .withMessage("name must be 2–20 characters")
+]
+
+const passwordValidation = [
+    body("currentPassword")
+        .notEmpty()
+        .withMessage("current password is required"),
+
+    body("newPassword")
+        .isLength({
+            min: 6
+        })
+        .withMessage("new password must be at least 6 characters")
+]
+
 router.post(
     "/register",
     registerValidation,
@@ -87,11 +109,31 @@ router.get(
     authcontroller.getme
 )
 
+router.patch(
+    "/me",
+    authMiddleware,
+    updateProfileValidation,
+    authcontroller.updateprofile
+)
+
+router.patch(
+    "/me/password",
+    authMiddleware,
+    passwordValidation,
+    authcontroller.updatepassword
+)
+
 router.put(
     "/update-profile-picture",
     authMiddleware,
     handleProfileUpload,
     authcontroller.updateprofilepicture
+)
+
+router.delete(
+    "/remove-profile-picture",
+    authMiddleware,
+    authcontroller.removeprofilepicture
 )
 
 module.exports = router
