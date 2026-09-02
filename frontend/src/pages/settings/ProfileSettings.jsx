@@ -249,6 +249,9 @@ function PersonalInfoForm({ user, onSaved }) {
    PASSWORD
 ========================================================= */
 
+import { validateNewPassword } from "../../features/auth/utils/validatePassword.js";
+import NewPasswordFields from "../../features/auth/components/NewPasswordFields.jsx";
+
 function PasswordForm() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -266,17 +269,9 @@ function PasswordForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    setMismatchError("");
-
-    if (newPassword !== confirmPassword) {
-      setMismatchError("New passwords don't match.");
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setMismatchError("New password must be at least 6 characters.");
-      return;
-    }
+    const validationError = validateNewPassword(newPassword, confirmPassword);
+    setMismatchError(validationError);
+    if (validationError) return;
 
     mutation.mutate({ currentPassword, newPassword });
   }
@@ -291,22 +286,11 @@ function PasswordForm() {
         required
       />
 
-      <PasswordInput
-        label="New password"
-        name="newPassword"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-        required
-        minLength={6}
-      />
-
-      <PasswordInput
-        label="Confirm new password"
-        name="confirmPassword"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        required
-        minLength={6}
+      <NewPasswordFields
+        newPassword={newPassword}
+        confirmPassword={confirmPassword}
+        onNewPasswordChange={setNewPassword}
+        onConfirmPasswordChange={setConfirmPassword}
       />
 
       {mismatchError && <p className="text-xs text-red-600">{mismatchError}</p>}
