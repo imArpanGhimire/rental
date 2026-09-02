@@ -46,6 +46,29 @@ const userschema = new mongoose.Schema(
         profilePicturePublicId: {
             type: String,
             default: ""
+        },
+
+        securityQuestions: {
+            type: [
+                {
+                    question: {
+                        type: String,
+                        required: true
+                    },
+                    answerHash: {
+                        type: String,
+                        required: true
+                    },
+                    _id: false
+                }
+            ],
+            validate: {
+                validator: function (arr) {
+                    return arr.length === 2
+                },
+                message: "Exactly two security questions are required"
+            },
+            required: true
         }
     },
 
