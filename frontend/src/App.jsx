@@ -121,6 +121,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route path="/forgot-password" element={<ForgetPassword />} />
           </Routes>
         </AnimatePresence>
       </main>
