@@ -3,6 +3,7 @@ import AuthField from "../../../components/ui/AuthField";
 import PasswordInput from "../../../components/ui/PasswordInput";
 import Button from "../../../components/ui/Button";
 import RoleToggle from "./RoleToggle";
+import SecurityQuestionsFields from "./SecurityQuestionsFields";
 import { useRegister } from "../hooks/useRegister";
 
 export default function RegisterForm() {
@@ -13,7 +14,12 @@ export default function RegisterForm() {
     phone: "",
     password: "",
     role: "renter",
+    securityAnswers: [
+      { question: "", answer: "" },
+      { question: "", answer: "" },
+    ],
   });
+  const [formError, setFormError] = useState("");
 
   function handleChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -23,8 +29,32 @@ export default function RegisterForm() {
     setForm((prev) => ({ ...prev, role }));
   }
 
+  function handleSecurityAnswersChange(securityAnswers) {
+    setForm((prev) => ({ ...prev, securityAnswers }));
+  }
+
+  function validate() {
+    const [q1, q2] = form.securityAnswers;
+    if (!q1.question || !q2.question) {
+      return "Please select both security questions.";
+    }
+    if (q1.question === q2.question) {
+      return "Please choose two different security questions.";
+    }
+    if (!q1.answer.trim() || !q2.answer.trim()) {
+      return "Please answer both security questions.";
+    }
+    return "";
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
+    const validationError = validate();
+    if (validationError) {
+      setFormError(validationError);
+      return;
+    }
+    setFormError("");
     try {
       await submit(form);
     } catch {
@@ -70,9 +100,17 @@ export default function RegisterForm() {
         minLength={6}
       />
 
-      {error && (
+      <SecurityQuestionsFields
+        value={form.securityAnswers}
+        onChange={handleSecurityAnswersChange}
+      />
+
+      {(formError || error) && (
         <p role="alert" className="form-error">
-          {typeof error === "string" ? error : "Please check your details and try again."}
+          {formError ||
+            (typeof error === "string"
+              ? error
+              : "Please check your details and try again.")}
         </p>
       )}
 
