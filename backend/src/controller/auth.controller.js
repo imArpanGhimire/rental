@@ -3,12 +3,19 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const { validationResult } = require("express-validator")
 const cloudinary = require("../config/cloudinary")
+const SECURITY_QUESTIONS = require("../config/securityQuestions")
 
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
+}
+
+// answers are normalized before hashing/comparing so casing and
+// stray whitespace ("Rex", "rex ", "REX") all count as the same answer
+function normalizeAnswer(answer) {
+    return (answer || "").trim().toLowerCase()
 }
 
 async function registeruser(req, res) {
@@ -24,7 +31,7 @@ async function registeruser(req, res) {
         const name = req.body.name?.trim()
         const email = req.body.email?.trim().toLowerCase()
         const phone = req.body.phone?.trim()
-        const { password, role } = req.body
+        const { password, role, securityAnswers } = req.body
 
         if (!name || !email || !password || !role || !phone) {
             return res.status(400).json({
@@ -56,6 +63,35 @@ async function registeruser(req, res) {
             })
         }
 
+        if (!Array.isArray(securityAnswers) || securityAnswers.length !== 2) {
+            return res.status(400).json({
+                message: "Please answer exactly two security questions"
+            })
+        }
+
+        const [first, second] = securityAnswers
+
+        if (
+            !SECURITY_QUESTIONS.includes(first?.question) ||
+            !SECURITY_QUESTIONS.includes(second?.question)
+        ) {
+            return res.status(400).json({
+                message: "Invalid security question"
+            })
+        }
+
+        if (first.question === second.question) {
+            return res.status(400).json({
+                message: "Please choose two different security questions"
+            })
+        }
+
+        if (!normalizeAnswer(first.answer) || !normalizeAnswer(second.answer)) {
+            return res.status(400).json({
+                message: "Security answers cannot be empty"
+            })
+        }
+
         const alreadyExists = await usermodel.findOne({ email })
 
         if (alreadyExists) {
@@ -66,12 +102,20 @@ async function registeruser(req, res) {
 
         const hash = await bcrypt.hash(password, 10)
 
+        const hashedSecurityQuestions = await Promise.all(
+            securityAnswers.map(async (item) => ({
+                question: item.question,
+                answerHash: await bcrypt.hash(normalizeAnswer(item.answer), 10)
+            }))
+        )
+
         const user = await usermodel.create({
             name,
             password: hash,
             email,
             role,
-            phone
+            phone,
+            securityQuestions: hashedSecurityQuestions
         })
 
         const token = jwt.sign(
@@ -312,11 +356,6 @@ async function updatepassword(req, res) {
         const pswcheck = await bcrypt.compare(currentPassword, user.password)
 
         if (!pswcheck) {
-            // IMPORTANT: this must NOT be 401. The axios client's
-            // response interceptor treats any 401 as "session expired"
-            // and force-logs-out + redirects to /login. A wrong current
-            // password is a validation failure, not an auth failure —
-            // use 400 so it stays on the settings page as a normal error.
             return res.status(400).json({
                 message: "Current password is incorrect"
             })
@@ -441,6 +480,168 @@ async function removeprofilepicture(req, res) {
     }
 }
 
+function getsecurityquestionslist(req, res) {
+    return res.status(200).json({
+        questions: SECURITY_QUESTIONS
+    })
+}
+
+async function getaccountsecurityquestions(req, res) {
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array()
+        })
+    }
+
+    try {
+        const email = req.body.email?.trim().toLowerCase()
+
+        const user = await usermodel.findOne({ email })
+
+        if (!user || !user.securityQuestions || user.securityQuestions.length !== 2) {
+            return res.status(404).json({
+                message: "No account found with that email"
+            })
+        }
+
+        return res.status(200).json({
+            questions: user.securityQuestions.map((q) => q.question)
+        })
+    }
+    catch (e) {
+        console.error(e)
+
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+async function verifysecurityanswers(req, res) {
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array()
+        })
+    }
+
+    try {
+        const email = req.body.email?.trim().toLowerCase()
+        const { answers } = req.body
+
+        const user = await usermodel.findOne({ email })
+
+        if (!user || !user.securityQuestions || user.securityQuestions.length !== 2) {
+            return res.status(404).json({
+                message: "No account found with that email"
+            })
+        }
+
+        for (const stored of user.securityQuestions) {
+            const submitted = answers.find((a) => a.question === stored.question)
+
+            if (!submitted) {
+                return res.status(400).json({
+                    message: "One or more answers are incorrect"
+                })
+            }
+
+            const match = await bcrypt.compare(
+                normalizeAnswer(submitted.answer),
+                stored.answerHash
+            )
+
+            if (!match) {
+                return res.status(400).json({
+                    message: "One or more answers are incorrect"
+                })
+            }
+        }
+
+        // short-lived token scoped only to resetting the password —
+        // it's not the login/session token and can't be used to access
+        // anything else, and it expires in 10 minutes
+        const resetToken = jwt.sign(
+            {
+                id: user._id,
+                purpose: "password_reset"
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "10m"
+            }
+        )
+
+        return res.status(200).json({
+            resetToken
+        })
+    }
+    catch (e) {
+        console.error(e)
+
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+async function resetpasswordwithtoken(req, res) {
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array()
+        })
+    }
+
+    try {
+        const { resetToken, newPassword } = req.body
+
+        let payload
+
+        try {
+            payload = jwt.verify(resetToken, process.env.JWT_SECRET)
+        }
+        catch (e) {
+            return res.status(400).json({
+                message: "Reset session expired, please start again"
+            })
+        }
+
+        if (payload.purpose !== "password_reset") {
+            return res.status(400).json({
+                message: "Invalid reset request"
+            })
+        }
+
+        const user = await usermodel.findById(payload.id)
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10)
+
+        await user.save()
+
+        return res.status(200).json({
+            message: "Password reset successfully"
+        })
+    }
+    catch (e) {
+        console.error(e)
+
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
 module.exports = {
     registeruser,
     loginuser,
@@ -449,5 +650,9 @@ module.exports = {
     updateprofile,
     updatepassword,
     updateprofilepicture,
-    removeprofilepicture
+    removeprofilepicture,
+    getsecurityquestionslist,
+    getaccountsecurityquestions,
+    verifysecurityanswers,
+    resetpasswordwithtoken
 }
