@@ -53,3 +53,29 @@ export function uploadAvatar(file) {
 export function removeAvatar() {
   return client.delete("/auth/remove-profile-picture").then((res) => res.data);
 }
+
+
+export function getSecurityQuestionsList() {
+  return client.get("/auth/security-questions-list").then((res) => res.data);
+}
+
+/**
+ * @param {string} email
+ */
+export function getAccountSecurityQuestions(email) {
+  return client.post("/auth/forgot-password/questions", { email }).then((res) => res.data);
+}
+
+/**
+ * @param {{ email: string, answers: { question: string, answer: string }[] }} payload
+ */
+export function verifySecurityAnswers(payload) {
+  return client.post("/auth/forgot-password/verify", payload).then((res) => res.data);
+}
+
+/**
+ * @param {{ resetToken: string, newPassword: string }} payload
+ */
+export function resetPasswordWithToken(payload) {
+  return client.post("/auth/forgot-password/reset", payload).then((res) => res.data);
+}
