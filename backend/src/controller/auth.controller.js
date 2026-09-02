@@ -312,7 +312,12 @@ async function updatepassword(req, res) {
         const pswcheck = await bcrypt.compare(currentPassword, user.password)
 
         if (!pswcheck) {
-            return res.status(401).json({
+            // IMPORTANT: this must NOT be 401. The axios client's
+            // response interceptor treats any 401 as "session expired"
+            // and force-logs-out + redirects to /login. A wrong current
+            // password is a validation failure, not an auth failure —
+            // use 400 so it stays on the settings page as a normal error.
+            return res.status(400).json({
                 message: "Current password is incorrect"
             })
         }
