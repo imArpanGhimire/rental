@@ -25,6 +25,7 @@ import { useTheme } from "../../context/ThemeContext.jsx";
 import {
   useMyVisitRequests,
   useOwnerVisitRequests,
+  useUpdateVisitRequestStatus,
 } from "../../features/requests/hooks/useVisitRequests.js";
 
 /* =========================================================
@@ -122,6 +123,27 @@ function NotificationPanel({
   onMarkAllRead,
   onOpenNotification,
 }) {
+  const updateStatus = useUpdateVisitRequestStatus();
+
+  // Tracks which specific request is mid-update, so only that row's
+  // buttons disable/show a loading state instead of the whole panel.
+  const [updatingId, setUpdatingId] = useState(null);
+
+  function handleRespond(e, requestId, status) {
+    e.stopPropagation();
+
+    if (!requestId || updateStatus.isPending) return;
+
+    setUpdatingId(requestId);
+
+    updateStatus.mutate(
+      { id: requestId, status },
+      {
+        onSettled: () => setUpdatingId(null),
+      },
+    );
+  }
+
   return (
     <div className="absolute right-0 top-[calc(100%+10px)] z-[10000] w-[370px] max-w-[calc(100vw-24px)] overflow-hidden rounded-2xl border border-stone bg-bg shadow-[0_20px_55px_rgba(20,20,26,0.15)]">
       {/* HEADER */}
@@ -176,67 +198,100 @@ function NotificationPanel({
             </p>
           </div>
         ) : (
-          notifications.map((notification) => (
-            <button
-              key={notification.key}
-              type="button"
-              onClick={() => onOpenNotification(notification)}
-              className={`group flex w-full gap-3.5 border-b border-stone px-5 py-4 text-left transition-all duration-200 last:border-b-0 ${
-                notification.unread
-                  ? "bg-brass-light/25 hover:bg-brass-light/45"
-                  : "bg-transparent hover:bg-ivory"
-              }`}
-            >
-              {/* ICON */}
+          notifications.map((notification) => {
+            const isPendingRequest = notification.type === "pending";
+            const requestId = notification.request?._id;
+            const isUpdatingThis = updatingId === requestId;
 
-              <span
-                className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                  notification.type === "accepted"
-                    ? "bg-green-100 text-green-700"
-                    : notification.type === "declined"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-brass-light text-brass"
+            return (
+              <div
+                key={notification.key}
+                className={`group flex w-full gap-3.5 border-b border-stone px-5 py-4 text-left transition-all duration-200 last:border-b-0 ${
+                  notification.unread
+                    ? "bg-brass-light/25 hover:bg-brass-light/45"
+                    : "bg-transparent hover:bg-ivory"
                 }`}
               >
-                {notification.type === "accepted" ? (
-                  <Check size={16} strokeWidth={2} />
-                ) : notification.type === "declined" ? (
-                  <X size={16} strokeWidth={2} />
-                ) : (
-                  <CalendarDays size={16} strokeWidth={1.8} />
-                )}
-              </span>
+                {/* ICON */}
 
-              {/* TEXT */}
-
-              <span className="min-w-0 flex-1">
-                <span className="flex items-start justify-between gap-3">
-                  <span className="text-[13px] font-semibold leading-snug text-text">
-                    {notification.title}
-                  </span>
-
-                  {notification.unread && (
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brass" />
+                <span
+                  className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                    notification.type === "accepted"
+                      ? "bg-green-100 text-green-700"
+                      : notification.type === "declined"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-brass-light text-brass"
+                  }`}
+                >
+                  {notification.type === "accepted" ? (
+                    <Check size={16} strokeWidth={2} />
+                  ) : notification.type === "declined" ? (
+                    <X size={16} strokeWidth={2} />
+                  ) : (
+                    <CalendarDays size={16} strokeWidth={1.8} />
                   )}
                 </span>
 
-                <span className="mt-1 block text-xs leading-relaxed text-text/52">
-                  {notification.message}
-                </span>
+                {/* TEXT + ACTIONS */}
 
-                <span className="mt-2.5 flex items-center gap-1.5 text-[10px] text-text/35">
-                  <Clock size={10} strokeWidth={1.8} />
-                  {notification.date}
-                </span>
-              </span>
-            </button>
-          ))
+                <div className="min-w-0 flex-1">
+                  <button
+                    type="button"
+                    onClick={() => onOpenNotification(notification)}
+                    className="block w-full text-left"
+                  >
+                    <span className="flex items-start justify-between gap-3">
+                      <span className="text-[13px] font-semibold leading-snug text-text">
+                        {notification.title}
+                      </span>
+
+                      {notification.unread && (
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brass" />
+                      )}
+                    </span>
+
+                    <span className="mt-1 block text-xs leading-relaxed text-text/52">
+                      {notification.message}
+                    </span>
+
+                    <span className="mt-2.5 flex items-center gap-1.5 text-[10px] text-text/35">
+                      <Clock size={10} strokeWidth={1.8} />
+                      {notification.date}
+                    </span>
+                  </button>
+
+                  {/* ACCEPT / DECLINE — only for the owner's pending requests */}
+
+                  {isPendingRequest && (
+                    <div className="mt-3 flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={isUpdatingThis}
+                        onClick={(e) => handleRespond(e, requestId, "accepted")}
+                        className="flex-1 rounded-lg bg-ink py-1.5 text-[11px] font-semibold text-ivory transition-opacity hover:opacity-90 disabled:opacity-50"
+                      >
+                        {isUpdatingThis ? "..." : "Accept"}
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={isUpdatingThis}
+                        onClick={(e) => handleRespond(e, requestId, "declined")}
+                        className="flex-1 rounded-lg border border-stone py-1.5 text-[11px] font-semibold text-text/70 transition-colors hover:bg-ivory disabled:opacity-50"
+                      >
+                        {isUpdatingThis ? "..." : "Decline"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
     </div>
   );
 }
-
 /* =========================================================
    THEME TOGGLE
 ========================================================= */
