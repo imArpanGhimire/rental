@@ -1,4 +1,5 @@
 import { formatAddress } from "../../../utils/formatAddress";
+import { formatRelativeDate } from "../../../utils/formatDate";
 import Icon from "../../../components/ui/Icon";
 
 export default function ListingCard({
@@ -73,10 +74,18 @@ export default function ListingCard({
             </span>
           </div>
 
-          <p className="text-sm font-semibold mt-3">
-            Rs {listing.price?.toLocaleString("en-IN")}
-            <span className="font-normal text-neutral-500"> / month</span>
-          </p>
+          <div className="flex items-center justify-between mt-3">
+            <p className="text-sm font-semibold">
+              Rs {listing.price?.toLocaleString("en-IN")}
+              <span className="font-normal text-neutral-500"> / month</span>
+            </p>
+
+            {listing.createdAt && (
+              <span className="text-[11px] text-neutral-400 shrink-0">
+                {formatRelativeDate(listing.createdAt)}
+              </span>
+            )}
+          </div>
         </div>
       </button>
     );
@@ -120,10 +129,21 @@ export default function ListingCard({
       </div>
 
       <div className="p-4">
-        <span className="text-base font-semibold">
-          Rs {listing.price?.toLocaleString("en-IN")}
-          <span className="text-xs font-normal text-neutral-500"> / month</span>
-        </span>
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-base font-semibold">
+            Rs {listing.price?.toLocaleString("en-IN")}
+            <span className="text-xs font-normal text-neutral-500">
+              {" "}
+              / month
+            </span>
+          </span>
+
+          {listing.createdAt && (
+            <span className="text-[11px] text-neutral-400 shrink-0 mt-0.5">
+              {formatRelativeDate(listing.createdAt)}
+            </span>
+          )}
+        </div>
 
         <h3 className="font-semibold text-sm mt-2 truncate">{listing.title}</h3>
 
