@@ -298,7 +298,11 @@ async function updateprofile(req, res) {
 
         user.name = name
 
-        await user.save()
+        // validateModifiedOnly: only re-check the fields actually changed
+        // in this save (here, just "name") instead of the whole document —
+        // otherwise accounts created before securityQuestions existed fail
+        // validation on every unrelated update because that field is empty
+        await user.save({ validateModifiedOnly: true })
 
         return res.status(200).json({
             message: "Profile updated",
@@ -371,7 +375,7 @@ async function updatepassword(req, res) {
 
         user.password = await bcrypt.hash(newPassword, 10)
 
-        await user.save()
+        await user.save({ validateModifiedOnly: true })
 
         return res.status(200).json({
             message: "Password updated successfully"
@@ -407,7 +411,7 @@ async function updateprofilepicture(req, res) {
         user.profilePicture = req.file.path
         user.profilePicturePublicId = req.file.filename
 
-        await user.save()
+        await user.save({ validateModifiedOnly: true })
 
         if (oldPublicId) {
             cloudinary.uploader.destroy(oldPublicId, (err) => {
@@ -451,7 +455,7 @@ async function removeprofilepicture(req, res) {
         user.profilePicture = ""
         user.profilePicturePublicId = ""
 
-        await user.save()
+        await user.save({ validateModifiedOnly: true })
 
         if (publicId) {
             cloudinary.uploader.destroy(publicId, (err) => {
@@ -627,7 +631,7 @@ async function resetpasswordwithtoken(req, res) {
 
         user.password = await bcrypt.hash(newPassword, 10)
 
-        await user.save()
+        await user.save({ validateModifiedOnly: true })
 
         return res.status(200).json({
             message: "Password reset successfully"
