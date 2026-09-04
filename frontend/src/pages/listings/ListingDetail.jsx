@@ -21,6 +21,8 @@ import ReviewCard from "../../features/reviews/components/ReviewCard.jsx";
 
 import ReviewForm from "../../features/reviews/components/ReviewForm.jsx";
 
+import { formatRelativeDate } from "../../utils/formatDate";
+
 import {
   useReviews,
   useCreateReview,
@@ -501,6 +503,12 @@ export default function ListingDetail() {
                   <MapPin size={14} className="text-text/40 shrink-0" />
 
                   {address}
+                </p>
+              )}
+
+              {listing.createdAt && (
+                <p className="text-xs text-text/40 mt-1.5">
+                  Listed {formatRelativeDate(listing.createdAt)}
                 </p>
               )}
             </div>
