@@ -700,9 +700,17 @@ export default function TopBar() {
                         : "border-transparent hover:border-stone hover:bg-ivory/60"
                     }`}
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full border border-brass/30 bg-brass-light text-[11px] font-bold tracking-wide text-ink">
-                      {initials}
-                    </span>
+                    {user?.profilePicture ? (
+                      <img
+                        src={user.profilePicture}
+                        alt={user?.name || "Profile"}
+                        className="h-8 w-8 rounded-full object-cover border border-brass/30"
+                      />
+                    ) : (
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-brass/30 bg-brass-light text-[11px] font-bold tracking-wide text-ink">
+                        {initials}
+                      </span>
+                    )}
 
                     <span className="hidden max-w-[100px] truncate text-[12px] font-medium text-ink/65 lg:block">
                       {user?.name}
@@ -723,9 +731,17 @@ export default function TopBar() {
 
                       <div className="border-b border-stone bg-ivory/35 px-4 py-4">
                         <div className="flex items-center gap-3">
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brass/30 bg-brass-light text-xs font-bold text-ink">
-                            {initials}
-                          </span>
+                          {user?.profilePicture ? (
+                            <img
+                              src={user.profilePicture}
+                              alt={user?.name || "Profile"}
+                              className="h-10 w-10 shrink-0 rounded-xl object-cover border border-brass/30"
+                            />
+                          ) : (
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brass/30 bg-brass-light text-xs font-bold text-ink">
+                              {initials}
+                            </span>
+                          )}
 
                           <div className="min-w-0">
                             <p className="truncate text-sm font-semibold text-ink">
@@ -793,12 +809,20 @@ export default function TopBar() {
                 ========================================= */}
 
                 <div className="sm:hidden">
-                  <span
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-brass/30 bg-brass-light text-[10px] font-bold tracking-wide text-ink"
-                    aria-label={user?.name}
-                  >
-                    {initials}
-                  </span>
+                  {user?.profilePicture ? (
+                    <img
+                      src={user.profilePicture}
+                      alt={user?.name || "Profile"}
+                      className="h-9 w-9 rounded-full object-cover border border-brass/30"
+                    />
+                  ) : (
+                    <span
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-brass/30 bg-brass-light text-[10px] font-bold tracking-wide text-ink"
+                      aria-label={user?.name}
+                    >
+                      {initials}
+                    </span>
+                  )}
                 </div>
 
                 {/* =========================================
@@ -952,9 +976,17 @@ export default function TopBar() {
                   {/* USER */}
 
                   <div className="mb-1 flex items-center gap-3 rounded-xl px-4 py-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-brass/30 bg-brass-light text-[10px] font-bold text-ink">
-                      {initials}
-                    </span>
+                    {user?.profilePicture ? (
+                      <img
+                        src={user.profilePicture}
+                        alt={user?.name || "Profile"}
+                        className="h-9 w-9 rounded-xl object-cover border border-brass/30"
+                      />
+                    ) : (
+                      <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-brass/30 bg-brass-light text-[10px] font-bold text-ink">
+                        {initials}
+                      </span>
+                    )}
 
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-ink">
