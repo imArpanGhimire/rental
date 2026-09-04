@@ -27,9 +27,7 @@ import {
 } from "../../api/auth.api.js";
 
 /* =========================================================
-   SIDEBAR LINKS — mirrors the links array in each Dashboard
-   so the active-tab highlighting matches when you navigate
-   here from Overview/Favorites/etc.
+   SIDEBAR LINKS
 ========================================================= */
 
 const OWNER_LINKS = [
@@ -50,11 +48,12 @@ const RENTER_LINKS = [
 ];
 
 /* =========================================================
-   AVATAR
+   AVATAR — pick a photo, preview it locally, then Save to upload
 ========================================================= */
 
 function AvatarUploader({ user, onUploaded, onRemoved }) {
   const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [localError, setLocalError] = useState("");
 
@@ -70,11 +69,9 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
   const uploadMutation = useMutation({
     mutationFn: uploadAvatar,
     onSuccess: (data) => {
+      setSelectedFile(null);
       setPreviewUrl(null);
       onUploaded(data);
-    },
-    onError: () => {
-      setPreviewUrl(null);
     },
   });
 
@@ -100,14 +97,27 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
     }
 
     setLocalError("");
+    setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
-    uploadMutation.mutate(file);
 
     // Allow re-selecting the same file later.
     e.target.value = "";
   }
 
-  const displaySrc = previewUrl || user?.avatarUrl;
+  function handleCancelPreview() {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setLocalError("");
+  }
+
+  function handleSave() {
+    if (!selectedFile) return;
+    uploadMutation.mutate(selectedFile);
+  }
+
+  // profilePicture is the field the backend actually returns — using
+  // anything else here is what caused the "doesn't save" bug before
+  const displaySrc = previewUrl || user?.profilePicture;
   const isBusy = uploadMutation.isPending || removeMutation.isPending;
 
   return (
@@ -133,7 +143,7 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <input
             ref={fileInputRef}
             type="file"
@@ -151,10 +161,35 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
             className="flex items-center gap-1.5 !py-2 !px-4 text-xs"
           >
             <Camera size={14} />
-            {user?.avatarUrl ? "Change photo" : "Upload photo"}
+            {user?.profilePicture ? "Change photo" : "Upload photo"}
           </Button>
 
-          {user?.avatarUrl && (
+          {selectedFile && (
+            <>
+              <Button
+                type="button"
+                pill
+                disabled={isBusy}
+                onClick={handleSave}
+                className="!py-2 !px-4 text-xs"
+              >
+                {uploadMutation.isPending ? "Saving..." : "Save photo"}
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                pill
+                disabled={isBusy}
+                onClick={handleCancelPreview}
+                className="!py-2 !px-4 text-xs"
+              >
+                Cancel
+              </Button>
+            </>
+          )}
+
+          {!selectedFile && user?.profilePicture && (
             <Button
               type="button"
               variant="ghost"
@@ -184,6 +219,10 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
             {removeMutation.error?.message || "Couldn't remove the photo."}
           </p>
         )}
+
+        {uploadMutation.isSuccess &&
+          !uploadMutation.isPending &&
+          !selectedFile && <p className="text-xs text-brass">Saved.</p>}
       </div>
     </div>
   );
@@ -249,9 +288,6 @@ function PersonalInfoForm({ user, onSaved }) {
    PASSWORD
 ========================================================= */
 
-import { validateNewPassword } from "../../features/auth/utils/validatePassword.js";
-import NewPasswordFields from "../../features/auth/components/NewPasswordFields.jsx";
-
 function PasswordForm() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -269,9 +305,17 @@ function PasswordForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    const validationError = validateNewPassword(newPassword, confirmPassword);
-    setMismatchError(validationError);
-    if (validationError) return;
+    setMismatchError("");
+
+    if (newPassword !== confirmPassword) {
+      setMismatchError("New passwords don't match.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setMismatchError("New password must be at least 6 characters.");
+      return;
+    }
 
     mutation.mutate({ currentPassword, newPassword });
   }
@@ -286,11 +330,22 @@ function PasswordForm() {
         required
       />
 
-      <NewPasswordFields
-        newPassword={newPassword}
-        confirmPassword={confirmPassword}
-        onNewPasswordChange={setNewPassword}
-        onConfirmPasswordChange={setConfirmPassword}
+      <PasswordInput
+        label="New password"
+        name="newPassword"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+        required
+        minLength={6}
+      />
+
+      <PasswordInput
+        label="Confirm new password"
+        name="confirmPassword"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        required
+        minLength={6}
       />
 
       {mismatchError && <p className="text-xs text-red-600">{mismatchError}</p>}
@@ -362,9 +417,9 @@ export default function ProfileSettings() {
             <AvatarUploader
               user={user}
               onUploaded={(data) =>
-                updateUser({ avatarUrl: data?.user?.profilePicture })
+                updateUser({ profilePicture: data?.user?.profilePicture })
               }
-              onRemoved={() => updateUser({ avatarUrl: null })}
+              onRemoved={() => updateUser({ profilePicture: null })}
             />
           </section>
 
