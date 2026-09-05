@@ -499,7 +499,7 @@ export default function ListingDetail() {
               </h1>
 
               {address && (
-                <p className="text-sm text-text/60 flex items-center gap-1.5 mt-2">
+                <p className="text-sm text-text/70 flex items-center gap-1.5 mt-2">
                   <MapPin size={14} className="text-text/40 shrink-0" />
 
                   {address}
