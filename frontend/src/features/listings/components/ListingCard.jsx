@@ -152,7 +152,7 @@ export default function ListingCard({
           <span className="truncate">{formatAddress(listing.location)}</span>
         </p>
 
-        <div className="flex items-center gap-4 text-xs text-neutral-500 mt-3">
+        <div className="flex items-center gap-4 text-xs text-neutral-500 mt-4">
           <span className="flex items-center gap-1.5">
             <Icon name="bed" size={14} />
             {listing.rooms ?? "—"}
