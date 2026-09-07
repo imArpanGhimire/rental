@@ -35,7 +35,7 @@ import {
 function LogoutConfirmModal({ onConfirm, onCancel }) {
   return createPortal(
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-ink/45 backdrop-blur-[6px] px-4">
-      <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-stone bg-bg shadow-[0_24px_70px_rgba(20,20,26,0.22)]">
+      <div className="w-full max-w-sm overflow-hidden rounded-xl border border-stone bg-bg shadow-[0_24px_70px_rgba(20,20,26,0.22)]">
         <div className="p-6 sm:p-7">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -124,9 +124,6 @@ function NotificationPanel({
   onOpenNotification,
 }) {
   const updateStatus = useUpdateVisitRequestStatus();
-
-  // Tracks which specific request is mid-update, so only that row's
-  // buttons disable/show a loading state instead of the whole panel.
   const [updatingId, setUpdatingId] = useState(null);
 
   function handleRespond(e, requestId, status) {
@@ -145,153 +142,223 @@ function NotificationPanel({
   }
 
   return (
-    <div className="absolute right-0 top-[calc(100%+10px)] z-[10000] w-[370px] max-w-[calc(100vw-24px)] overflow-hidden rounded-2xl border border-stone bg-bg shadow-[0_20px_55px_rgba(20,20,26,0.15)]">
+    <div
+      className="
+        absolute right-0 top-[calc(100%+10px)] z-[10000]
+        w-[360px] max-w-[calc(100vw-24px)] overflow-hidden
+        rounded-[22px] border border-black/10
+        bg-gradient-to-b from-[#f3f2ee] via-[#ecebe7] to-[#dfded9]
+        shadow-[0_24px_70px_rgba(20,23,31,0.18)]
+        backdrop-blur-xl
+        dark:border-white/10
+        dark:from-[#1c1f26] dark:via-[#181b20] dark:to-[#121419]
+      "
+    >
+      {/* soft ambient highlight */}
+      <div
+        className="
+          pointer-events-none absolute -right-16 -top-20 h-48 w-48
+          rounded-full bg-white/55 blur-3xl dark:bg-white/[0.035]
+        "
+      />
+
       {/* HEADER */}
+      <div className="relative border-b border-black/10 px-4 pb-3.5 pt-4 dark:border-white/10">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              className="
+                flex h-9 w-9 shrink-0 items-center justify-center rounded-xl
+                border border-black/10 bg-white/55 text-[#26282d]
+                shadow-[0_8px_24px_rgba(20,23,31,0.07)]
+                dark:border-white/10 dark:bg-white/[0.06] dark:text-white
+              "
+            >
+              <Bell size={16} strokeWidth={1.8} />
+            </div>
 
-      <div className="flex items-center justify-between gap-3 border-b border-stone px-5 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brass-light text-brass">
-            <Bell size={16} strokeWidth={1.8} />
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#2b2d31]/45 dark:text-white/40">
+                Activity
+              </p>
+
+              <h3 className="mt-0.5 font-display text-[17px] font-bold tracking-[-0.035em] text-[#1f2125] dark:text-white">
+                Notifications
+              </h3>
+
+              <p className="mt-0.5 text-[11px] leading-4 text-[#2b2d31]/55 dark:text-white/50">
+                {unreadCount > 0
+                  ? `${unreadCount} unread notification${
+                      unreadCount === 1 ? "" : "s"
+                    }`
+                  : "You're all caught up"}
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h3 className="font-display text-[15px] tracking-tight text-text">
-              Notifications
-            </h3>
-
-            <p className="mt-0.5 text-[11px] text-text/45">
-              {unreadCount > 0
-                ? `${unreadCount} unread notification${
-                    unreadCount === 1 ? "" : "s"
-                  }`
-                : "You're all caught up"}
-            </p>
-          </div>
+          {unreadCount > 0 && (
+            <button
+              type="button"
+              onClick={onMarkAllRead}
+              className="
+                shrink-0 rounded-full border border-black/10 bg-white/45
+                px-2.5 py-1.5 text-[10px] font-semibold text-[#2b2d31]/70
+                transition-colors hover:bg-white/75 hover:text-[#14161a]
+                dark:border-white/10 dark:bg-white/[0.05]
+                dark:text-white/65 dark:hover:bg-white/10 dark:hover:text-white
+              "
+            >
+              Mark all read
+            </button>
+          )}
         </div>
-
-        {unreadCount > 0 && (
-          <button
-            type="button"
-            onClick={onMarkAllRead}
-            className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-brass transition-colors hover:bg-brass-light hover:text-ink"
-          >
-            Mark all read
-          </button>
-        )}
       </div>
 
       {/* CONTENT */}
-
-      <div className="max-h-[430px] overflow-y-auto">
+      <div className="relative max-h-[390px] overflow-y-auto p-2.5">
         {notifications.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brass-light">
-              <Bell size={19} className="text-brass" strokeWidth={1.8} />
+          <div
+            className="
+              rounded-[18px] border border-black/10 bg-white/40 px-6 py-9
+              text-center shadow-[0_12px_35px_rgba(20,23,31,0.05)]
+              dark:border-white/10 dark:bg-white/[0.035]
+            "
+          >
+            <div
+              className="
+                mx-auto flex h-10 w-10 items-center justify-center rounded-xl
+                border border-black/10 bg-white/60 text-[#2b2d31]
+                dark:border-white/10 dark:bg-white/[0.06] dark:text-white/80
+              "
+            >
+              <Bell size={17} strokeWidth={1.8} />
             </div>
 
-            <p className="mt-4 text-sm font-semibold text-text">
+            <p className="mt-3 font-display text-[14px] font-semibold tracking-[-0.02em] text-[#1f2125] dark:text-white">
               No notifications
             </p>
 
-            <p className="mt-1 text-xs text-text/45">
+            <p className="mt-1 text-[11px] leading-4 text-[#2b2d31]/50 dark:text-white/45">
               New activity will appear here.
             </p>
           </div>
         ) : (
-          notifications.map((notification) => {
-            const isPendingRequest = notification.type === "pending";
-            const requestId = notification.request?._id;
-            const isUpdatingThis = updatingId === requestId;
+          <div className="space-y-2">
+            {notifications.map((notification) => {
+              const isPendingRequest = notification.type === "pending";
+              const requestId = notification.request?._id;
+              const isUpdatingThis = updatingId === requestId;
 
-            return (
-              <div
-                key={notification.key}
-                className={`group flex w-full gap-3.5 border-b border-stone px-5 py-4 text-left transition-all duration-200 last:border-b-0 ${
-                  notification.unread
-                    ? "bg-brass-light/25 hover:bg-brass-light/45"
-                    : "bg-transparent hover:bg-ivory"
-                }`}
-              >
-                {/* ICON */}
-
-                <span
-                  className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                    notification.type === "accepted"
-                      ? "bg-green-100 text-green-700"
-                      : notification.type === "declined"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-brass-light text-brass"
-                  }`}
+              return (
+                <div
+                  key={notification.key}
+                  className={`
+                    relative overflow-hidden rounded-[17px] border px-3.5 py-3
+                    transition-colors duration-200
+                    ${
+                      notification.unread
+                        ? "border-black/10 bg-white/62 hover:bg-white/80 dark:border-white/10 dark:bg-white/[0.07] dark:hover:bg-white/[0.09]"
+                        : "border-black/[0.07] bg-white/32 hover:bg-white/55 dark:border-white/[0.07] dark:bg-white/[0.025] dark:hover:bg-white/[0.05]"
+                    }
+                  `}
                 >
-                  {notification.type === "accepted" ? (
-                    <Check size={16} strokeWidth={2} />
-                  ) : notification.type === "declined" ? (
-                    <X size={16} strokeWidth={2} />
-                  ) : (
-                    <CalendarDays size={16} strokeWidth={1.8} />
+                  {notification.unread && (
+                    <span className="absolute right-3.5 top-3.5 h-1.5 w-1.5 rounded-full bg-[#2f3136] dark:bg-white/70" />
                   )}
-                </span>
 
-                {/* TEXT + ACTIONS */}
-
-                <div className="min-w-0 flex-1">
-                  <button
-                    type="button"
-                    onClick={() => onOpenNotification(notification)}
-                    className="block w-full text-left"
-                  >
-                    <span className="flex items-start justify-between gap-3">
-                      <span className="text-[13px] font-semibold leading-snug text-text">
-                        {notification.title}
-                      </span>
-
-                      {notification.unread && (
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brass" />
+                  <div className="flex gap-3 pr-3">
+                    <span
+                      className={`
+                        mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center
+                        rounded-xl border
+                        ${
+                          notification.type === "accepted"
+                            ? "border-emerald-700/10 bg-emerald-50/80 text-emerald-700 dark:border-emerald-400/15 dark:bg-emerald-400/10 dark:text-emerald-300"
+                            : notification.type === "declined"
+                              ? "border-red-700/10 bg-red-50/80 text-red-700 dark:border-red-400/15 dark:bg-red-400/10 dark:text-red-300"
+                              : "border-black/10 bg-white/60 text-[#2b2d31] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/75"
+                        }
+                      `}
+                    >
+                      {notification.type === "accepted" ? (
+                        <Check size={16} strokeWidth={2} />
+                      ) : notification.type === "declined" ? (
+                        <X size={16} strokeWidth={2} />
+                      ) : (
+                        <CalendarDays size={16} strokeWidth={1.8} />
                       )}
                     </span>
 
-                    <span className="mt-1 block text-xs leading-relaxed text-text/52">
-                      {notification.message}
-                    </span>
-
-                    <span className="mt-2.5 flex items-center gap-1.5 text-[10px] text-text/35">
-                      <Clock size={10} strokeWidth={1.8} />
-                      {notification.date}
-                    </span>
-                  </button>
-
-                  {/* ACCEPT / DECLINE — only for the owner's pending requests */}
-
-                  {isPendingRequest && (
-                    <div className="mt-3 flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
                       <button
                         type="button"
-                        disabled={isUpdatingThis}
-                        onClick={(e) => handleRespond(e, requestId, "accepted")}
-                        className="flex-1 rounded-lg bg-ink py-1.5 text-[11px] font-semibold text-ivory transition-opacity hover:opacity-90 disabled:opacity-50"
+                        onClick={() => onOpenNotification(notification)}
+                        className="block w-full text-left"
                       >
-                        {isUpdatingThis ? "..." : "Accept"}
+                        <span className="block pr-3 text-[12.5px] font-semibold leading-[1.35rem] text-[#202226] dark:text-white/90">
+                          {notification.title}
+                        </span>
+
+                        <span className="mt-1 block text-[12px] leading-[1.55] text-[#2b2d31]/58 dark:text-white/50">
+                          {notification.message}
+                        </span>
+
+                        <span className="mt-2.5 flex items-center gap-1.5 text-[10px] font-medium text-[#2b2d31]/38 dark:text-white/35">
+                          <Clock size={10} strokeWidth={1.8} />
+                          {notification.date}
+                        </span>
                       </button>
 
-                      <button
-                        type="button"
-                        disabled={isUpdatingThis}
-                        onClick={(e) => handleRespond(e, requestId, "declined")}
-                        className="flex-1 rounded-lg border border-stone py-1.5 text-[11px] font-semibold text-text/70 transition-colors hover:bg-ivory disabled:opacity-50"
-                      >
-                        {isUpdatingThis ? "..." : "Decline"}
-                      </button>
+                      {isPendingRequest && (
+                        <div className="mt-3.5 grid grid-cols-2 gap-2.5">
+                          <button
+                            type="button"
+                            disabled={isUpdatingThis}
+                            onClick={(e) =>
+                              handleRespond(e, requestId, "accepted")
+                            }
+                            className="
+                              rounded-xl bg-[#202226] px-2.5 py-1.5 text-[10px]
+                              font-semibold text-white transition-colors
+                              hover:bg-[#303238] disabled:cursor-not-allowed disabled:opacity-50
+                              dark:bg-white dark:text-[#16181c] dark:hover:bg-white/90
+                            "
+                          >
+                            {isUpdatingThis ? "..." : "Accept"}
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={isUpdatingThis}
+                            onClick={(e) =>
+                              handleRespond(e, requestId, "declined")
+                            }
+                            className="
+                              rounded-xl border border-black/10 bg-white/45 px-3 py-2
+                              text-[11px] font-semibold text-[#2b2d31]/70
+                              transition-colors hover:bg-white/75 hover:text-[#14161a]
+                              disabled:cursor-not-allowed disabled:opacity-50
+                              dark:border-white/10 dark:bg-white/[0.04]
+                              dark:text-white/65 dark:hover:bg-white/[0.08]
+                              dark:hover:text-white
+                            "
+                          >
+                            {isUpdatingThis ? "..." : "Decline"}
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
   );
 }
+
 /* =========================================================
    THEME TOGGLE
 ========================================================= */
@@ -635,7 +702,7 @@ export default function TopBar() {
             MAIN HEADER
         =================================================== */}
 
-        <div className="mx-auto flex h-[68px] w-full max-w-[1275px] items-center gap-4 px-4 sm:px-6 md:h-[72px]">
+        <div className="mx-auto flex h-[68px] w-full max-w-[1280px] items-center gap-4 px-4 sm:px-6 md:h-[72px]">
           {/* =================================================
               LOGO
           ================================================= */}
@@ -781,7 +848,7 @@ export default function TopBar() {
                   </button>
 
                   {menuOpen && (
-                    <div className="absolute right-0 top-[calc(100%+10px)] z-[10000] w-60 overflow-hidden rounded-2xl border border-stone bg-bg shadow-[0_20px_55px_rgba(20,20,26,0.15)]">
+                    <div className="absolute right-0 top-[calc(100%+10px)] z-[10000] w-60 overflow-hidden rounded-xl border border-stone bg-bg shadow-[0_20px_55px_rgba(20,20,26,0.15)]">
                       {/* USER HEADER */}
 
                       <div className="border-b border-stone bg-ivory/35 px-4 py-4">
