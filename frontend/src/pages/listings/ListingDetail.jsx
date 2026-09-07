@@ -140,10 +140,6 @@ function VisitRequestModal({ listing, onClose }) {
           <X size={16} />
         </button>
 
-        {/* =================================================
-            SUCCESS
-        ================================================= */}
-
         {sent ? (
           <div className="py-6 text-center">
             <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-brass-light flex items-center justify-center">
@@ -165,18 +161,12 @@ function VisitRequestModal({ listing, onClose }) {
             </button>
           </div>
         ) : (
-          /* =================================================
-             FORM
-          ================================================= */
-
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <p className="font-display text-lg text-text">Request to visit</p>
 
               <p className="text-sm text-text/60 mt-1">{listing.title}</p>
             </div>
-
-            {/* DATE */}
 
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-medium text-text/70">Date</span>
@@ -190,8 +180,6 @@ function VisitRequestModal({ listing, onClose }) {
               />
             </label>
 
-            {/* TIME */}
-
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-medium text-text/70">Time</span>
 
@@ -203,8 +191,6 @@ function VisitRequestModal({ listing, onClose }) {
                 className="border border-stone rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brass bg-transparent"
               />
             </label>
-
-            {/* MESSAGE */}
 
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-medium text-text/70">
@@ -220,15 +206,11 @@ function VisitRequestModal({ listing, onClose }) {
               />
             </label>
 
-            {/* ERROR */}
-
             {submitError && (
               <p role="alert" className="text-sm text-red-600">
                 {submitError}
               </p>
             )}
-
-            {/* SUBMIT */}
 
             <button
               type="submit"
@@ -442,9 +424,7 @@ export default function ListingDetail() {
     <AppShell>
       <div className="max-w-7xl mx-auto pb-24 lg:pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.15fr] gap-6 lg:gap-8">
-          {/* =================================================
-              LEFT SIDE — MAP
-          ================================================= */}
+          {/* LEFT SIDE — MAP */}
 
           <div className="lg:sticky lg:top-6 lg:self-start h-[420px] lg:h-[calc(100vh-96px)]">
             {coordinates ? (
@@ -462,15 +442,9 @@ export default function ListingDetail() {
             )}
           </div>
 
-          {/* =================================================
-              RIGHT SIDE — LISTING CONTENT
-          ================================================= */}
+          {/* RIGHT SIDE — LISTING CONTENT */}
 
           <div className="flex flex-col gap-6">
-            {/* =================================================
-                GALLERY
-            ================================================= */}
-
             <ListingGallery
               photos={images}
               rating={avgRating}
@@ -478,9 +452,7 @@ export default function ListingDetail() {
               title={listing.title}
             />
 
-            {/* =================================================
-                TITLE / LOCATION
-            ================================================= */}
+            {/* TITLE / LOCATION */}
 
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -518,25 +490,44 @@ export default function ListingDetail() {
             ================================================= */}
 
             {amenities.length > 0 && (
-              <div className="rounded-2xl bg-gradient-to-br from-brass-light/70 to-brass-light/30 border border-brass/20 py-5 px-4">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-5 gap-x-2">
+              <div>
+                <h2 className="font-display text-lg text-text mb-3">
+                  {t("listing.amenities", "Amenities")}
+                </h2>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {amenities.map((amenity) => {
                     const AmenityIcon = amenityIcon(amenity);
 
                     return (
                       <div
                         key={amenity}
-                        className="flex flex-col items-center gap-2 text-center"
+                        className="
+                            flex items-center gap-3
+                            min-h-[72px]
+                            rounded-xl
+                            border border-stone/70
+                            bg-bg
+                            px-4 py-3
+                            transition-colors duration-200
+                            hover:border-brass/40
+                            hover:bg-ivory/30
+                          "
                       >
-                        <span className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-brass to-[#8f6d3f]">
-                          <AmenityIcon
-                            size={19}
-                            className="text-ivory"
-                            strokeWidth={1.75}
-                          />
-                        </span>
+                        <div
+                          className="
+                              flex h-9 w-9 shrink-0
+                              items-center justify-center
+                              rounded-lg
+                              border border-stone/60
+                              bg-ivory/60
+                              text-text/70
+                            "
+                        >
+                          <AmenityIcon size={18} strokeWidth={1.8} />
+                        </div>
 
-                        <span className="text-xs font-medium text-text/80">
+                        <span className="text-sm font-medium text-text/80 leading-tight">
                           {amenity}
                         </span>
                       </div>
@@ -546,9 +537,7 @@ export default function ListingDetail() {
               </div>
             )}
 
-            {/* =================================================
-                DESCRIPTION
-            ================================================= */}
+            {/* DESCRIPTION */}
 
             {description && (
               <div>
@@ -576,9 +565,7 @@ export default function ListingDetail() {
               </div>
             )}
 
-            {/* =================================================
-                PRICE / CONTACT
-            ================================================= */}
+            {/* PRICE / CONTACT */}
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1">
               <p className="text-2xl text-text font-semibold whitespace-nowrap">
@@ -604,6 +591,7 @@ export default function ListingDetail() {
                     }`}
                   >
                     <Heart size={16} className={isSaved ? "fill-brass" : ""} />
+
                     {isSaved
                       ? t("listing.saved", "Saved")
                       : t("listing.save", "Save")}
@@ -629,9 +617,7 @@ export default function ListingDetail() {
               )}
             </div>
 
-            {/* =================================================
-                REVIEWS
-            ================================================= */}
+            {/* REVIEWS */}
 
             <div className="pt-2 border-t border-stone">
               <div className="flex items-center justify-between gap-3 mb-3 mt-4">
@@ -650,13 +636,7 @@ export default function ListingDetail() {
                 )}
               </div>
 
-              {/* REVIEW ERROR */}
-
               {reviewsError && <ErrorState onRetry={refetchReviews} />}
-
-              {/* =================================================
-                  RENTER REVIEW FORM
-              ================================================= */}
 
               {canReview && (
                 <div className="mb-4">
@@ -669,10 +649,6 @@ export default function ListingDetail() {
                 </div>
               )}
 
-              {/* =================================================
-                  NO REVIEWS
-              ================================================= */}
-
               {!reviewsError && reviews.length === 0 && (
                 <div className="rounded-2xl border border-stone bg-ivory p-5">
                   <p className="text-sm text-text/60">
@@ -680,10 +656,6 @@ export default function ListingDetail() {
                   </p>
                 </div>
               )}
-
-              {/* =================================================
-                  REVIEW LIST
-              ================================================= */}
 
               {reviews.length > 0 && (
                 <div className="flex flex-col gap-3">
@@ -717,10 +689,6 @@ export default function ListingDetail() {
         </div>
       </div>
 
-      {/* =====================================================
-          VISIT REQUEST MODAL
-      ===================================================== */}
-
       {visitModalOpen && (
         <VisitRequestModal
           listing={listing}
@@ -728,9 +696,7 @@ export default function ListingDetail() {
         />
       )}
 
-      {/* =====================================================
-          MOBILE BOTTOM BAR
-      ===================================================== */}
+      {/* MOBILE BOTTOM BAR */}
 
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-bg border-t border-stone p-4 flex items-center justify-between gap-4 z-40">
         <p className="text-lg text-text font-semibold shrink-0">
