@@ -20,7 +20,7 @@ async function saveForlater(req, res) {
             });
         }
 
-        // check if its already saved
+        // Check if property is already saved
         const alreadysaved = await favoritemodel.findOne({
             renter: renterid,
             property: propertyid,
@@ -32,11 +32,12 @@ async function saveForlater(req, res) {
             });
         }
 
-        // save favorite
+        // Save property to favorites
         const favoriteproperty = await favoritemodel.create({
             renter: renterid,
             property: propertyid,
         });
+
         return res.status(201).json({
             message: "Property saved successfully",
             favoriteproperty,
@@ -73,28 +74,36 @@ async function removeForlater(req, res) {
         });
     } catch (e) {
         console.error(e);
+
         return res.status(500).json({
             message: "Server error",
+            error: e.message,
         });
     }
 }
 
 async function getForlater(req, res) {
     try {
-        const renterid = req.user.id
-        const forlater = await favoritemodel.find({ renter: renterid }).populate("property", "title description price ")
+        const renterid = req.user.id;
+
+        const forlater = await favoritemodel
+            .find({ renter: renterid })
+            .populate("property");
 
         return res.status(200).json({
             message: "found all the for-later",
-            forlater
-        })
-    }
-    catch (e) {
+            forlater,
+        });
+    } catch (e) {
         return res.status(500).json({
             message: "internal server error",
-            error: e.message
-        })
+            error: e.message,
+        });
     }
 }
 
-module.exports = { saveForlater, removeForlater, getForlater };
+module.exports = {
+    saveForlater,
+    removeForlater,
+    getForlater,
+};
