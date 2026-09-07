@@ -635,7 +635,7 @@ export default function TopBar() {
             MAIN HEADER
         =================================================== */}
 
-        <div className="mx-auto flex h-[68px] w-full items-center gap-4 px-4 sm:px-6 md:h-[72px] md:px-10 lg:px-[82px]">
+        <div className="mx-auto flex h-[68px] w-full max-w-[1275px] items-center gap-4 px-4 sm:px-6 md:h-[72px]">
           {/* =================================================
               LOGO
           ================================================= */}
