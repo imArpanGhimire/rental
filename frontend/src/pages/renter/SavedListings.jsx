@@ -1,9 +1,15 @@
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
 import AppShell from "../../components/layout/AppShell.jsx";
 import Sidebar from "../../components/layout/Sidebar.jsx";
 import ListingCard from "../../features/listings/components/ListingCard.jsx";
 import { StaggerGrid, StaggerItem } from "../../components/ui/StaggerGrid.jsx";
-import { useFavorites, useToggleFavorite } from "../../features/favorites/hooks/useFavorites.js";
+
+import {
+  useFavorites,
+  useToggleFavorite,
+} from "../../features/favorites/hooks/useFavorites.js";
 
 const links = [
   { to: "/renter", label: "Overview" },
@@ -12,6 +18,8 @@ const links = [
 
 export default function SavedListings() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
   const { listings, isLoading, isError, refetch } = useFavorites();
   const { toggle } = useToggleFavorite();
 
@@ -21,11 +29,16 @@ export default function SavedListings() {
         {t("dashboard.renter.savedTitle", "Saved Listings")}
       </h1>
 
-      {isLoading && <p className="text-sm text-text/70">{t("dashboard.loading", "Loading...")}</p>}
+      {isLoading && (
+        <p className="text-sm text-text/70">
+          {t("dashboard.loading", "Loading...")}
+        </p>
+      )}
 
       {isError && (
         <div className="text-sm text-red-600 flex items-center gap-3">
           {t("dashboard.error", "Couldn't load your saved listings.")}
+
           <button onClick={() => refetch()} className="text-brass underline">
             {t("dashboard.retry", "Retry")}
           </button>
@@ -45,6 +58,7 @@ export default function SavedListings() {
               listing={listing}
               isFavorited={true}
               onToggleFavorite={(id) => toggle(id, true)}
+              onClick={() => navigate(`/listings/${listing._id}`)}
             />
           </StaggerItem>
         ))}
