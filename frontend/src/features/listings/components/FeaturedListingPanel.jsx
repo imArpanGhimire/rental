@@ -82,7 +82,6 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
 
     const url = `${window.location.origin}/listings/${listing._id}`;
 
-    // MOBILE
     if (isMobileDevice() && typeof navigator.share === "function") {
       try {
         await navigator.share({
@@ -99,7 +98,6 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
       }
     }
 
-    // DESKTOP
     try {
       const success = await copyToClipboard(url);
 
@@ -141,7 +139,6 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
       return;
     }
 
-    // Guests must log in before saving.
     if (user?.role !== "renter") {
       navigate("/login");
       return;
@@ -153,43 +150,11 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
   return (
     <div className="p-1">
       {selected && (
-        <div className="relative rounded-2xl bg-bg border border-stone shadow-[0_1px_2px_rgba(20,20,26,0.04),0_8px_24px_rgba(20,20,26,0.05)] overflow-visible">
-          {/* TOPBAR */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-stone/70">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-brass shrink-0" />
+        <div className="relative overflow-visible rounded-2xl border border-stone bg-bg shadow-[0_1px_2px_rgba(20,20,26,0.04),0_8px_24px_rgba(20,20,26,0.05)]">
+          {/* IMAGE */}
 
-                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">
-                  Featured listing
-                </span>
-              </div>
-
-              <p className="text-sm font-semibold text-ink mt-1 truncate">
-                {selected.title}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleShare(selected);
-              }}
-              className={`shrink-0 ml-4 flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium transition-all duration-200 ${
-                copied
-                  ? "bg-brass-light text-brass"
-                  : "text-neutral-500 hover:text-ink hover:bg-ivory"
-              }`}
-            >
-              <Icon name="share" size={14} />
-              {copied ? "Copied!" : "Share"}
-            </button>
-          </div>
-
-          {/* IMAGE + TITLE */}
           <div
-            className="cursor-pointer"
+            className="cursor-pointer px-5 pt-5"
             onClick={() => navigate(`/listings/${selected._id}`)}
             role="button"
             tabIndex={0}
@@ -199,79 +164,103 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
               }
             }}
           >
-            <div className="px-5 pt-5">
-              <div className="aspect-[16/10] rounded-xl overflow-hidden bg-ivory border border-stone">
-                {selected.images?.[0]?.url ? (
-                  <img
-                    src={selected.images[0].url}
-                    alt={selected.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-neutral-400 text-xs">
-                    No photo yet
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="px-5 pt-4">
-              <h2 className="text-xl font-bold tracking-tight leading-snug">
-                {selected.title}
-              </h2>
-
-              <p className="flex items-center gap-1.5 text-sm text-neutral-500 mt-1.5">
-                <Icon
-                  name="pin"
-                  size={13}
-                  className="text-neutral-400 shrink-0"
+            <div className="aspect-[16/10] overflow-hidden rounded-xl bg-ivory">
+              {selected.images?.[0]?.url ? (
+                <img
+                  src={selected.images[0].url}
+                  alt={selected.title}
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.015]"
                 />
-
-                <span className="truncate">
-                  {selected.location?.address || "Location unavailable"}
-                </span>
-              </p>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
+                  No photo yet
+                </div>
+              )}
             </div>
           </div>
 
-          {/* PROPERTY DETAILS */}
-          <div className="px-5 pb-4">
-            <div className="flex items-center gap-6 text-sm text-neutral-500 my-4">
-              <span className="flex items-center gap-1.5">
-                <Icon name="bed" size={15} className="text-neutral-400" />
-                {selected.rooms ?? "—"}
-                <span className="text-xs text-neutral-400">rooms</span>
-              </span>
+          {/* CONTENT */}
 
-              <span className="flex items-center gap-1.5">
-                <Icon name="bath" size={15} className="text-neutral-400" />
-                {selected.bathrooms ?? 1}
-                <span className="text-xs text-neutral-400">bath</span>
-              </span>
-            </div>
+          <div className="px-5 pb-5 pt-4">
+            <div className="flex items-start justify-between gap-4">
+              <div
+                className="min-w-0 cursor-pointer"
+                onClick={() => navigate(`/listings/${selected._id}`)}
+              >
+                <h2 className="text-[21px] font-bold leading-tight tracking-tight text-ink">
+                  {selected.title}
+                </h2>
 
-            <p className="text-sm text-neutral-600 leading-relaxed">
-              {selected.description}
-            </p>
+                <p className="mt-2 flex items-center gap-1.5 text-sm text-neutral-500">
+                  <Icon
+                    name="pin"
+                    size={14}
+                    className="shrink-0 text-neutral-400"
+                  />
 
-            <p className="mt-4 text-sm">
-              Rental price:{" "}
-              <strong className="text-base">
-                Rs {selected.price?.toLocaleString("en-IN")} / month
-              </strong>
-            </p>
+                  <span className="truncate">
+                    {selected.location?.address || "Location unavailable"}
+                  </span>
+                </p>
+              </div>
 
-            {/* ACTIONS */}
-            <div className="relative flex gap-2 mt-4">
               <button
                 type="button"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-ink text-ivory rounded-full py-3 font-semibold text-sm honey-lift hover:shadow-lg hover:-translate-y-px active:translate-y-0 active:shadow-sm active:duration-150"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShare(selected);
+                }}
+                className={`shrink-0 rounded-full px-2.5 py-2 text-xs font-medium transition-colors ${
+                  copied
+                    ? "bg-brass-light text-brass"
+                    : "text-neutral-500 hover:bg-ivory hover:text-ink"
+                }`}
+                aria-label="Share listing"
+              >
+                <span className="flex items-center gap-1.5">
+                  <Icon name="share" size={14} />
+                  {copied ? "Copied" : "Share"}
+                </span>
+              </button>
+            </div>
+
+            {/* DESCRIPTION */}
+
+            {selected.description && (
+              <p className="mt-4 line-clamp-3 text-[14px] leading-6 text-neutral-600">
+                {selected.description}
+              </p>
+            )}
+
+            {/* PRICE */}
+
+            <div className="mt-5 flex items-end justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.08em] text-neutral-400">
+                  Monthly rent
+                </p>
+
+                <p className="mt-1 text-[19px] font-bold tracking-tight text-ink">
+                  Rs {selected.price?.toLocaleString("en-IN")}
+                  <span className="ml-1 text-sm font-normal text-neutral-500">
+                    / month
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {/* ACTIONS */}
+
+            <div className="relative mt-5 flex gap-2">
+              <button
+                type="button"
+                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-ink py-3 text-sm font-semibold text-ivory transition-all duration-200 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/listings/${selected._id}`);
                 }}
               >
-                Show contacts
+                View property
                 <Icon name="arrowRight" size={16} />
               </button>
 
@@ -280,7 +269,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                   trigger={
                     <button
                       type="button"
-                      className="w-11 h-11 flex items-center justify-center rounded-full border border-stone bg-bg text-neutral-500 hover:text-ink hover:bg-ivory hover:border-neutral-300 transition-all duration-200"
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-stone bg-bg text-neutral-500 transition-all duration-200 hover:border-neutral-300 hover:bg-ivory hover:text-ink"
                       aria-label="More actions"
                     >
                       <Icon name="dots" size={16} />
@@ -304,9 +293,10 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
       )}
 
       {/* MORE NEARBY */}
+
       {listings.length > 1 && (
         <div className="mt-7">
-          <div className="flex items-end justify-between mb-3 px-1">
+          <div className="mb-3 flex items-end justify-between px-1">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400">
                 Explore
@@ -316,7 +306,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {listings
               .filter((listing) => listing._id !== selected?._id)
               .slice(0, 4)
@@ -325,28 +315,28 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                   key={listing._id}
                   type="button"
                   onClick={() => navigate(`/listings/${listing._id}`)}
-                  className="text-left rounded-2xl bg-bg border border-stone overflow-hidden honey-lift hover:shadow-[0_8px_24px_rgba(20,20,26,0.08)] hover:-translate-y-0.5"
+                  className="overflow-hidden rounded-2xl border border-stone bg-bg text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(20,20,26,0.08)]"
                 >
-                  <div className="aspect-[4/3] overflow-hidden bg-ivory border-b border-stone">
+                  <div className="aspect-[4/3] overflow-hidden bg-ivory">
                     {listing.images?.[0]?.url ? (
                       <img
                         src={listing.images[0].url}
                         alt={listing.title}
-                        className="w-full h-full object-cover"
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-neutral-400 text-xs">
+                      <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
                         No photo yet
                       </div>
                     )}
                   </div>
 
                   <div className="p-3">
-                    <p className="font-semibold text-sm truncate">
+                    <p className="truncate text-sm font-semibold">
                       {listing.title}
                     </p>
 
-                    <p className="text-xs text-neutral-500 mt-1">
+                    <p className="mt-1 text-xs text-neutral-500">
                       Rs {listing.price?.toLocaleString("en-IN")} /mo
                     </p>
                   </div>
