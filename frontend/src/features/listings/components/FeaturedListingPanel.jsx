@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useAuth } from "../../auth/AuthContext.jsx";
+import {
+  Heart,
+  MapPin,
+  ArrowUpRight,
+  MoreHorizontal,
+  Copy,
+} from "lucide-react";
 
+import { useAuth } from "../../auth/AuthContext.jsx";
 import {
   useFavorites,
   useToggleFavorite,
 } from "../../favorites/hooks/useFavorites.js";
 
-import Icon from "../../../components/ui/Icon";
 import DropdownMenu from "../../../components/ui/DropdownMenu";
 
 async function copyToClipboard(text) {
@@ -57,7 +63,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
   const { toggle, add, remove } = useToggleFavorite();
 
   /* =========================================================
-     INITIAL / FILTERED LISTING
+     INITIAL PROPERTY
   ========================================================= */
 
   useEffect(() => {
@@ -80,7 +86,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
   }, [listings]);
 
   /* =========================================================
-     AUTO ROTATE FEATURED PROPERTY
+     AUTO ROTATION
   ========================================================= */
 
   useEffect(() => {
@@ -116,7 +122,18 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-stone bg-ivory p-6 text-sm text-neutral-500">
+      <div
+        className="
+          rounded-[28px]
+          border border-stone/70
+          bg-bg/80
+          p-6
+          text-sm
+          text-text/50
+          shadow-[0_20px_60px_rgba(20,23,31,0.06)]
+          backdrop-blur
+        "
+      >
         Loading listings…
       </div>
     );
@@ -124,14 +141,25 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
 
   if (!listings.length || !selected) {
     return (
-      <div className="rounded-2xl border border-stone bg-ivory p-6 text-sm text-neutral-500">
+      <div
+        className="
+          rounded-[28px]
+          border border-stone/70
+          bg-bg/80
+          p-6
+          text-sm
+          text-text/50
+          shadow-[0_20px_60px_rgba(20,23,31,0.06)]
+          backdrop-blur
+        "
+      >
         No listings match your search yet.
       </div>
     );
   }
 
   /* =========================================================
-     FAVORITES
+     SAVE
   ========================================================= */
 
   const isSaved =
@@ -180,87 +208,104 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
     }
   }
 
-  /* =========================================================
-     RENDER
-  ========================================================= */
+  const imageUrl = selected.images?.[0]?.url;
 
   return (
     <div className="p-1">
       <div
         key={selected._id}
         className="
+          group
           relative
           overflow-visible
-          rounded-2xl
-          border border-stone
+          rounded-[30px]
+          border border-stone/70
           bg-bg
-          shadow-[0_1px_2px_rgba(20,20,26,0.04),0_8px_24px_rgba(20,20,26,0.05)]
-          animate-[panel-fade-in_350ms_ease-out]
+          shadow-[0_1px_2px_rgba(20,23,31,0.04),0_20px_55px_rgba(20,23,31,0.08)]
+          transition-all
+          duration-300
+           
+          hover:shadow-[0_8px_24px_rgba(20,23,31,0.08),0_28px_70px_rgba(20,23,31,0.10)]
         "
       >
-        {/* IMAGE */}
+        {/* =====================================================
+            IMAGE
+        ===================================================== */}
 
         <div
-          className="cursor-pointer px-5 pt-5"
+          className="
+            relative
+            cursor-pointer
+            overflow-hidden
+            rounded-t-[29px]
+          "
           onClick={() => navigate(`/listings/${selected._id}`)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              navigate(`/listings/${selected._id}`);
-            }
-          }}
         >
-          <div className="aspect-[16/10] overflow-hidden rounded-xl bg-ivory">
-            {selected.images?.[0]?.url ? (
+          <div className="aspect-[16/10] bg-ivory">
+            {imageUrl ? (
               <img
-                src={selected.images[0].url}
+                src={imageUrl}
                 alt={selected.title}
                 className="
-                  h-full
-                  w-full
-                  object-cover
-                  transition-transform
-                  duration-500
-                  hover:scale-[1.015]
-                "
+  h-full
+  w-full
+  object-cover
+"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
+              <div className="flex h-full w-full items-center justify-center text-sm text-text/40">
                 No photo yet
               </div>
             )}
           </div>
-        </div>
 
-        {/* CONTENT */}
+          {/* cinematic bottom gradient */}
 
-        <div className="px-5 pb-5 pt-4">
-          {/* TITLE + SAVE */}
+          <div
+            className="
+              pointer-events-none
+              absolute
+              inset-x-0
+              bottom-0
+              h-32
+              bg-gradient-to-t
+              from-black/45
+              via-black/10
+              to-transparent
+            "
+          />
 
-          <div className="flex items-start justify-between gap-4">
+          {/* top controls */}
+
+          <div
+            className="
+              absolute
+              left-4
+              right-4
+              top-4
+              flex
+              items-center
+              justify-between
+              gap-3
+            "
+          >
             <div
-              className="min-w-0 cursor-pointer"
-              onClick={() => navigate(`/listings/${selected._id}`)}
+              className="
+                rounded-full
+                border border-white/20
+                bg-black/25
+                px-3
+                py-1.5
+                text-[10px]
+                font-semibold
+                uppercase
+                tracking-[0.13em]
+                text-white/85
+                backdrop-blur-md
+              "
             >
-              <h2 className="text-[21px] font-bold leading-tight tracking-tight text-ink">
-                {selected.title}
-              </h2>
-
-              <p className="mt-2 flex items-center gap-1.5 text-sm text-neutral-500">
-                <Icon
-                  name="pin"
-                  size={14}
-                  className="shrink-0 text-neutral-400"
-                />
-
-                <span className="truncate">
-                  {selected.location?.address || "Location unavailable"}
-                </span>
-              </p>
+              {selected.type || "Rental"}
             </div>
-
-            {/* SAVE */}
 
             <button
               type="button"
@@ -271,150 +316,341 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
               disabled={isSaving}
               aria-pressed={isSaved}
               className={`
-                shrink-0
                 flex
+                h-10
+                w-10
                 items-center
-                gap-1.5
+                justify-center
                 rounded-full
-                px-3
-                py-2
-                text-xs
-                font-medium
+                border
+                backdrop-blur-md
                 transition-all
                 duration-200
                 disabled:opacity-60
                 ${
                   isSaved
-                    ? "bg-brass-light text-brass"
-                    : "text-neutral-500 hover:bg-ivory hover:text-ink"
+                    ? "border-white/25 bg-white text-ink"
+                    : "border-white/20 bg-black/25 text-white hover:bg-white hover:text-ink"
                 }
               `}
             >
-              <Icon
-                name={isSaved ? "heartFill" : "heart"}
-                size={15}
-                filled={isSaved}
+              <Heart
+                size={17}
+                strokeWidth={1.8}
+                className={isSaved ? "fill-current" : ""}
               />
-
-              {isSaved ? "Saved" : "Save"}
             </button>
           </div>
 
-          {/* DESCRIPTION */}
+          {/* location overlay */}
 
-          {selected.description && (
-            <p className="mt-5 line-clamp-3 text-[15px] leading-7 text-neutral-600">
-              {selected.description}
-            </p>
-          )}
-
-          {/* PRICE */}
-
-          <div className="mt-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-neutral-400">
-              Monthly rent
-            </p>
-
-            <p className="mt-1 text-[20px] font-bold tracking-tight text-ink">
-              Rs {selected.price?.toLocaleString("en-IN")}
-              <span className="ml-1 text-sm font-normal text-neutral-500">
-                / month
-              </span>
-            </p>
-          </div>
-
-          {/* ACTIONS */}
-
-          <div className="relative mt-6 flex gap-2">
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-
-                navigate(`/listings/${selected._id}`);
-              }}
+          <div
+            className="
+              absolute
+              bottom-4
+              left-4
+              right-4
+              flex
+              items-end
+              justify-between
+              gap-4
+            "
+          >
+            <div
               className="
-                flex
-                flex-1
+                inline-flex
+                min-w-0
                 items-center
-                justify-center
                 gap-2
                 rounded-full
-                bg-ink
-                py-3
-                text-sm
-                font-semibold
-                text-ivory
-                transition-all
-                duration-200
-                hover:-translate-y-px
-                hover:shadow-md
-                active:translate-y-0
+                border border-white/15
+                bg-black/25
+                px-3
+                py-2
+                text-xs
+                text-white/85
+                backdrop-blur-md
               "
             >
-              View property
-              <Icon name="arrowRight" size={16} />
-            </button>
+              <MapPin size={13} strokeWidth={1.8} className="shrink-0" />
 
-            {/* MORE */}
-
-            <div className="relative z-50 shrink-0">
-              <DropdownMenu
-                trigger={
-                  <button
-                    type="button"
-                    className="
-                      flex
-                      h-11
-                      w-11
-                      items-center
-                      justify-center
-                      rounded-full
-                      border
-                      border-stone
-                      bg-bg
-                      text-neutral-500
-                      transition-all
-                      duration-200
-                      hover:border-neutral-300
-                      hover:bg-ivory
-                      hover:text-ink
-                    "
-                    aria-label="More actions"
-                  >
-                    <Icon name="dots" size={16} />
-                  </button>
-                }
-                items={[
-                  {
-                    label: copied ? "Link copied" : "Copy link",
-
-                    onSelect: handleCopyLink,
-                  },
-
-                  {
-                    label: "Open property",
-
-                    onSelect: () => navigate(`/listings/${selected._id}`),
-                  },
-                ]}
-              />
+              <span className="truncate">
+                {selected.location?.address || "Location unavailable"}
+              </span>
             </div>
+          </div>
+        </div>
+
+        {/* =====================================================
+            CONTENT
+        ===================================================== */}
+
+        <div className="relative px-5 pb-5 pt-5 sm:px-6 sm:pb-6">
+          {/* subtle decorative glow */}
+
+          <div
+            className="
+              pointer-events-none
+              absolute
+              right-0
+              top-0
+              h-32
+              w-32
+              rounded-full
+              bg-text/[0.025]
+              blur-3xl
+            "
+          />
+
+          <div className="relative">
+            {/* EYEBROW */}
+
+            <p
+              className="
+                text-[10px]
+                font-semibold
+                uppercase
+                tracking-[0.14em]
+                text-text/35
+              "
+            >
+              Selected rental
+            </p>
+
+            {/* TITLE */}
+
+            <div className="mt-2 flex items-start justify-between gap-4">
+              <h2
+                className="
+                  min-w-0
+                  font-display
+                  text-[23px]
+                  font-bold
+                  leading-tight
+                  tracking-[-0.04em]
+                  text-text
+                  sm:text-[25px]
+                "
+              >
+                {selected.title}
+              </h2>
+
+              <div className="relative z-30 shrink-0">
+                <DropdownMenu
+                  trigger={
+                    <button
+                      type="button"
+                      className="
+                        flex
+                        h-10
+                        w-10
+                        items-center
+                        justify-center
+                        rounded-full
+                        border border-stone
+                        bg-bg
+                        text-text/45
+                        transition-all
+                        duration-200
+                        hover:border-text/15
+                        hover:bg-ivory
+                        hover:text-text
+                      "
+                      aria-label="More actions"
+                    >
+                      <MoreHorizontal size={17} strokeWidth={1.8} />
+                    </button>
+                  }
+                  items={[
+                    {
+                      label: copied ? "Link copied" : "Copy link",
+
+                      onSelect: handleCopyLink,
+                    },
+
+                    {
+                      label: "Open property",
+
+                      onSelect: () => navigate(`/listings/${selected._id}`),
+                    },
+                  ]}
+                />
+              </div>
+            </div>
+
+            {/* DESCRIPTION */}
+
+            {selected.description && (
+              <p
+                className="
+                  mt-4
+                  line-clamp-3
+                  max-w-[95%]
+                  text-[15px]
+                  leading-6
+                  text-text/60
+                "
+              >
+                {selected.description}
+              </p>
+            )}
+
+            {/* PRICE / META */}
+
+            <div
+              className="
+                mt-6
+                flex
+                items-end
+                justify-between
+                gap-4
+                border-t
+                border-stone/70
+                pt-5
+              "
+            >
+              <div>
+                <p
+                  className="
+                    mt-1
+                    font-display
+                    text-[24px]
+                    font-bold
+                    tracking-[-0.045em]
+                    text-text
+                  "
+                >
+                  Rs {selected.price?.toLocaleString("en-IN")}
+                  <span
+                    className="
+                      ml-1
+                      font-sans
+                      text-sm
+                      font-normal
+                      tracking-normal
+                      text-text/45
+                    "
+                  >
+                    / month
+                  </span>
+                </p>
+              </div>
+
+              <div
+                className="
+                  hidden
+                  rounded-full
+                  border border-stone
+                  bg-ivory/50
+                  px-3
+                  py-1.5
+                  text-[11px]
+                  font-medium
+                  text-text/50
+                  sm:block
+                "
+              >
+                {listings.length} nearby
+              </div>
+            </div>
+
+            {/* ACTION */}
+
+            <button
+              type="button"
+              onClick={() => navigate(`/listings/${selected._id}`)}
+              className="
+                group/button
+                mt-6
+                flex
+                w-full
+                items-center
+                justify-between
+                rounded-full
+                bg-gradient-to-r
+                from-[#22252a]
+                via-[#191c20]
+                to-[#111318]
+                px-5
+                py-3.5
+                text-sm
+                font-semibold
+                text-white
+                shadow-[0_8px_20px_rgba(17,19,24,0.18)]
+                transition-all
+                duration-200
+                 
+                hover:shadow-[0_12px_28px_rgba(17,19,24,0.22)]
+                dark:from-[#f1f0ec]
+                dark:via-[#e3e2de]
+                dark:to-[#d7d6d2]
+                dark:text-[#14161a]
+              "
+            >
+              <span>View property</span>
+
+              <span
+                className="
+                  flex
+                  h-8
+                  w-8
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-white/10
+                  transition-transform
+                  duration-200
+                  group-hover/button:translate-x-0.5
+                  dark:bg-black/5
+                "
+              >
+                <ArrowUpRight size={15} strokeWidth={1.8} />
+              </span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* MORE NEARBY */}
+      {/* =====================================================
+          MORE NEARBY
+      ===================================================== */}
 
       {listings.length > 1 && (
         <div className="mt-7">
-          <div className="mb-3 flex items-end justify-between px-1">
+          <div
+            className="
+              mb-3
+              flex
+              items-end
+              justify-between
+              px-1
+            "
+          >
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400">
+              <p
+                className="
+                  text-[10px]
+                  font-semibold
+                  uppercase
+                  tracking-[0.14em]
+                  text-text/35
+                "
+              >
                 Explore
               </p>
 
-              <h3 className="text-lg font-bold tracking-tight">More nearby</h3>
+              <h3
+                className="
+                  mt-1
+                  font-display
+                  text-lg
+                  font-bold
+                  tracking-[-0.035em]
+                  text-text
+                "
+              >
+                More nearby
+              </h3>
             </div>
           </div>
 
@@ -428,46 +664,79 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                   type="button"
                   onClick={() => navigate(`/listings/${listing._id}`)}
                   className="
+                    group/nearby
                     overflow-hidden
-                    rounded-2xl
-                    border
-                    border-stone
+                    rounded-[20px]
+                    border border-stone/70
                     bg-bg
                     text-left
+                    shadow-[0_6px_18px_rgba(20,23,31,0.04)]
                     transition-all
                     duration-200
-                    hover:-translate-y-0.5
-                    hover:shadow-[0_8px_24px_rgba(20,20,26,0.08)]
+                     
+                    hover:shadow-[0_12px_28px_rgba(20,23,31,0.08)]
                   "
                 >
-                  <div className="aspect-[4/3] overflow-hidden bg-ivory">
+                  <div
+                    className="
+                      relative
+                      aspect-[4/3]
+                      overflow-hidden
+                      bg-ivory
+                    "
+                  >
                     {listing.images?.[0]?.url ? (
                       <img
                         src={listing.images[0].url}
                         alt={listing.title}
                         className="
-                          h-full
-                          w-full
-                          object-cover
-                          transition-transform
-                          duration-300
-                          hover:scale-[1.02]
-                        "
+  h-full
+  w-full
+  object-cover
+"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
+                      <div className="flex h-full w-full items-center justify-center text-xs text-text/35">
                         No photo yet
                       </div>
                     )}
+
+                    <div
+                      className="
+                        pointer-events-none
+                        absolute
+                        inset-x-0
+                        bottom-0
+                        h-16
+                        bg-gradient-to-t
+                        from-black/35
+                        to-transparent
+                      "
+                    />
                   </div>
 
-                  <div className="p-3">
-                    <p className="truncate text-sm font-semibold">
+                  <div className="p-3.5">
+                    <p
+                      className="
+                        truncate
+                        font-display
+                        text-sm
+                        font-semibold
+                        tracking-[-0.02em]
+                        text-text
+                      "
+                    >
                       {listing.title}
                     </p>
 
-                    <p className="mt-1 text-xs text-neutral-500">
-                      Rs {listing.price?.toLocaleString("en-IN")} /mo
+                    <p
+                      className="
+                        mt-1
+                        text-xs
+                        text-text/45
+                      "
+                    >
+                      Rs {listing.price?.toLocaleString("en-IN")} / month
                     </p>
                   </div>
                 </button>
