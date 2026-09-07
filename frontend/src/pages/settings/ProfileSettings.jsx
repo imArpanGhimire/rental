@@ -10,6 +10,8 @@ import {
   PlusCircle,
   Camera,
   Trash2,
+  ShieldCheck,
+  UserRound,
 } from "lucide-react";
 
 import AppShell from "../../components/layout/AppShell.jsx";
@@ -31,36 +33,85 @@ import {
 ========================================================= */
 
 const OWNER_LINKS = [
-  { to: "/owner", label: "Overview", icon: Home, end: true },
-  { to: "/owner/listings", label: "My Listings", icon: Compass },
-  { to: "/owner/listings/new", label: "Add Listing", icon: PlusCircle },
-  { to: "/owner/messages", label: "Messages", icon: MessageSquare },
-  { to: "/owner/favorites", label: "Favorites", icon: Heart },
-  { to: "/owner/settings", label: "Settings", icon: Settings },
+  {
+    to: "/owner",
+    label: "Overview",
+    icon: Home,
+    end: true,
+  },
+  {
+    to: "/owner/listings",
+    label: "My Listings",
+    icon: Compass,
+  },
+  {
+    to: "/owner/listings/new",
+    label: "Add Listing",
+    icon: PlusCircle,
+  },
+  {
+    to: "/owner/messages",
+    label: "Messages",
+    icon: MessageSquare,
+  },
+  {
+    to: "/owner/favorites",
+    label: "Favorites",
+    icon: Heart,
+  },
+  {
+    to: "/owner/settings",
+    label: "Settings",
+    icon: Settings,
+  },
 ];
 
 const RENTER_LINKS = [
-  { to: "/renter", label: "Overview", icon: Home, end: true },
-  { to: "/renter/saved", label: "Favorites", icon: Heart },
-  { to: "/renter/messages", label: "Messages", icon: MessageSquare },
-  { to: "/", label: "Discover", icon: Compass },
-  { to: "/renter/settings", label: "Settings", icon: Settings },
+  {
+    to: "/renter",
+    label: "Overview",
+    icon: Home,
+    end: true,
+  },
+  {
+    to: "/renter/saved",
+    label: "Favorites",
+    icon: Heart,
+  },
+  {
+    to: "/renter/messages",
+    label: "Messages",
+    icon: MessageSquare,
+  },
+  {
+    to: "/",
+    label: "Discover",
+    icon: Compass,
+  },
+  {
+    to: "/renter/settings",
+    label: "Settings",
+    icon: Settings,
+  },
 ];
 
 /* =========================================================
-   AVATAR — pick a photo, preview it locally, then Save to upload
+   AVATAR
 ========================================================= */
 
 function AvatarUploader({ user, onUploaded, onRemoved }) {
   const fileInputRef = useRef(null);
+
   const [selectedFile, setSelectedFile] = useState(null);
+
   const [previewUrl, setPreviewUrl] = useState(null);
+
   const [localError, setLocalError] = useState("");
 
   const initials = user?.name
     ? user.name
         .split(" ")
-        .map((n) => n[0])
+        .map((name) => name[0])
         .slice(0, 2)
         .join("")
         .toUpperCase()
@@ -68,40 +119,48 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
 
   const uploadMutation = useMutation({
     mutationFn: uploadAvatar,
+
     onSuccess: (data) => {
       setSelectedFile(null);
       setPreviewUrl(null);
+
       onUploaded(data);
     },
   });
 
   const removeMutation = useMutation({
     mutationFn: removeAvatar,
+
     onSuccess: () => {
       onRemoved();
     },
   });
 
-  function handleFileChange(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  function handleFileChange(event) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
 
     if (!file.type.startsWith("image/")) {
       setLocalError("Please choose an image file.");
+
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
       setLocalError("Image must be under 5MB.");
+
       return;
     }
 
     setLocalError("");
     setSelectedFile(file);
+
     setPreviewUrl(URL.createObjectURL(file));
 
-    // Allow re-selecting the same file later.
-    e.target.value = "";
+    event.target.value = "";
   }
 
   function handleCancelPreview() {
@@ -111,56 +170,156 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
   }
 
   function handleSave() {
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      return;
+    }
+
     uploadMutation.mutate(selectedFile);
   }
 
-  // profilePicture is the field the backend actually returns — using
-  // anything else here is what caused the "doesn't save" bug before
   const displaySrc = previewUrl || user?.profilePicture;
+
   const isBusy = uploadMutation.isPending || removeMutation.isPending;
 
   return (
-    <div className="flex items-center gap-5">
-      <div className="relative shrink-0">
-        {displaySrc ? (
-          <img
-            src={displaySrc}
-            alt={user?.name || "Profile picture"}
-            className="w-20 h-20 rounded-full object-cover border border-stone"
-          />
-        ) : (
-          <span className="w-20 h-20 rounded-full flex items-center justify-center text-xl font-bold text-ink bg-gradient-to-br from-brass-light to-brass border border-stone">
-            {initials}
-          </span>
-        )}
+    <div className="flex h-full flex-col">
+      {/* PROFILE */}
 
-        {isBusy && (
-          <div className="absolute inset-0 rounded-full bg-ink/40 flex items-center justify-center">
-            <div className="w-5 h-5 border-2 border-ivory border-t-transparent rounded-full animate-spin" />
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+        <div className="relative w-fit shrink-0">
+          <div
+            className="
+              rounded-[26px]
+              border border-stone/70
+              bg-ivory/55
+              p-2
+              shadow-[0_8px_28px_rgba(20,23,31,0.06)]
+            "
+          >
+            {displaySrc ? (
+              <img
+                src={displaySrc}
+                alt={user?.name || "Profile picture"}
+                className="
+                  h-24
+                  w-24
+                  rounded-[20px]
+                  object-cover
+                "
+              />
+            ) : (
+              <span
+                className="
+                  flex
+                  h-24
+                  w-24
+                  items-center
+                  justify-center
+                  rounded-[20px]
+                  bg-gradient-to-br
+                  from-[#e6e5e1]
+                  via-[#cececb]
+                  to-[#aaa9a6]
+                  font-display
+                  text-2xl
+                  font-bold
+                  tracking-[-0.04em]
+                  text-[#25272c]
+                  dark:from-[#30333a]
+                  dark:via-[#23262c]
+                  dark:to-[#181a1f]
+                  dark:text-white/85
+                "
+              >
+                {initials}
+              </span>
+            )}
           </div>
-        )}
+
+          {isBusy && (
+            <div
+              className="
+                absolute
+                inset-2
+                flex
+                items-center
+                justify-center
+                rounded-[20px]
+                bg-black/45
+                backdrop-blur-sm
+              "
+            >
+              <div
+                className="
+                  h-5
+                  w-5
+                  animate-spin
+                  rounded-full
+                  border-2
+                  border-white
+                  border-t-transparent
+                "
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="min-w-0">
+          <p
+            className="
+              font-display
+              text-lg
+              font-semibold
+              tracking-[-0.03em]
+              text-text
+            "
+          >
+            {user?.name || "Your profile"}
+          </p>
+
+          <p
+            className="
+              mt-1
+              max-w-sm
+              text-sm
+              leading-6
+              text-text/45
+            "
+          >
+            Use a clear photo so your profile is easier to recognise.
+          </p>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-          />
+      {/* CONTROLS */}
 
+      <div className="mt-5">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
             variant="outline"
             pill
             disabled={isBusy}
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 !py-2 !px-4 text-xs"
+            className="
+              flex
+              items-center
+              gap-1.5
+              !px-4
+              !py-2.5
+              text-xs
+            "
           >
-            <Camera size={14} />
+            <Camera size={14} strokeWidth={1.8} />
+
             {user?.profilePicture ? "Change photo" : "Upload photo"}
           </Button>
 
@@ -171,7 +330,11 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
                 pill
                 disabled={isBusy}
                 onClick={handleSave}
-                className="!py-2 !px-4 text-xs"
+                className="
+                  !px-4
+                  !py-2.5
+                  text-xs
+                "
               >
                 {uploadMutation.isPending ? "Saving..." : "Save photo"}
               </Button>
@@ -182,7 +345,11 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
                 pill
                 disabled={isBusy}
                 onClick={handleCancelPreview}
-                className="!py-2 !px-4 text-xs"
+                className="
+                  !px-4
+                  !py-2.5
+                  text-xs
+                "
               >
                 Cancel
               </Button>
@@ -196,33 +363,50 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
               pill
               disabled={isBusy}
               onClick={() => removeMutation.mutate()}
-              className="flex items-center gap-1.5 !py-2 !px-4 text-xs text-red-600 hover:bg-red-50 hover:text-red-600"
+              className="
+                  flex
+                  items-center
+                  gap-1.5
+                  !px-4
+                  !py-2.5
+                  text-xs
+                  text-red-600
+                  hover:bg-red-500/[0.06]
+                  hover:text-red-600
+                  dark:text-red-400
+                "
             >
-              <Trash2 size={14} />
+              <Trash2 size={14} strokeWidth={1.8} />
               Remove
             </Button>
           )}
         </div>
 
-        <p className="text-xs text-text/45">JPG or PNG, up to 5MB.</p>
+        <p className="mt-3 text-xs text-text/35">JPG or PNG · Maximum 5MB</p>
 
-        {localError && <p className="text-xs text-red-600">{localError}</p>}
+        {localError && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-400">
+            {localError}
+          </p>
+        )}
 
         {uploadMutation.isError && (
-          <p className="text-xs text-red-600">
+          <p className="mt-2 text-xs text-red-600 dark:text-red-400">
             {uploadMutation.error?.message || "Couldn't upload that photo."}
           </p>
         )}
 
         {removeMutation.isError && (
-          <p className="text-xs text-red-600">
+          <p className="mt-2 text-xs text-red-600 dark:text-red-400">
             {removeMutation.error?.message || "Couldn't remove the photo."}
           </p>
         )}
 
         {uploadMutation.isSuccess &&
           !uploadMutation.isPending &&
-          !selectedFile && <p className="text-xs text-brass">Saved.</p>}
+          !selectedFile && (
+            <p className="mt-2 text-xs font-medium text-brass">Saved.</p>
+          )}
       </div>
     </div>
   );
@@ -237,49 +421,91 @@ function PersonalInfoForm({ user, onSaved }) {
 
   const mutation = useMutation({
     mutationFn: updateProfile,
+
     onSuccess: (data) => {
-      onSaved({ name: data?.user?.name ?? data?.name ?? name });
+      onSaved({
+        name: data?.user?.name ?? data?.name ?? name,
+      });
     },
   });
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (!name.trim()) return;
-    mutation.mutate({ name: name.trim() });
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    if (!name.trim()) {
+      return;
+    }
+
+    mutation.mutate({
+      name: name.trim(),
+    });
   }
 
   const isUnchanged = name.trim() === (user?.name || "").trim();
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-sm">
-      <AuthField
-        label="Full name"
-        name="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
+    <form
+      onSubmit={handleSubmit}
+      className="
+        flex
+        h-full
+        flex-col
+      "
+    >
+      <div className="grid gap-4">
+        <AuthField
+          label="Full name"
+          name="name"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          required
+        />
 
-      <AuthField label="Email" value={user?.email || ""} disabled readOnly />
+        <AuthField label="Email" value={user?.email || ""} disabled readOnly />
+      </div>
 
-      {mutation.isError && (
-        <p className="text-xs text-red-600">
-          {mutation.error?.message || "Couldn't save your changes."}
-        </p>
-      )}
+      <div className="mt-4 min-h-[20px]">
+        {mutation.isError && (
+          <p className="text-xs text-red-600 dark:text-red-400">
+            {mutation.error?.message || "Couldn't save your changes."}
+          </p>
+        )}
 
-      {mutation.isSuccess && !mutation.isPending && (
-        <p className="text-xs text-brass">Saved.</p>
-      )}
+        {mutation.isSuccess && !mutation.isPending && (
+          <p className="text-xs font-medium text-brass">Changes saved.</p>
+        )}
+      </div>
 
-      <Button
-        type="submit"
-        pill
-        disabled={mutation.isPending || isUnchanged}
-        className="self-start !py-2.5 !px-5 text-xs"
+      <div
+        className="
+          mt-auto
+          flex
+          items-center
+          justify-between
+          gap-4
+          border-t
+          border-stone/60
+          pt-5
+        "
       >
-        {mutation.isPending ? "Saving..." : "Save changes"}
-      </Button>
+        <p className="hidden text-xs text-text/35 sm:block">
+          Your email address cannot be changed here.
+        </p>
+
+        <Button
+          type="submit"
+          pill
+          disabled={mutation.isPending || isUnchanged}
+          className="
+            !px-5
+            !py-2.5
+            text-xs
+            sm:ml-auto
+          "
+        >
+          {mutation.isPending ? "Saving..." : "Save changes"}
+        </Button>
+      </div>
     </form>
   );
 }
@@ -290,12 +516,16 @@ function PersonalInfoForm({ user, onSaved }) {
 
 function PasswordForm() {
   const [currentPassword, setCurrentPassword] = useState("");
+
   const [newPassword, setNewPassword] = useState("");
+
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [mismatchError, setMismatchError] = useState("");
 
   const mutation = useMutation({
     mutationFn: updatePassword,
+
     onSuccess: () => {
       setCurrentPassword("");
       setNewPassword("");
@@ -303,64 +533,113 @@ function PasswordForm() {
     },
   });
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  function handleSubmit(event) {
+    event.preventDefault();
+
     setMismatchError("");
 
     if (newPassword !== confirmPassword) {
       setMismatchError("New passwords don't match.");
+
       return;
     }
 
     if (newPassword.length < 6) {
       setMismatchError("New password must be at least 6 characters.");
+
       return;
     }
 
-    mutation.mutate({ currentPassword, newPassword });
+    mutation.mutate({
+      currentPassword,
+      newPassword,
+    });
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-sm">
-      <PasswordInput
-        label="Current password"
-        name="currentPassword"
-        value={currentPassword}
-        onChange={(e) => setCurrentPassword(e.target.value)}
-        required
-      />
+    <form onSubmit={handleSubmit} className="w-full">
+      {/* ALL THREE FIELDS USE THE WIDTH */}
 
-      <PasswordInput
-        label="New password"
-        name="newPassword"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-        required
-        minLength={6}
-      />
+      <div
+        className="
+          grid
+          gap-4
+          md:grid-cols-3
+        "
+      >
+        <PasswordInput
+          label="Current password"
+          name="currentPassword"
+          value={currentPassword}
+          onChange={(event) => setCurrentPassword(event.target.value)}
+          required
+        />
 
-      <PasswordInput
-        label="Confirm new password"
-        name="confirmPassword"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        required
-        minLength={6}
-      />
+        <PasswordInput
+          label="New password"
+          name="newPassword"
+          value={newPassword}
+          onChange={(event) => setNewPassword(event.target.value)}
+          required
+          minLength={6}
+        />
 
-      {mismatchError && <p className="text-xs text-red-600">{mismatchError}</p>}
+        <PasswordInput
+          label="Confirm new password"
+          name="confirmPassword"
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
+          required
+          minLength={6}
+        />
+      </div>
 
-      {mutation.isError && (
-        <p className="text-xs text-red-600">
-          {mutation.error?.message || "Couldn't update your password."}
-        </p>
-      )}
+      <div className="mt-4 min-h-[20px]">
+        {mismatchError && (
+          <p className="text-xs text-red-600 dark:text-red-400">
+            {mismatchError}
+          </p>
+        )}
 
-      {mutation.isSuccess && !mutation.isPending && (
-        <p className="text-xs text-brass">Password updated.</p>
-      )}
+        {mutation.isError && (
+          <p className="text-xs text-red-600 dark:text-red-400">
+            {mutation.error?.message || "Couldn't update your password."}
+          </p>
+        )}
 
-      <div className="flex items-center gap-4">
+        {mutation.isSuccess && !mutation.isPending && (
+          <p className="text-xs font-medium text-brass">Password updated.</p>
+        )}
+      </div>
+
+      <div
+        className="
+          mt-4
+          flex
+          flex-col
+          gap-4
+          border-t
+          border-stone/60
+          pt-5
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+        "
+      >
+        <Link
+          to="/forgot-password"
+          className="
+            text-xs
+            font-medium
+            text-text/45
+            no-underline
+            transition-colors
+            hover:text-text
+          "
+        >
+          Forgot your password?
+        </Link>
+
         <Button
           type="submit"
           pill
@@ -370,19 +649,148 @@ function PasswordForm() {
             !newPassword ||
             !confirmPassword
           }
-          className="!py-2.5 !px-5 text-xs"
+          className="
+            !px-5
+            !py-2.5
+            text-xs
+          "
         >
           {mutation.isPending ? "Updating..." : "Update password"}
         </Button>
-
-        <Link
-          to="/forgot-password"
-          className="text-xs font-medium text-text/50 hover:text-brass transition-colors"
-        >
-          Forgot your password?
-        </Link>
       </div>
     </form>
+  );
+}
+
+/* =========================================================
+   SETTINGS SECTION
+========================================================= */
+
+function SettingsSection({
+  eyebrow,
+  title,
+  description,
+  icon: Icon,
+  children,
+  className = "",
+}) {
+  return (
+    <section
+      className={`
+        relative
+        flex
+        flex-col
+        overflow-hidden
+        rounded-[28px]
+        border border-stone/70
+        bg-bg
+        shadow-[0_1px_2px_rgba(20,23,31,0.03),0_14px_40px_rgba(20,23,31,0.05)]
+        ${className}
+      `}
+    >
+      {/* SOFT BACKGROUND DETAIL */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          -right-16
+          -top-16
+          h-40
+          w-40
+          rounded-full
+          bg-text/[0.025]
+          blur-3xl
+        "
+      />
+
+      {/* HEADER */}
+
+      <div
+        className="
+          relative
+          flex
+          items-start
+          gap-4
+          border-b
+          border-stone/60
+          px-5
+          py-5
+          sm:px-6
+        "
+      >
+        <div
+          className="
+            flex
+            h-10
+            w-10
+            shrink-0
+            items-center
+            justify-center
+            rounded-2xl
+            border border-stone/70
+            bg-ivory/65
+            text-text/55
+          "
+        >
+          <Icon size={17} strokeWidth={1.8} />
+        </div>
+
+        <div>
+          <p
+            className="
+              text-[10px]
+              font-semibold
+              uppercase
+              tracking-[0.15em]
+              text-text/35
+            "
+          >
+            {eyebrow}
+          </p>
+
+          <h2
+            className="
+              mt-1
+              font-display
+              text-lg
+              font-bold
+              tracking-[-0.035em]
+              text-text
+            "
+          >
+            {title}
+          </h2>
+
+          {description && (
+            <p
+              className="
+                mt-1.5
+                text-sm
+                leading-6
+                text-text/45
+              "
+            >
+              {description}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* BODY */}
+
+      <div
+        className="
+          relative
+          flex-1
+          px-5
+          py-6
+          sm:px-6
+        "
+      >
+        {children}
+      </div>
+    </section>
   );
 }
 
@@ -396,48 +804,213 @@ export default function ProfileSettings() {
   const links = role === "owner" ? OWNER_LINKS : RENTER_LINKS;
 
   return (
-    <AppShell sidebar={<Sidebar links={links} />}>
-      <div className="max-w-2xl">
-        <div className="mb-8">
-          <h1 className="font-display text-2xl sm:text-3xl text-text">
-            Settings
-          </h1>
-          <p className="text-sm text-text/50 mt-1">
-            Manage your profile, photo, and password.
-          </p>
-        </div>
+    <AppShell sidebar={<Sidebar links={links} />} centeredContent>
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1280px]
+        "
+      >
+        {/* =================================================
+            HERO
+        ================================================= */}
 
-        <div className="flex flex-col gap-8">
+        <section
+          className="
+            relative
+            overflow-hidden
+            rounded-[30px]
+            border border-stone/70
+            bg-gradient-to-br
+            from-[#f4f3ef]
+            via-[#e9e8e4]
+            to-[#d2d2cf]
+            px-6
+            py-7
+            shadow-[0_16px_45px_rgba(20,23,31,0.06)]
+            sm:px-8
+            sm:py-8
+            dark:from-[#202329]
+            dark:via-[#191c21]
+            dark:to-[#121419]
+          "
+        >
+          <div
+            className="
+              pointer-events-none
+              absolute
+              -right-20
+              -top-24
+              h-72
+              w-72
+              rounded-full
+              bg-white/40
+              blur-[90px]
+              dark:bg-white/[0.025]
+            "
+          />
+
+          <div
+            className="
+              pointer-events-none
+              absolute
+              -bottom-24
+              left-1/3
+              h-48
+              w-72
+              rounded-full
+              bg-black/[0.04]
+              blur-[80px]
+              dark:bg-black/20
+            "
+          />
+
+          <div
+            className="
+              relative
+              flex
+              flex-col
+              gap-6
+              sm:flex-row
+              sm:items-end
+              sm:justify-between
+            "
+          >
+            <div>
+              <p
+                className="
+                  text-[10px]
+                  font-semibold
+                  uppercase
+                  tracking-[0.16em]
+                  text-text/40
+                "
+              >
+                Account settings
+              </p>
+
+              <h1
+                className="
+                  mt-2
+                  font-display
+                  text-3xl
+                  font-bold
+                  tracking-[-0.045em]
+                  text-text
+                  sm:text-[38px]
+                "
+              >
+                Personal information
+              </h1>
+
+              <p
+                className="
+                  mt-3
+                  max-w-xl
+                  text-sm
+                  leading-6
+                  text-text/55
+                "
+              >
+                Manage your identity, profile photo and account security from
+                one place.
+              </p>
+            </div>
+
+            <div
+              className="
+                flex
+                w-fit
+                items-center
+                gap-2
+                rounded-full
+                border border-white/35
+                bg-white/30
+                px-4
+                py-2
+                text-xs
+                font-medium
+                text-text/55
+                backdrop-blur-md
+                dark:border-white/[0.06]
+                dark:bg-white/[0.04]
+              "
+            >
+              <Settings size={14} strokeWidth={1.8} />
+
+              {role === "owner" ? "Owner account" : "Renter account"}
+            </div>
+          </div>
+        </section>
+
+        {/* =================================================
+            SETTINGS GRID
+
+            Desktop:
+            ┌──────────────┬──────────────┐
+            │   Profile    │ Personal info│
+            ├──────────────┴──────────────┤
+            │          Password           │
+            └─────────────────────────────┘
+        ================================================= */}
+
+        <div
+          className="
+            mt-6
+            grid
+            grid-cols-1
+            gap-5
+            lg:grid-cols-2
+          "
+        >
           {/* PROFILE PICTURE */}
-          <section className="border border-stone rounded-2xl p-5 sm:p-6">
-            <h2 className="text-sm font-semibold text-text mb-4">
-              Profile picture
-            </h2>
 
+          <SettingsSection
+            eyebrow="Identity"
+            title="Profile picture"
+            description="This photo appears alongside your account across Rentora."
+            icon={Camera}
+            className="h-full"
+          >
             <AvatarUploader
               user={user}
               onUploaded={(data) =>
-                updateUser({ profilePicture: data?.user?.profilePicture })
+                updateUser({
+                  profilePicture: data?.user?.profilePicture,
+                })
               }
-              onRemoved={() => updateUser({ profilePicture: null })}
+              onRemoved={() =>
+                updateUser({
+                  profilePicture: null,
+                })
+              }
             />
-          </section>
+          </SettingsSection>
 
           {/* PERSONAL INFORMATION */}
-          <section className="border border-stone rounded-2xl p-5 sm:p-6">
-            <h2 className="text-sm font-semibold text-text mb-4">
-              Personal information
-            </h2>
 
+          <SettingsSection
+            eyebrow="Account"
+            title="Personal information"
+            description="Keep your basic account information accurate and up to date."
+            icon={UserRound}
+            className="h-full"
+          >
             <PersonalInfoForm user={user} onSaved={updateUser} />
-          </section>
+          </SettingsSection>
 
-          {/* PASSWORD */}
-          <section className="border border-stone rounded-2xl p-5 sm:p-6">
-            <h2 className="text-sm font-semibold text-text mb-4">Password</h2>
+          {/* PASSWORD — FULL WIDTH */}
 
+          <SettingsSection
+            eyebrow="Security"
+            title="Password & security"
+            description="Choose a strong password that you don't use elsewhere."
+            icon={ShieldCheck}
+            className="lg:col-span-2"
+          >
             <PasswordForm />
-          </section>
+          </SettingsSection>
         </div>
       </div>
     </AppShell>
