@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../auth/AuthContext.jsx";
+
 import {
   useFavorites,
   useToggleFavorite,
@@ -9,16 +10,6 @@ import {
 
 import Icon from "../../../components/ui/Icon";
 import DropdownMenu from "../../../components/ui/DropdownMenu";
-
-function isMobileDevice() {
-  if (typeof navigator === "undefined") {
-    return false;
-  }
-
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent,
-  );
-}
 
 async function copyToClipboard(text) {
   if (navigator.clipboard && window.isSecureContext) {
@@ -63,7 +54,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
     enabled: user?.role === "renter",
   });
 
-  const { toggle } = useToggleFavorite();
+  const { toggle, add, remove } = useToggleFavorite();
 
   useEffect(() => {
     if (!selected && listings.length > 0) {
@@ -75,28 +66,48 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
     }
   }, [listings, selected]);
 
-  async function handleShare(listing) {
-    if (!listing?._id) {
+  if (isLoading) {
+    return (
+      <div className="rounded-2xl border border-stone bg-ivory p-6 text-sm text-neutral-500">
+        Loading listings…
+      </div>
+    );
+  }
+
+  if (!listings.length) {
+    return (
+      <div className="rounded-2xl border border-stone bg-ivory p-6 text-sm text-neutral-500">
+        No listings match your search yet.
+      </div>
+    );
+  }
+
+  const isSaved =
+    favoriteIds?.some(
+      (favoriteId) => String(favoriteId) === String(selected?._id),
+    ) ?? false;
+
+  const isSaving = add?.isPending || remove?.isPending;
+
+  function handleSave() {
+    if (!selected?._id) {
       return;
     }
 
-    const url = `${window.location.origin}/listings/${listing._id}`;
-
-    if (isMobileDevice() && typeof navigator.share === "function") {
-      try {
-        await navigator.share({
-          title: listing.title || "Rentora listing",
-          text: `Check out ${listing.title || "this property"} on Rentora.`,
-          url,
-        });
-
-        return;
-      } catch (error) {
-        if (error?.name === "AbortError") {
-          return;
-        }
-      }
+    if (user?.role !== "renter") {
+      navigate("/login");
+      return;
     }
+
+    toggle(selected._id, isSaved);
+  }
+
+  async function handleCopyLink() {
+    if (!selected?._id) {
+      return;
+    }
+
+    const url = `${window.location.origin}/listings/${selected._id}`;
 
     try {
       const success = await copyToClipboard(url);
@@ -113,44 +124,19 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="rounded-2xl bg-ivory border border-stone p-6 text-sm text-neutral-500">
-        Loading listings…
-      </div>
-    );
-  }
-
-  if (!listings.length) {
-    return (
-      <div className="rounded-2xl bg-ivory border border-stone p-6 text-sm text-neutral-500">
-        No listings match your search yet.
-      </div>
-    );
-  }
-
-  const isSaved =
-    favoriteIds?.some(
-      (favoriteId) => String(favoriteId) === String(selected?._id),
-    ) ?? false;
-
-  function handleSave() {
-    if (!selected?._id) {
-      return;
-    }
-
-    if (user?.role !== "renter") {
-      navigate("/login");
-      return;
-    }
-
-    toggle(selected._id, isSaved);
-  }
-
   return (
     <div className="p-1">
       {selected && (
-        <div className="relative overflow-visible rounded-2xl border border-stone bg-bg shadow-[0_1px_2px_rgba(20,20,26,0.04),0_8px_24px_rgba(20,20,26,0.05)]">
+        <div
+          className="
+            relative
+            overflow-visible
+            rounded-2xl
+            border border-stone
+            bg-bg
+            shadow-[0_1px_2px_rgba(20,20,26,0.04),0_8px_24px_rgba(20,20,26,0.05)]
+          "
+        >
           {/* IMAGE */}
 
           <div
@@ -169,7 +155,14 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                 <img
                   src={selected.images[0].url}
                   alt={selected.title}
-                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.015]"
+                  className="
+                    h-full
+                    w-full
+                    object-cover
+                    transition-transform
+                    duration-500
+                    hover:scale-[1.015]
+                  "
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
@@ -182,6 +175,8 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
           {/* CONTENT */}
 
           <div className="px-5 pb-5 pt-4">
+            {/* TITLE + SAVE */}
+
             <div className="flex items-start justify-between gap-4">
               <div
                 className="min-w-0 cursor-pointer"
@@ -204,72 +199,126 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                 </p>
               </div>
 
+              {/* SAVE BUTTON */}
+
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleShare(selected);
+                  handleSave();
                 }}
-                className={`shrink-0 rounded-full px-2.5 py-2 text-xs font-medium transition-colors ${
-                  copied
-                    ? "bg-brass-light text-brass"
-                    : "text-neutral-500 hover:bg-ivory hover:text-ink"
-                }`}
-                aria-label="Share listing"
+                disabled={isSaving}
+                aria-pressed={isSaved}
+                className={`
+                  shrink-0
+                  flex
+                  items-center
+                  gap-1.5
+                  rounded-full
+                  px-3
+                  py-2
+                  text-xs
+                  font-medium
+                  transition-all
+                  duration-200
+                  disabled:opacity-60
+                  ${
+                    isSaved
+                      ? "bg-brass-light text-brass"
+                      : "text-neutral-500 hover:bg-ivory hover:text-ink"
+                  }
+                `}
               >
-                <span className="flex items-center gap-1.5">
-                  <Icon name="share" size={14} />
-                  {copied ? "Copied" : "Share"}
-                </span>
+                <Icon
+                  name={isSaved ? "heartFill" : "heart"}
+                  size={15}
+                  filled={isSaved}
+                />
+
+                {isSaved ? "Saved" : "Save"}
               </button>
             </div>
 
             {/* DESCRIPTION */}
 
             {selected.description && (
-              <p className="mt-4 line-clamp-3 text-[14px] leading-6 text-neutral-600">
+              <p className="mt-5 line-clamp-3 text-[15px] leading-7 text-neutral-600">
                 {selected.description}
               </p>
             )}
 
             {/* PRICE */}
 
-            <div className="mt-5 flex items-end justify-between gap-3">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.08em] text-neutral-400">
-                  Monthly rent
-                </p>
+            <div className="mt-5">
+              {/* <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-neutral-400">
+                Monthly rent
+              </p> */}
 
-                <p className="mt-1 text-[19px] font-bold tracking-tight text-ink">
-                  Rs {selected.price?.toLocaleString("en-IN")}
-                  <span className="ml-1 text-sm font-normal text-neutral-500">
-                    / month
-                  </span>
-                </p>
-              </div>
+              <p className="mt-1 text-[20px] font-bold tracking-tight text-ink">
+                Rs {selected.price?.toLocaleString("en-IN")}
+                <span className="ml-1 text-sm font-normal text-neutral-500">
+                  / month
+                </span>
+              </p>
             </div>
 
             {/* ACTIONS */}
 
-            <div className="relative mt-5 flex gap-2">
+            <div className="relative mt-6 flex gap-2">
               <button
                 type="button"
-                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-ink py-3 text-sm font-semibold text-ivory transition-all duration-200 hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-sm"
                 onClick={(e) => {
                   e.stopPropagation();
+
                   navigate(`/listings/${selected._id}`);
                 }}
+                className="
+                  flex
+                  flex-1
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-full
+                  bg-ink
+                  py-3
+                  text-sm
+                  font-semibold
+                  text-ivory
+                  transition-all
+                  duration-200
+                  hover:-translate-y-px
+                  hover:shadow-md
+                  active:translate-y-0
+                "
               >
                 View property
                 <Icon name="arrowRight" size={16} />
               </button>
+
+              {/* MORE MENU */}
 
               <div className="relative z-50 shrink-0">
                 <DropdownMenu
                   trigger={
                     <button
                       type="button"
-                      className="flex h-11 w-11 items-center justify-center rounded-full border border-stone bg-bg text-neutral-500 transition-all duration-200 hover:border-neutral-300 hover:bg-ivory hover:text-ink"
+                      className="
+                        flex
+                        h-11
+                        w-11
+                        items-center
+                        justify-center
+                        rounded-full
+                        border
+                        border-stone
+                        bg-bg
+                        text-neutral-500
+                        transition-all
+                        duration-200
+                        hover:border-neutral-300
+                        hover:bg-ivory
+                        hover:text-ink
+                      "
                       aria-label="More actions"
                     >
                       <Icon name="dots" size={16} />
@@ -277,13 +326,16 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                   }
                   items={[
                     {
-                      label: isSaved ? "Remove from saved" : "Save listing",
-                      onSelect: handleSave,
+                      label: copied ? "Link copied" : "Copy link",
+
+                      onSelect: handleCopyLink,
                     },
-                    {
-                      label: "Copy link",
-                      onSelect: () => handleShare(selected),
-                    },
+
+                    // {
+                    //   label: "Open property",
+
+                    //   onSelect: () => navigate(`/listings/${selected._id}`),
+                    // },
                   ]}
                 />
               </div>
@@ -315,14 +367,32 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                   key={listing._id}
                   type="button"
                   onClick={() => navigate(`/listings/${listing._id}`)}
-                  className="overflow-hidden rounded-2xl border border-stone bg-bg text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(20,20,26,0.08)]"
+                  className="
+                    overflow-hidden
+                    rounded-2xl
+                    border
+                    border-stone
+                    bg-bg
+                    text-left
+                    transition-all
+                    duration-200
+                    hover:-translate-y-0.5
+                    hover:shadow-[0_8px_24px_rgba(20,20,26,0.08)]
+                  "
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-ivory">
                     {listing.images?.[0]?.url ? (
                       <img
                         src={listing.images[0].url}
                         alt={listing.title}
-                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
+                        className="
+                          h-full
+                          w-full
+                          object-cover
+                          transition-transform
+                          duration-300
+                          hover:scale-[1.02]
+                        "
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
