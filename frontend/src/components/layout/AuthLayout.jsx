@@ -188,105 +188,143 @@ function RegisterArtPanel() {
   );
 }
 
-function LoginShowcase({ active, setActive }) {
+function LoginArtPanel({ active, setActive }) {
   const slide = SLIDES[active];
   const SlideIcon = slide.icon;
 
   return (
-    <aside className="relative hidden min-h-screen overflow-hidden border-r border-white/[0.07] lg:flex lg:flex-col">
-      <div className="absolute inset-0 bg-[linear-gradient(145deg,#262a31_0%,#1a1d22_46%,#111318_100%)]" />
-      <div className="pointer-events-none absolute -left-28 -top-20 h-[420px] w-[420px] rounded-full bg-white/[0.07] blur-[100px]" />
-      <div className="pointer-events-none absolute -bottom-40 right-[-80px] h-[460px] w-[460px] rounded-full bg-white/[0.045] blur-[120px]" />
+    <section
+      className="
+        relative h-full min-h-[560px] overflow-hidden rounded-[30px]
+        border border-white/[0.08]
+        bg-[linear-gradient(145deg,#22262d_0%,#181b20_52%,#101216_100%)]
+        p-7 shadow-[0_30px_90px_rgba(0,0,0,0.22)]
+        xl:p-9
+      "
+    >
+      <div className="pointer-events-none absolute -left-24 -top-20 h-72 w-72 rounded-full bg-white/[0.055] blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-28 -right-24 h-80 w-80 rounded-full bg-white/[0.035] blur-3xl" />
 
-      <div className="pointer-events-none absolute inset-0 opacity-[0.16] [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:56px_56px]" />
+      <div
+        className="
+          pointer-events-none absolute inset-0 opacity-[0.12]
+          [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)]
+          [background-size:54px_54px]
+        "
+      />
 
       <svg
-        viewBox="0 0 900 700"
-        preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-x-0 top-[14%] h-[64%] w-full opacity-70"
+        viewBox="0 0 700 520"
+        className="pointer-events-none absolute bottom-0 right-0 h-[78%] w-[70%] opacity-55"
         aria-hidden="true"
       >
         <path
-          d="M-30 500 C120 400 250 520 380 360 S650 170 930 260"
+          d="M80 430 C150 350 210 390 285 300 S450 160 640 205"
           fill="none"
-          stroke="rgba(255,255,255,0.20)"
+          stroke="rgba(255,255,255,0.12)"
           strokeWidth="2"
-          strokeDasharray="8 10"
+          strokeDasharray="7 9"
         />
         <path
-          d="M30 170 C190 220 280 80 430 170 S680 420 930 330"
-          fill="none"
-          stroke="rgba(255,255,255,0.09)"
-          strokeWidth="1.3"
+          d="M128 480V285L330 140L530 285V480"
+          fill="rgba(255,255,255,0.025)"
+          stroke="rgba(255,255,255,0.10)"
+          strokeWidth="2"
         />
+        <path
+          d="M92 300L330 98L568 300"
+          fill="none"
+          stroke="rgba(255,255,255,0.14)"
+          strokeWidth="3"
+        />
+        <rect
+          x="270"
+          y="340"
+          width="120"
+          height="140"
+          rx="8"
+          fill="rgba(255,255,255,0.03)"
+          stroke="rgba(255,255,255,0.07)"
+        />
+        <circle cx="330" cy="220" r="28" fill="rgba(255,255,255,0.04)" />
       </svg>
 
-      <div className="relative z-10 flex min-h-screen flex-col px-10 py-9 xl:px-14 xl:py-11">
-        <div className="flex items-center justify-between">
-          <Logo variant="light" />
-
-          <div className="inline-flex h-9 items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.045] px-3.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/50 backdrop-blur">
-            <MapPin size={12} strokeWidth={1.8} />
+      <div className="relative z-10 flex h-full flex-col">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.045] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.15em] text-white/45">
+            <MapPin size={11} strokeWidth={1.8} />
             Kathmandu Valley
           </div>
+
+          <div className="mt-8 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/[0.09] bg-white/[0.05] text-white/72">
+            <SlideIcon size={18} strokeWidth={1.8} />
+          </div>
+
+          <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/34">
+            {slide.eyebrow}
+          </p>
+
+          <h2 className="mt-3 whitespace-pre-line font-display text-[40px] font-bold leading-[1.05] tracking-[-0.055em] text-white xl:text-[46px]">
+            {slide.heading}
+          </h2>
+
+          <p className="mt-4 max-w-[450px] text-[14px] leading-7 text-white/48">
+            {slide.body}
+          </p>
         </div>
 
-        <div className="flex flex-1 items-center py-12">
-          <div className="w-full max-w-[520px]">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/[0.10] bg-white/[0.055] text-white/80 shadow-[0_14px_40px_rgba(0,0,0,0.16)]">
-              <SlideIcon size={18} strokeWidth={1.8} />
-            </div>
+        <div className="mt-8 grid grid-cols-3 gap-3">
+          {FEATURES.map(({ icon: Icon, label, helper }) => (
+            <div
+              key={label}
+              className="
+                rounded-[18px] border border-white/[0.07]
+                bg-white/[0.03] p-3.5 backdrop-blur
+              "
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.045] text-white/65">
+                <Icon size={14} strokeWidth={1.8} />
+              </div>
 
-            <p className="mt-7 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/38">
-              {slide.eyebrow}
+              <p className="mt-3 text-[10px] font-semibold text-white/78">
+                {label}
+              </p>
+
+              <p className="mt-1 text-[8px] leading-4 text-white/30">
+                {helper}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-auto flex items-end justify-between gap-6 pt-8">
+          <div>
+            <p className="font-display text-[20px] font-bold tracking-[-0.04em] text-white/80">
+              Good places start with a good search.
             </p>
-
-            <h2 className="mt-3 whitespace-pre-line font-display text-[42px] font-bold leading-[1.06] tracking-[-0.055em] text-white xl:text-[50px]">
-              {slide.heading}
-            </h2>
-
-            <p className="mt-5 max-w-[470px] text-[14px] leading-7 text-white/50 xl:text-[15px]">
-              {slide.body}
+            <p className="mt-1 text-[9px] text-white/28">
+              Welcome back to Rentora.
             </p>
+          </div>
 
-            <div className="mt-8 grid gap-2.5 xl:grid-cols-3">
-              {FEATURES.map(({ icon: Icon, label, helper }) => (
-                <div
-                  key={label}
-                  className="rounded-[18px] border border-white/[0.08] bg-white/[0.035] p-3.5 backdrop-blur"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.05] text-white/68">
-                    <Icon size={14} strokeWidth={1.8} />
-                  </div>
-                  <p className="mt-3 text-[11px] font-semibold text-white/82">
-                    {label}
-                  </p>
-                  <p className="mt-1 text-[9px] leading-4 text-white/34">
-                    {helper}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-7 flex items-center gap-2">
-              {SLIDES.map((item, index) => (
-                <button
-                  key={item.eyebrow}
-                  type="button"
-                  onClick={() => setActive(index)}
-                  aria-label={`Show ${item.eyebrow}`}
-                  className={`h-1.5 rounded-full transition-[width,background-color] duration-300 ${
-                    index === active
-                      ? "w-8 bg-white/85"
-                      : "w-3 bg-white/16 hover:bg-white/30"
-                  }`}
-                />
-              ))}
-            </div>
+          <div className="flex shrink-0 items-center gap-2">
+            {SLIDES.map((item, index) => (
+              <button
+                key={item.eyebrow}
+                type="button"
+                onClick={() => setActive(index)}
+                aria-label={`Show ${item.eyebrow}`}
+                className={`h-1.5 rounded-full transition-[width,background-color] duration-300 ${
+                  index === active
+                    ? "w-8 bg-white/80"
+                    : "w-3 bg-white/14 hover:bg-white/28"
+                }`}
+              />
+            ))}
           </div>
         </div>
       </div>
-    </aside>
+    </section>
   );
 }
 
@@ -391,69 +429,72 @@ export default function AuthLayout({
      LOGIN
   ========================================================= */
   return (
-    <div className="min-h-screen bg-[#111318] text-white">
-      <div className="grid min-h-screen lg:grid-cols-[0.95fr_1.05fr]">
-        <LoginShowcase active={active} setActive={setActive} />
+    <div className="min-h-screen bg-[linear-gradient(145deg,#181b20_0%,#121419_58%,#0d0f13_100%)] px-5 py-6 text-white sm:px-8 lg:px-10 lg:py-8">
+      <div className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[1380px] flex-col">
+        <header className="flex min-h-11 items-center justify-between gap-5">
+          <Logo variant="light" />
 
-        <main className="relative flex min-h-screen flex-col overflow-hidden bg-[linear-gradient(145deg,#181b20_0%,#121419_58%,#0d0f13_100%)] px-5 py-5 sm:px-8 sm:py-7 lg:px-10 lg:py-8">
-          <div className="pointer-events-none absolute right-[-130px] top-[-120px] h-[360px] w-[360px] rounded-full bg-white/[0.035] blur-[110px]" />
+          {topLinkTo && (
+            <div className="flex items-center gap-3">
+              <span className="hidden text-[12px] text-white/42 sm:inline">
+                {topLinkLabel}
+              </span>
 
-          <div className="relative flex min-h-11 items-center justify-between">
-            <div className="lg:hidden">
-              <Logo variant="light" />
+              <Link
+                to={topLinkTo}
+                className="
+                  inline-flex h-10 items-center justify-center gap-1.5
+                  rounded-full border border-white/[0.10] bg-white/[0.065]
+                  px-4 text-[12px] font-semibold text-white no-underline
+                  transition-colors hover:bg-white/[0.11]
+                "
+              >
+                {topLinkText}
+                <ArrowUpRight size={12} strokeWidth={2} />
+              </Link>
             </div>
+          )}
+        </header>
 
-            {topLinkTo && (
-              <div className="ml-auto flex items-center gap-3">
-                <span className="hidden text-[12px] text-white/42 sm:inline">
-                  {topLinkLabel}
-                </span>
+        <div className="flex flex-1 items-center py-8 lg:py-10">
+          <div className="grid w-full items-stretch gap-6 lg:grid-cols-[1fr_0.9fr] xl:gap-8">
+            <LoginArtPanel active={active} setActive={setActive} />
 
-                <Link
-                  to={topLinkTo}
-                  className="
-                    inline-flex h-10 items-center justify-center gap-1.5
-                    rounded-full border border-white/[0.10] bg-white/[0.065]
-                    px-4 text-[12px] font-semibold text-white no-underline
-                    transition-colors hover:bg-white/[0.11]
-                  "
-                >
-                  {topLinkText}
-                  <ArrowUpRight size={12} strokeWidth={2} />
-                </Link>
-              </div>
-            )}
-          </div>
+            <section
+              className="
+                flex h-full min-h-[560px] flex-col overflow-hidden rounded-[30px]
+                border border-white/[0.09] bg-white/[0.04]
+                shadow-[0_28px_90px_rgba(0,0,0,0.22)]
+                backdrop-blur-xl
+              "
+            >
+              <div className="border-b border-white/[0.07] px-6 pb-5 pt-6 sm:px-7 sm:pt-7">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/34">
+                  Rentora account
+                </p>
 
-          <div className="relative flex flex-1 items-center justify-center py-8 sm:py-10">
-            <div className="w-full max-w-[480px]">
-              <div className="overflow-hidden rounded-[30px] border border-white/[0.09] bg-white/[0.04] shadow-[0_28px_90px_rgba(0,0,0,0.22)] backdrop-blur-xl">
-                <div className="border-b border-white/[0.07] px-6 pb-5 pt-6 sm:px-7 sm:pt-7">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/34">
-                    Rentora account
+                <h1 className="mt-2 font-display text-[31px] font-bold tracking-[-0.045em] text-white sm:text-[36px]">
+                  {title}
+                </h1>
+
+                {subtitle && (
+                  <p className="mt-2 text-[13px] leading-6 text-white/43">
+                    {subtitle}
                   </p>
-
-                  <h1 className="mt-2 font-display text-[31px] font-bold tracking-[-0.045em] text-white sm:text-[36px]">
-                    {title}
-                  </h1>
-
-                  {subtitle && (
-                    <p className="mt-2 text-[13px] leading-6 text-white/43">
-                      {subtitle}
-                    </p>
-                  )}
-                </div>
-
-                <div className="px-6 py-6 sm:px-7 sm:py-7">{children}</div>
+                )}
               </div>
 
-              <p className="mt-4 text-center text-[10px] leading-5 text-white/27">
+              <div className="flex flex-1 items-center px-6 py-6 sm:px-7">
+                <div className="w-full">{children}</div>
+              </div>
+
+              <div className="border-t border-white/[0.06] px-6 py-3.5 text-center text-[9px] leading-4 text-white/25 sm:px-7">
                 By continuing, you agree to use Rentora responsibly and keep
                 your account information secure.
-              </p>
-            </div>
+              </div>
+            </section>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );
