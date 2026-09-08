@@ -144,7 +144,7 @@ function NotificationPanel({
   return (
     <div
       className="
-        absolute right-0 top-[calc(100%+10px)] z-[10000]
+        absolute right-0 top-[calc(100%+10px)] z-[99999]
         w-[360px] max-w-[calc(100vw-24px)] overflow-hidden
         rounded-[22px] border border-black/10
         bg-gradient-to-b from-[#f3f2ee] via-[#ecebe7] to-[#dfded9]
@@ -848,65 +848,134 @@ export default function TopBar() {
                   </button>
 
                   {menuOpen && (
-                    <div className="absolute right-0 top-[calc(100%+10px)] z-[10000] w-60 overflow-hidden rounded-xl border border-stone bg-bg shadow-[0_20px_55px_rgba(20,20,26,0.15)]">
-                      {/* USER HEADER */}
+                    <div
+                      className="
+                        absolute right-0 top-[calc(100%+10px)] z-[99999]
+                        w-[278px] max-w-[calc(100vw-24px)] overflow-hidden
+                        rounded-[22px] border border-black/[0.08]
+                        bg-gradient-to-b from-[#f3f2ee] via-[#ebeae6] to-[#dfded9]
+                        shadow-[0_24px_70px_rgba(20,23,31,0.17)]
+                        backdrop-blur-xl
+                        dark:border-white/[0.08]
+                        dark:from-[#1c1f26] dark:via-[#181b20] dark:to-[#121419]
+                      "
+                    >
+                      <div className="relative overflow-hidden border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.07]">
+                        <div className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-white/45 blur-2xl dark:bg-white/[0.025]" />
 
-                      <div className="border-b border-stone bg-ivory/35 px-4 py-4">
-                        <div className="flex items-center gap-3">
+                        <p className="relative text-[9px] font-semibold uppercase tracking-[0.16em] text-[#2b2d31]/38 dark:text-white/35">
+                          Account
+                        </p>
+
+                        <div className="relative mt-3 flex items-center gap-3">
                           {user?.profilePicture ? (
                             <img
                               src={user.profilePicture}
                               alt={user?.name || "Profile"}
-                              className="h-10 w-10 shrink-0 rounded-xl object-cover border border-brass/30"
+                              className="
+                                h-11 w-11 shrink-0 rounded-[14px] object-cover
+                                border border-black/[0.08]
+                                shadow-[0_8px_22px_rgba(20,23,31,0.08)]
+                                dark:border-white/[0.09] dark:shadow-none
+                              "
                             />
                           ) : (
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brass/30 bg-brass-light text-xs font-bold text-ink">
+                            <span
+                              className="
+                                flex h-11 w-11 shrink-0 items-center justify-center
+                                rounded-[14px] border border-black/[0.07]
+                                bg-white/55 text-xs font-bold text-[#202226]
+                                shadow-[0_8px_22px_rgba(20,23,31,0.06)]
+                                dark:border-white/[0.08] dark:bg-white/[0.05]
+                                dark:text-white dark:shadow-none
+                              "
+                            >
                               {initials}
                             </span>
                           )}
 
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-ink">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate font-display text-[14px] font-bold tracking-[-0.02em] text-[#202226] dark:text-white">
                               {user?.name}
                             </p>
 
-                            <p className="mt-0.5 text-[11px] capitalize text-ink/45">
-                              {role}
-                            </p>
+                            <div className="mt-1 flex items-center gap-2">
+                              <span className="rounded-full border border-black/[0.07] bg-white/45 px-2 py-0.5 text-[9px] font-semibold capitalize text-[#2b2d31]/50 dark:border-white/[0.08] dark:bg-white/[0.035] dark:text-white/45">
+                                {role}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* DASHBOARD */}
+                      <div className="p-2.5">
+                        <p className="px-2 pb-1.5 pt-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#2b2d31]/32 dark:text-white/30">
+                          Workspace
+                        </p>
 
-                      <div className="p-1.5">
                         <NavLink
                           to={`/${role}`}
                           onClick={() => setMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink/65 no-underline transition-colors hover:bg-ivory hover:text-ink"
+                          className="
+                            group flex items-center gap-3 rounded-[15px] px-2.5 py-2.5
+                            text-[12px] font-semibold text-[#2b2d31]/66 no-underline
+                            transition-colors hover:bg-white/60 hover:text-[#17191d]
+                            dark:text-white/60 dark:hover:bg-white/[0.055] dark:hover:text-white
+                          "
                         >
-                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-ivory text-ink/50">
+                          <span
+                            className="
+                              flex h-8 w-8 shrink-0 items-center justify-center rounded-xl
+                              border border-black/[0.06] bg-white/50 text-[#2b2d31]/48
+                              transition-colors group-hover:bg-white/80 group-hover:text-[#202226]
+                              dark:border-white/[0.07] dark:bg-white/[0.035]
+                              dark:text-white/45 dark:group-hover:bg-white/[0.07]
+                              dark:group-hover:text-white
+                            "
+                          >
                             <LayoutDashboard size={14} strokeWidth={1.8} />
                           </span>
-                          Dashboard
-                        </NavLink>
 
-                        {/* SETTINGS */}
+                          <span className="min-w-0 flex-1">
+                            <span className="block">Dashboard</span>
+                            <span className="mt-0.5 block text-[9px] font-medium text-[#2b2d31]/34 dark:text-white/30">
+                              Open your workspace
+                            </span>
+                          </span>
+                        </NavLink>
 
                         <NavLink
                           to={`/${role}/settings`}
                           onClick={() => setMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-ink/65 no-underline transition-colors hover:bg-ivory hover:text-ink"
+                          className="
+                            group mt-1 flex items-center gap-3 rounded-[15px] px-2.5 py-2.5
+                            text-[12px] font-semibold text-[#2b2d31]/66 no-underline
+                            transition-colors hover:bg-white/60 hover:text-[#17191d]
+                            dark:text-white/60 dark:hover:bg-white/[0.055] dark:hover:text-white
+                          "
                         >
-                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-ivory text-ink/50">
+                          <span
+                            className="
+                              flex h-8 w-8 shrink-0 items-center justify-center rounded-xl
+                              border border-black/[0.06] bg-white/50 text-[#2b2d31]/48
+                              transition-colors group-hover:bg-white/80 group-hover:text-[#202226]
+                              dark:border-white/[0.07] dark:bg-white/[0.035]
+                              dark:text-white/45 dark:group-hover:bg-white/[0.07]
+                              dark:group-hover:text-white
+                            "
+                          >
                             <UserCog size={14} strokeWidth={1.8} />
                           </span>
-                          Personal information
+
+                          <span className="min-w-0 flex-1">
+                            <span className="block">Personal information</span>
+                            <span className="mt-0.5 block text-[9px] font-medium text-[#2b2d31]/34 dark:text-white/30">
+                              Profile and account details
+                            </span>
+                          </span>
                         </NavLink>
 
-                        <div className="my-1 border-t border-stone" />
-
-                        {/* LOGOUT */}
+                        <div className="my-2 border-t border-black/[0.06] dark:border-white/[0.07]" />
 
                         <button
                           type="button"
@@ -914,12 +983,31 @@ export default function TopBar() {
                             setMenuOpen(false);
                             setConfirmOpen(true);
                           }}
-                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium text-[#B5502E] transition-colors hover:bg-[#B5502E]/[0.06]"
+                          className="
+                            group flex w-full items-center gap-3 rounded-[15px]
+                            px-2.5 py-2.5 text-left text-[12px] font-semibold
+                            text-[#a4472a] transition-colors hover:bg-[#B5502E]/[0.065]
+                            dark:text-[#e28a68] dark:hover:bg-[#d97a54]/[0.09]
+                          "
                         >
-                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#B5502E]/[0.07]">
+                          <span
+                            className="
+                              flex h-8 w-8 shrink-0 items-center justify-center rounded-xl
+                              border border-[#B5502E]/10 bg-[#B5502E]/[0.055]
+                              transition-colors group-hover:bg-[#B5502E]/[0.09]
+                              dark:border-[#d97a54]/15 dark:bg-[#d97a54]/[0.07]
+                              dark:group-hover:bg-[#d97a54]/[0.12]
+                            "
+                          >
                             <LogOut size={14} strokeWidth={1.8} />
                           </span>
-                          Log out
+
+                          <span className="min-w-0 flex-1">
+                            <span className="block">Log out</span>
+                            <span className="mt-0.5 block text-[9px] font-medium text-current opacity-55">
+                              Sign out of Rentora
+                            </span>
+                          </span>
                         </button>
                       </div>
                     </div>
