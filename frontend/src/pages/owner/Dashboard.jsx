@@ -23,7 +23,6 @@ import Button from "../../components/ui/Button.jsx";
 import ErrorState from "../../components/ui/ErrorState.jsx";
 import DashboardTabs from "../../components/ui/DashboardTabs.jsx";
 import ListingCard from "../../features/listings/components/ListingCard.jsx";
-import ListingsMapPanel from "../../features/listings/components/ListingsMapPanel.jsx";
 import { useMyListings } from "../../features/listings/hooks/useMyListings.js";
 import {
   useOwnerVisitRequests,
@@ -366,6 +365,16 @@ export default function OwnerDashboard() {
 
   const reviewsLoading = reviewQueries.some((query) => query.isLoading);
 
+  const recentListings = useMemo(() => {
+    return [...listings]
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt ?? 0).getTime() -
+          new Date(a.createdAt ?? 0).getTime(),
+      )
+      .slice(0, 3);
+  }, [listings]);
+
   return (
     <AppShell sidebar={<Sidebar links={links} />}>
       <div className="space-y-6">
@@ -667,17 +676,129 @@ export default function OwnerDashboard() {
                 dark:border-white/[0.07] dark:bg-white/[0.025] dark:shadow-none
               "
             >
-              <div className="px-5 pb-4 pt-5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
-                  Property locations
-                </p>
-                <h2 className="mt-1 font-display text-xl font-bold tracking-[-0.035em] text-[#202226] dark:text-white">
-                  Your listings on the map
-                </h2>
+              <div className="flex items-start justify-between gap-4 border-b border-black/[0.06] px-5 pb-4 pt-5 dark:border-white/[0.07]">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
+                    Portfolio snapshot
+                  </p>
+
+                  <h2 className="mt-1 font-display text-xl font-bold tracking-[-0.035em] text-[#202226] dark:text-white">
+                    Recently added
+                  </h2>
+
+                  <p className="mt-1 text-[12px] text-[#2b2d31]/48 dark:text-white/43">
+                    A quick look at your latest properties.
+                  </p>
+                </div>
+
+                <Link
+                  to="/owner/listings"
+                  className="
+                    inline-flex shrink-0 items-center gap-1.5 rounded-full
+                    border border-black/[0.08] bg-white/50 px-3 py-2
+                    text-[10px] font-semibold text-[#2b2d31]/62 no-underline
+                    transition-colors hover:bg-white/80 hover:text-[#17191d]
+                    dark:border-white/[0.08] dark:bg-white/[0.035]
+                    dark:text-white/58 dark:hover:bg-white/[0.07] dark:hover:text-white
+                  "
+                >
+                  View all
+                  <ArrowUpRight size={11} strokeWidth={1.8} />
+                </Link>
               </div>
 
-              <div className="h-[300px] border-t border-black/[0.06] dark:border-white/[0.07]">
-                <ListingsMapPanel listings={listings} />
+              <div className="p-4">
+                {isLoading ? (
+                  <div className="space-y-2.5">
+                    {[1, 2, 3].map((item) => (
+                      <div
+                        key={item}
+                        className="h-[72px] animate-pulse rounded-[16px] border border-black/[0.06] bg-black/[0.025] dark:border-white/[0.06] dark:bg-white/[0.035]"
+                      />
+                    ))}
+                  </div>
+                ) : recentListings.length > 0 ? (
+                  <div className="space-y-2.5">
+                    {recentListings.map((listing) => {
+                      const image =
+                        listing.images?.[0]?.url ?? listing.images?.[0] ?? null;
+
+                      const address =
+                        listing.location?.address ??
+                        listing.address ??
+                        "Location not specified";
+
+                      return (
+                        <Link
+                          key={listing._id}
+                          to={`/listings/${listing._id}`}
+                          className="
+                            flex items-center gap-3 rounded-[17px]
+                            border border-black/[0.06] bg-white/38 p-2.5
+                            no-underline transition-colors hover:bg-white/70
+                            dark:border-white/[0.07] dark:bg-white/[0.02]
+                            dark:hover:bg-white/[0.045]
+                          "
+                        >
+                          <div className="h-14 w-16 shrink-0 overflow-hidden rounded-[13px] bg-black/[0.04] dark:bg-white/[0.04]">
+                            {image ? (
+                              <img
+                                src={image}
+                                alt={listing.title ?? "Property"}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-[#2b2d31]/28 dark:text-white/25">
+                                <Home size={16} strokeWidth={1.7} />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[12px] font-semibold text-[#202226] dark:text-white">
+                              {listing.title ?? "Untitled property"}
+                            </p>
+
+                            <p className="mt-1 truncate text-[10px] text-[#2b2d31]/44 dark:text-white/40">
+                              {address}
+                            </p>
+
+                            <p className="mt-1 text-[11px] font-semibold text-[#2b2d31]/68 dark:text-white/62">
+                              {Number.isFinite(Number(listing.price))
+                                ? `NPR ${Number(listing.price).toLocaleString()} / month`
+                                : "Price not set"}
+                            </p>
+                          </div>
+
+                          <ArrowUpRight
+                            size={13}
+                            strokeWidth={1.8}
+                            className="shrink-0 text-[#2b2d31]/32 dark:text-white/30"
+                          />
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="rounded-[18px] border border-dashed border-black/10 bg-white/30 px-5 py-8 text-center dark:border-white/10 dark:bg-white/[0.018]">
+                    <p className="text-[12px] font-semibold text-[#202226] dark:text-white">
+                      No properties yet
+                    </p>
+
+                    <p className="mt-1 text-[11px] leading-5 text-[#2b2d31]/46 dark:text-white/42">
+                      Your latest listings will appear here after you publish
+                      them.
+                    </p>
+
+                    <Link
+                      to="/owner/listings/new"
+                      className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#202226] px-3.5 py-2 text-[10px] font-semibold text-white no-underline transition-colors hover:bg-[#303238] dark:bg-white dark:text-[#17191d] dark:hover:bg-white/90"
+                    >
+                      <PlusCircle size={11} strokeWidth={1.9} />
+                      Add listing
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>
