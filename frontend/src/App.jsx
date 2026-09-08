@@ -29,13 +29,14 @@ import Terms from "./pages/static/Terms.jsx";
 function App() {
   const location = useLocation();
 
+  const hideFooter =
+    location.pathname === "/login" || location.pathname === "/register";
+
   return (
     <div className="min-h-screen flex flex-col bg-bg">
-      {/* PAGE CONTENT */}
       <main className="flex-1">
         <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>
-            {/* PUBLIC ROUTES */}
             <Route path="/" element={<Browse />} />
 
             <Route path="/listings/:id" element={<ListingDetail />} />
@@ -46,7 +47,6 @@ function App() {
 
             <Route path="/forgot-password" element={<ForgetPassword />} />
 
-            {/* STATIC ROUTES */}
             <Route path="/about" element={<About />} />
 
             <Route path="/how-it-works" element={<HowItWorks />} />
@@ -57,7 +57,6 @@ function App() {
 
             <Route path="/terms" element={<Terms />} />
 
-            {/* OWNER ROUTES */}
             <Route
               path="/owner"
               element={
@@ -94,7 +93,6 @@ function App() {
               }
             />
 
-            {/* RENTER ROUTES */}
             <Route
               path="/renter"
               element={
@@ -121,14 +119,11 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
-            <Route path="/forgot-password" element={<ForgetPassword />} />
           </Routes>
         </AnimatePresence>
       </main>
 
-      {/* FOOTER */}
-      <Footer />
+      {!hideFooter && <Footer />}
     </div>
   );
 }
