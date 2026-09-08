@@ -93,7 +93,7 @@ export default function PhotoUploader({ images, onChange }) {
         <div
           className="
             flex h-11 w-11 items-center justify-center rounded-2xl
-            border border-black/[0.07] bg-white/55 text-[#2b2d31]/70
+            border border-black/[0.07] bg-white/65 text-[#2b2d31]/75
             dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-white/65
           "
         >
