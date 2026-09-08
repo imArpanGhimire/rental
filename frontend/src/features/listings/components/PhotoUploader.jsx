@@ -104,7 +104,7 @@ export default function PhotoUploader({ images, onChange }) {
           )}
         </div>
 
-        <p className="mt-3 text-[13px] font-semibold text-[#202226] dark:text-white">
+        <p className="mt-3 text-[14px] font-semibold text-[#202226] dark:text-white">
           {uploading ? "Uploading photos..." : "Add property photos"}
         </p>
 
