@@ -5,10 +5,11 @@ export default function Register() {
   return (
     <AuthLayout
       title="Create your account"
-      subtitle="Find your next place, or list one"
+      subtitle="Choose how you'll use Rentora, then add your account details."
       topLinkLabel="Already have an account?"
       topLinkText="Log in"
       topLinkTo="/login"
+      wide
     >
       <RegisterForm />
     </AuthLayout>
