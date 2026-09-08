@@ -1,5 +1,6 @@
-// src/features/auth/components/SecurityQuestionsFields.jsx
 import { useEffect, useState } from "react";
+import { ChevronDown, ShieldCheck } from "lucide-react";
+
 import AuthField from "../../../components/ui/AuthField";
 import { getSecurityQuestionsList } from "../../../api/auth.api";
 
@@ -16,7 +17,6 @@ export default function SecurityQuestionsFields({ value, onChange }) {
   useEffect(() => {
     getSecurityQuestionsList()
       .then((data) => {
-        // handle either ["question", ...] or [{ question: "..." }, ...]
         const list = Array.isArray(data?.questions) ? data.questions : data;
         const normalized = (list || []).map((item) =>
           typeof item === "string" ? item : item.question,
@@ -38,52 +38,112 @@ export default function SecurityQuestionsFields({ value, onChange }) {
     onChange(next);
   }
 
-  // prevent picking the same question twice
   function optionsFor(index) {
     const otherChosen = value[(index + 1) % 2]?.question;
+
     return options.filter(
-      (q) => q !== otherChosen || q === value[index]?.question,
+      (question) =>
+        question !== otherChosen || question === value[index]?.question,
     );
   }
 
   if (loadError) {
-    return <p className="text-xs text-red-600">{loadError}</p>;
+    return (
+      <div className="rounded-[14px] border border-rose-200/70 bg-rose-50/70 px-3.5 py-3 text-[11px] text-rose-700 dark:border-rose-400/15 dark:bg-rose-400/10 dark:text-rose-300">
+        {loadError}
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      {[0, 1].map((index) => (
-        <div key={index} className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-ink/70">
-            Security question {index + 1}
-          </label>
-          <select
-            name={`securityQuestion-${index}`}
-            value={value[index]?.question || ""}
-            onChange={(e) => handleQuestionChange(index, e.target.value)}
-            required
-            className="border rounded-md px-3 py-2 text-sm"
-          >
-            <option value="" disabled>
-              Select a question
-            </option>
-            {optionsFor(index).map((q) => (
-              <option key={q} value={q}>
-                {q}
-              </option>
-            ))}
-          </select>
+    <section
+      className="
+        mt-5 rounded-[18px] border border-black/[0.07]
+        bg-black/[0.018] p-4
+        dark:border-white/[0.07] dark:bg-white/[0.018]
+      "
+    >
+      <div className="mb-4 flex items-start gap-2.5">
+        <span
+          className="
+            flex h-8 w-8 shrink-0 items-center justify-center rounded-xl
+            border border-black/[0.06] bg-white/55 text-[#2b2d31]/50
+            dark:border-white/[0.07] dark:bg-white/[0.035] dark:text-white/45
+          "
+        >
+          <ShieldCheck size={14} strokeWidth={1.8} />
+        </span>
 
-          <AuthField
-            label="Answer"
-            type="text"
-            name={`securityAnswer-${index}`}
-            value={value[index]?.answer || ""}
-            onChange={(e) => handleAnswerChange(index, e.target.value)}
-            required
-          />
+        <div>
+          <p className="text-[11px] font-semibold text-[#202226] dark:text-white">
+            Account recovery
+          </p>
+          <p className="mt-0.5 text-[9px] leading-4 text-[#2b2d31]/38 dark:text-white/34">
+            Choose two different questions you can answer later.
+          </p>
         </div>
-      ))}
-    </div>
+      </div>
+
+      <div className="space-y-4">
+        {[0, 1].map((index) => (
+          <div key={index} className="space-y-2">
+            <label
+              htmlFor={`securityQuestion-${index}`}
+              className="text-[11px] font-semibold text-[#2b2d31]/58 dark:text-white/55"
+            >
+              Security question {index + 1}
+            </label>
+
+            <div className="relative">
+              <select
+                id={`securityQuestion-${index}`}
+                name={`securityQuestion-${index}`}
+                value={value[index]?.question || ""}
+                onChange={(e) => handleQuestionChange(index, e.target.value)}
+                required
+                className="
+                  h-11 w-full appearance-none rounded-[13px]
+                  border border-black/[0.09] bg-white/55
+                  px-3.5 pr-10 text-[12px] text-[#202226]
+                  outline-none transition-[border-color,background-color,box-shadow]
+                  hover:bg-white/70
+                  focus:border-black/20 focus:bg-white
+                  focus:shadow-[0_0_0_3px_rgba(20,23,31,0.055)]
+                  dark:border-white/[0.09] dark:bg-[#1a1d22]
+                  dark:text-white dark:hover:bg-[#1e2127]
+                  dark:focus:border-white/20 dark:focus:bg-[#1e2127]
+                  dark:focus:shadow-[0_0_0_3px_rgba(255,255,255,0.04)]
+                "
+              >
+                <option value="" disabled>
+                  Select a question
+                </option>
+
+                {optionsFor(index).map((question) => (
+                  <option key={question} value={question}>
+                    {question}
+                  </option>
+                ))}
+              </select>
+
+              <ChevronDown
+                size={14}
+                strokeWidth={1.8}
+                className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#2b2d31]/38 dark:text-white/38"
+              />
+            </div>
+
+            <AuthField
+              label="Answer"
+              type="text"
+              name={`securityAnswer-${index}`}
+              value={value[index]?.answer || ""}
+              onChange={(e) => handleAnswerChange(index, e.target.value)}
+              required
+            />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
