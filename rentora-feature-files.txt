@@ -1,0 +1,3022 @@
+
+============================================================
+FILE: backend/src/model/rental.model.js
+============================================================
+const mongoose = require("mongoose")
+
+const rentalschema = new mongoose.Schema(
+    {
+        title: {
+            type: String,
+            required: true
+        },
+
+        description: {
+            type: String,
+            required: true
+        },
+
+        type: {
+            type: String,
+            enum: ["hostel", "rental", "flat"],
+            required: true
+        },
+
+        location: {
+            type: {
+                type: String,
+                enum: ["Point"],
+                default: "Point"
+            },
+
+            coordinates: {
+                type: [Number],
+                required: true
+            },
+
+            address: String
+        },
+
+        price: {
+            type: Number,
+            required: true
+        },
+
+        amenities: [
+            {
+                type: String
+            }
+        ],
+
+        rooms: {
+            type: Number
+        },
+
+        furnished: {
+            type: Boolean,
+            default: false
+        },
+
+        genderPreference: {
+            type: String,
+            enum: ["any", "male", "female"],
+            default: "any"
+        },
+
+        waterSupply: {
+            type: String,
+            enum: ["municipal", "tanker", "jar", "borewell"]
+        },
+
+        owner: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user",
+            required: true
+        },
+
+        images: [
+            {
+                url: {
+                    type: String,
+                    required: true
+                },
+
+                publicId: {
+                    type: String,
+                    required: true
+                }
+            }
+        ]
+    },
+
+    {
+        timestamps: true
+    }
+)
+
+rentalschema.index({
+    location: "2dsphere"
+})
+
+const rentalmodel = mongoose.model(
+    "rental",
+    rentalschema
+)
+
+module.exports = rentalmodel
+
+
+
+============================================================
+FILE: backend/src/model/user.model.js
+============================================================
+const mongoose = require("mongoose")
+
+const userschema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            minlength: 2,
+            maxlength: 20
+        },
+
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+            trim: true
+        },
+
+        password: {
+            type: String,
+            required: true
+        },
+
+        role: {
+            type: String,
+            enum: ["owner", "renter"],
+            required: true
+        },
+
+        phone: {
+            type: String,
+            required: true,
+            trim: true,
+            match: [
+                /^9[678]\d{8}$/,
+                "Enter a valid 10-digit Nepali mobile number"
+            ]
+        },
+
+        profilePicture: {
+            type: String,
+            default: ""
+        },
+
+        profilePicturePublicId: {
+            type: String,
+            default: ""
+        },
+
+        securityQuestions: {
+            type: [
+                {
+                    question: {
+                        type: String,
+                        required: true
+                    },
+                    answerHash: {
+                        type: String,
+                        required: true
+                    },
+                    _id: false
+                }
+            ],
+            validate: {
+                validator: function (arr) {
+                    return arr.length === 2
+                },
+                message: "Exactly two security questions are required"
+            },
+            required: true
+        }
+    },
+
+    {
+        timestamps: true
+    }
+)
+
+const usermodel = mongoose.model(
+    "user",
+    userschema
+)
+
+module.exports = usermodel
+
+
+
+============================================================
+FILE: backend/src/controller/property.controller.js
+============================================================
+const rentalmodel = require("../model/rental.model")
+const cloudinary = require("../config/cloudinary")
+const streamifier = require("streamifier")
+
+
+// ============================================================
+// CLOUDINARY HELPERS
+// ============================================================
+
+function uploadBufferToCloudinary(buffer) {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            {
+                folder: "rentora/listings"
+            },
+            (error, result) => {
+                if (error) {
+                    return reject(error)
+                }
+
+                resolve(result)
+            }
+        )
+
+        streamifier
+            .createReadStream(buffer)
+            .pipe(stream)
+    })
+}
+
+
+async function uploadMultipleImages(files) {
+    if (!files || files.length === 0) {
+        return []
+    }
+
+    const uploadedImages = []
+
+    for (const file of files) {
+        const result = await uploadBufferToCloudinary(
+            file.buffer
+        )
+
+        uploadedImages.push({
+            url: result.secure_url,
+            publicId: result.public_id
+        })
+    }
+
+    return uploadedImages
+}
+
+
+// ============================================================
+// UPLOAD SINGLE IMAGE
+// ============================================================
+
+async function uploadimage(req, res) {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                message: "No image file provided"
+            })
+        }
+
+        const result = await uploadBufferToCloudinary(
+            req.file.buffer
+        )
+
+        return res.status(201).json({
+            url: result.secure_url,
+            publicId: result.public_id
+        })
+    }
+    catch (e) {
+        console.error("Image upload error:", e)
+
+        return res.status(500).json({
+            message: "Image upload failed"
+        })
+    }
+}
+
+
+// ============================================================
+// CREATE PROPERTY
+// ============================================================
+
+async function createproperty(req, res) {
+    try {
+        const {
+            title,
+            description,
+            type,
+            price,
+            rooms,
+            furnished,
+            genderPreference,
+            waterSupply,
+            amenities
+        } = req.body
+
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                message: "Unauthorized"
+            })
+        }
+
+        const owner = req.user.id
+
+        if (
+            !title ||
+            !description ||
+            price === undefined ||
+            price === null ||
+            !req.body.location ||
+            !type
+        ) {
+            return res.status(400).json({
+                message:
+                    "title, description, price, location, and type are required"
+            })
+        }
+
+        // --------------------------------------------------------
+        // Parse location
+        // --------------------------------------------------------
+
+        let parsedLocation
+
+        try {
+            parsedLocation =
+                typeof req.body.location === "string"
+                    ? JSON.parse(req.body.location)
+                    : req.body.location
+        }
+        catch (e) {
+            return res.status(400).json({
+                message:
+                    'location must be valid JSON, e.g. {"type":"Point","coordinates":[lng,lat],"address":"..."}'
+            })
+        }
+
+        if (
+            !parsedLocation ||
+            !Array.isArray(parsedLocation.coordinates) ||
+            parsedLocation.coordinates.length !== 2
+        ) {
+            return res.status(400).json({
+                message:
+                    "location coordinates must contain [lng, lat]"
+            })
+        }
+
+        const longitude = Number(
+            parsedLocation.coordinates[0]
+        )
+
+        const latitude = Number(
+            parsedLocation.coordinates[1]
+        )
+
+        if (
+            !Number.isFinite(longitude) ||
+            !Number.isFinite(latitude)
+        ) {
+            return res.status(400).json({
+                message:
+                    "longitude and latitude must be valid numbers"
+            })
+        }
+
+        if (
+            longitude < -180 ||
+            longitude > 180 ||
+            latitude < -90 ||
+            latitude > 90
+        ) {
+            return res.status(400).json({
+                message:
+                    "Invalid longitude or latitude"
+            })
+        }
+
+        const location = {
+            type: "Point",
+            coordinates: [
+                longitude,
+                latitude
+            ],
+            address: parsedLocation.address
+        }
+
+        // --------------------------------------------------------
+        // Upload images
+        // --------------------------------------------------------
+
+        let finalImages = []
+
+        if (
+            req.files &&
+            req.files.length > 0
+        ) {
+            finalImages =
+                await uploadMultipleImages(req.files)
+        }
+
+        // --------------------------------------------------------
+        // Handle images already supplied as URLs
+        // --------------------------------------------------------
+
+        if (
+            finalImages.length === 0 &&
+            req.body.images
+        ) {
+            if (typeof req.body.images === "string") {
+                try {
+                    finalImages =
+                        JSON.parse(req.body.images)
+                }
+                catch {
+                    finalImages = []
+                }
+            }
+            else if (Array.isArray(req.body.images)) {
+                finalImages = req.body.images
+            }
+        }
+
+        // --------------------------------------------------------
+        // Handle amenities
+        // --------------------------------------------------------
+
+        let finalAmenities = amenities
+
+        if (typeof amenities === "string") {
+            try {
+                finalAmenities =
+                    JSON.parse(amenities)
+            }
+            catch {
+                finalAmenities = [amenities]
+            }
+        }
+
+        if (!Array.isArray(finalAmenities)) {
+            finalAmenities = []
+        }
+
+        // --------------------------------------------------------
+        // Create property
+        // --------------------------------------------------------
+
+        const property =
+            await rentalmodel.create({
+                title,
+                description,
+                type,
+                price,
+                owner,
+                location,
+                images: finalImages,
+                amenities: finalAmenities,
+                rooms,
+                furnished,
+                genderPreference,
+                waterSupply
+            })
+
+        return res.status(201).json({
+            message: "Property has been added",
+            property
+        })
+    }
+    catch (e) {
+        console.error("Create property error:", e)
+
+        return res.status(500).json({
+            message:
+                e.message ||
+                "Something went wrong on our side"
+        })
+    }
+}
+
+
+// ============================================================
+// GET ALL PROPERTIES
+// ============================================================
+
+async function getallproperties(req, res) {
+    try {
+        const {
+            minPrice,
+            maxPrice,
+            search,
+            sort,
+            page,
+            limit
+        } = req.query
+
+        const filter = {}
+
+        // --------------------------------------------------------
+        // Price filter
+        // --------------------------------------------------------
+
+        if (
+            minPrice !== undefined ||
+            maxPrice !== undefined
+        ) {
+            filter.price = {}
+
+            if (minPrice !== undefined) {
+                const min = Number(minPrice)
+
+                if (!Number.isFinite(min)) {
+                    return res.status(400).json({
+                        message:
+                            "minPrice must be a valid number"
+                    })
+                }
+
+                filter.price.$gte = min
+            }
+
+            if (maxPrice !== undefined) {
+                const max = Number(maxPrice)
+
+                if (!Number.isFinite(max)) {
+                    return res.status(400).json({
+                        message:
+                            "maxPrice must be a valid number"
+                    })
+                }
+
+                filter.price.$lte = max
+            }
+        }
+
+        // --------------------------------------------------------
+        // Search
+        // --------------------------------------------------------
+
+        if (search) {
+            filter.title = {
+                $regex: search,
+                $options: "i"
+            }
+        }
+
+        // --------------------------------------------------------
+        // Sorting
+        // --------------------------------------------------------
+
+        let sortOption = {}
+
+        if (sort === "price_asc") {
+            sortOption.price = 1
+        }
+        else if (sort === "price_desc") {
+            sortOption.price = -1
+        }
+        else if (sort === "newest") {
+            sortOption.createdAt = -1
+        }
+        else if (sort === "oldest") {
+            sortOption.createdAt = 1
+        }
+
+        // --------------------------------------------------------
+        // Pagination
+        // --------------------------------------------------------
+
+        const currentPage =
+            Math.max(
+                Number(page) || 1,
+                1
+            )
+
+        const currentLimit =
+            Math.max(
+                Number(limit) || 10,
+                1
+            )
+
+        const skip =
+            (currentPage - 1) * currentLimit
+
+        // --------------------------------------------------------
+        // Query
+        // --------------------------------------------------------
+
+        const allproperties =
+            await rentalmodel
+                .find(filter)
+                .sort(sortOption)
+                .skip(skip)
+                .limit(currentLimit)
+                .populate(
+                    "owner",
+                    "name phone"
+                )
+
+        const totalCount =
+            await rentalmodel.countDocuments(
+                filter
+            )
+
+        const totalPages =
+            Math.ceil(
+                totalCount / currentLimit
+            )
+
+        return res.status(200).json({
+            properties: allproperties,
+
+            pagination: {
+                currentPage,
+                totalPages,
+                totalCount,
+                limit: currentLimit
+            }
+        })
+    }
+    catch (e) {
+        console.error("Get all properties error:", e)
+
+        return res.status(500).json({
+            message:
+                "Something went wrong on our side"
+        })
+    }
+}
+
+
+// ============================================================
+// GET ONE PROPERTY
+// ============================================================
+
+async function getoneproperty(req, res) {
+    const { id } = req.params
+
+    try {
+        if (!id) {
+            return res.status(400).json({
+                message: "Property ID is required"
+            })
+        }
+
+        const property =
+            await rentalmodel
+                .findById(id)
+                .populate(
+                    "owner",
+                    "name phone profilePicture"
+                )
+
+        if (!property) {
+            return res.status(404).json({
+                message:
+                    "Couldn't find that property"
+            })
+        }
+
+        return res.status(200).json(property)
+    }
+    catch (e) {
+        console.error("Get property error:", e)
+
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+
+// ============================================================
+// UPDATE PROPERTY
+// ============================================================
+
+async function updateproperty(req, res) {
+    const { id } = req.params
+
+    try {
+        if (!id) {
+            return res.status(400).json({
+                message: "Property ID is required"
+            })
+        }
+
+        const propertyToEdit =
+            req.property
+
+        if (!propertyToEdit) {
+            return res.status(404).json({
+                message: "Property not found"
+            })
+        }
+
+        const {
+            title,
+            description,
+            type,
+            price,
+            location,
+            rooms,
+            furnished,
+            genderPreference,
+            waterSupply,
+            amenities
+        } = req.body
+
+        // --------------------------------------------------------
+        // Basic fields
+        // --------------------------------------------------------
+
+        if (title !== undefined) {
+            propertyToEdit.title = title
+        }
+
+        if (description !== undefined) {
+            propertyToEdit.description =
+                description
+        }
+
+        if (type !== undefined) {
+            propertyToEdit.type = type
+        }
+
+        if (price !== undefined) {
+            const parsedPrice = Number(price)
+
+            if (!Number.isFinite(parsedPrice)) {
+                return res.status(400).json({
+                    message:
+                        "price must be a valid number"
+                })
+            }
+
+            propertyToEdit.price =
+                parsedPrice
+        }
+
+        // --------------------------------------------------------
+        // Rooms
+        // --------------------------------------------------------
+
+        if (rooms !== undefined) {
+            propertyToEdit.rooms = rooms
+        }
+
+        // --------------------------------------------------------
+        // Furnished
+        // --------------------------------------------------------
+
+        if (furnished !== undefined) {
+            propertyToEdit.furnished =
+                furnished
+        }
+
+        // --------------------------------------------------------
+        // Gender preference
+        // --------------------------------------------------------
+
+        if (genderPreference !== undefined) {
+            propertyToEdit.genderPreference =
+                genderPreference
+        }
+
+        // --------------------------------------------------------
+        // Water supply
+        // --------------------------------------------------------
+
+        if (waterSupply !== undefined) {
+            propertyToEdit.waterSupply =
+                waterSupply
+        }
+
+        // --------------------------------------------------------
+        // Amenities
+        // --------------------------------------------------------
+
+        if (amenities !== undefined) {
+            let finalAmenities = amenities
+
+            if (typeof amenities === "string") {
+                try {
+                    finalAmenities =
+                        JSON.parse(amenities)
+                }
+                catch {
+                    finalAmenities =
+                        [amenities]
+                }
+            }
+
+            if (!Array.isArray(finalAmenities)) {
+                return res.status(400).json({
+                    message:
+                        "amenities must be an array"
+                })
+            }
+
+            propertyToEdit.amenities =
+                finalAmenities
+        }
+
+        // --------------------------------------------------------
+        // Location
+        // --------------------------------------------------------
+
+        if (location !== undefined) {
+            let parsedLocation
+
+            try {
+                parsedLocation =
+                    typeof location === "string"
+                        ? JSON.parse(location)
+                        : location
+            }
+            catch {
+                return res.status(400).json({
+                    message:
+                        'location must be valid JSON'
+                })
+            }
+
+            if (
+                !parsedLocation ||
+                !Array.isArray(
+                    parsedLocation.coordinates
+                ) ||
+                parsedLocation.coordinates.length !== 2
+            ) {
+                return res.status(400).json({
+                    message:
+                        "location coordinates must contain [lng, lat]"
+                })
+            }
+
+            const longitude =
+                Number(
+                    parsedLocation.coordinates[0]
+                )
+
+            const latitude =
+                Number(
+                    parsedLocation.coordinates[1]
+                )
+
+            if (
+                !Number.isFinite(longitude) ||
+                !Number.isFinite(latitude)
+            ) {
+                return res.status(400).json({
+                    message:
+                        "longitude and latitude must be valid numbers"
+                })
+            }
+
+            if (
+                longitude < -180 ||
+                longitude > 180 ||
+                latitude < -90 ||
+                latitude > 90
+            ) {
+                return res.status(400).json({
+                    message:
+                        "Invalid longitude or latitude"
+                })
+            }
+
+            propertyToEdit.location = {
+                type: "Point",
+                coordinates: [
+                    longitude,
+                    latitude
+                ],
+                address:
+                    parsedLocation.address
+            }
+        }
+
+        // --------------------------------------------------------
+        // Replace images
+        // --------------------------------------------------------
+
+        if (
+            req.files &&
+            req.files.length > 0
+        ) {
+            const newImages =
+                await uploadMultipleImages(
+                    req.files
+                )
+
+            // Delete old Cloudinary images
+            if (
+                propertyToEdit.images &&
+                propertyToEdit.images.length > 0
+            ) {
+                await Promise.all(
+                    propertyToEdit.images.map(
+                        async (img) => {
+                            if (!img.publicId) {
+                                return
+                            }
+
+                            try {
+                                await cloudinary
+                                    .uploader
+                                    .destroy(
+                                        img.publicId
+                                    )
+                            }
+                            catch (e) {
+                                console.error(
+                                    `Failed to delete Cloudinary image ${img.publicId}:`,
+                                    e
+                                )
+                            }
+                        }
+                    )
+                )
+            }
+
+            propertyToEdit.images =
+                newImages
+        }
+
+        // --------------------------------------------------------
+        // Save
+        // --------------------------------------------------------
+
+        const updatedProperty =
+            await propertyToEdit.save()
+
+        return res.status(200).json({
+            message:
+                "Property updated successfully",
+            updatedProperty
+        })
+    }
+    catch (e) {
+        console.error("Update property error:", e)
+
+        return res.status(500).json({
+            message:
+                e.message ||
+                "Internal server error"
+        })
+    }
+}
+
+
+// ============================================================
+// DELETE PROPERTY
+// ============================================================
+
+async function deleteproperty(req, res) {
+    try {
+        const propToDelete =
+            req.property
+
+        if (!propToDelete) {
+            return res.status(404).json({
+                message:
+                    "Property couldn't be found to delete"
+            })
+        }
+
+        // --------------------------------------------------------
+        // Delete images from Cloudinary
+        // --------------------------------------------------------
+
+        if (
+            propToDelete.images &&
+            propToDelete.images.length > 0
+        ) {
+            await Promise.all(
+                propToDelete.images.map(
+                    async (img) => {
+                        if (!img.publicId) {
+                            return
+                        }
+
+                        try {
+                            await cloudinary
+                                .uploader
+                                .destroy(
+                                    img.publicId
+                                )
+                        }
+                        catch (e) {
+                            console.error(
+                                `Failed to delete Cloudinary image ${img.publicId}:`,
+                                e
+                            )
+                        }
+                    }
+                )
+            )
+        }
+
+        // --------------------------------------------------------
+        // Delete property
+        // --------------------------------------------------------
+
+        await propToDelete.deleteOne()
+
+        return res.status(200).json({
+            message: "Deleted property",
+            propToDelete
+        })
+    }
+    catch (e) {
+        console.error("Delete property error:", e)
+
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+
+// ============================================================
+// GET MY PROPERTIES
+// ============================================================
+
+async function getmyproperties(req, res) {
+    try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                message: "Unauthorized"
+            })
+        }
+
+        const myproperties =
+            await rentalmodel
+                .find({
+                    owner: req.user.id
+                })
+                .populate(
+                    "owner",
+                    "name phone profilePicture"
+                )
+
+        return res.status(200).json({
+            message:
+                "Here are the listings of your properties",
+            myproperties
+        })
+    }
+    catch (e) {
+        console.error(
+            "Get my properties error:",
+            e
+        )
+
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+
+// ============================================================
+// GET NEARBY PROPERTIES
+// ============================================================
+
+async function getnearbyproperties(req, res) {
+    const {
+        lng,
+        lat,
+        radius,
+        minPrice,
+        maxPrice,
+        search,
+        sort,
+        page,
+        limit
+    } = req.query
+
+    // --------------------------------------------------------
+    // Validate coordinates
+    // --------------------------------------------------------
+
+    if (
+        lng === undefined ||
+        lat === undefined
+    ) {
+        return res.status(400).json({
+            message:
+                "longitude and latitude are required"
+        })
+    }
+
+    const longitude = Number(lng)
+    const latitude = Number(lat)
+
+    if (
+        !Number.isFinite(longitude) ||
+        !Number.isFinite(latitude)
+    ) {
+        return res.status(400).json({
+            message:
+                "longitude and latitude must be valid numbers"
+        })
+    }
+
+    if (
+        longitude < -180 ||
+        longitude > 180 ||
+        latitude < -90 ||
+        latitude > 90
+    ) {
+        return res.status(400).json({
+            message:
+                "Invalid longitude or latitude"
+        })
+    }
+
+    // --------------------------------------------------------
+    // Radius
+    // MongoDB uses meters.
+    // API receives kilometers.
+    // --------------------------------------------------------
+
+    let maxDistance = 5000
+
+    if (radius !== undefined) {
+        const radiusInKm = Number(radius)
+
+        if (
+            !Number.isFinite(radiusInKm) ||
+            radiusInKm <= 0
+        ) {
+            return res.status(400).json({
+                message:
+                    "radius must be a valid positive number"
+            })
+        }
+
+        maxDistance =
+            radiusInKm * 1000
+    }
+
+    // --------------------------------------------------------
+    // Pagination
+    // --------------------------------------------------------
+
+    const currentPage =
+        Math.max(
+            Number(page) || 1,
+            1
+        )
+
+    const currentLimit =
+        Math.max(
+            Number(limit) || 10,
+            1
+        )
+
+    const skip =
+        (currentPage - 1) * currentLimit
+
+    // --------------------------------------------------------
+    // Build filters
+    // --------------------------------------------------------
+
+    const query = {}
+
+    if (
+        minPrice !== undefined ||
+        maxPrice !== undefined
+    ) {
+        query.price = {}
+
+        if (minPrice !== undefined) {
+            const min = Number(minPrice)
+
+            if (!Number.isFinite(min)) {
+                return res.status(400).json({
+                    message:
+                        "minPrice must be a valid number"
+                })
+            }
+
+            query.price.$gte = min
+        }
+
+        if (maxPrice !== undefined) {
+            const max = Number(maxPrice)
+
+            if (!Number.isFinite(max)) {
+                return res.status(400).json({
+                    message:
+                        "maxPrice must be a valid number"
+                })
+            }
+
+            query.price.$lte = max
+        }
+    }
+
+    if (search) {
+        query.title = {
+            $regex: search,
+            $options: "i"
+        }
+    }
+
+    try {
+        // --------------------------------------------------------
+        // $geoNear MUST be the first stage
+        // --------------------------------------------------------
+
+        const geoNearStage = {
+            $geoNear: {
+                near: {
+                    type: "Point",
+                    coordinates: [
+                        longitude,
+                        latitude
+                    ]
+                },
+
+                distanceField: "distance",
+
+                maxDistance,
+
+                spherical: true,
+
+                query
+            }
+        }
+
+        // --------------------------------------------------------
+        // Count matching properties
+        // --------------------------------------------------------
+
+        const countResult =
+            await rentalmodel.aggregate([
+                geoNearStage,
+                {
+                    $count: "total"
+                }
+            ])
+
+        const totalCount =
+            countResult.length > 0
+                ? countResult[0].total
+                : 0
+
+        const totalPages =
+            Math.ceil(
+                totalCount / currentLimit
+            )
+
+        // --------------------------------------------------------
+        // Actual property pipeline
+        // --------------------------------------------------------
+
+        const pipeline = [
+            geoNearStage
+        ]
+
+        // --------------------------------------------------------
+        // Sorting
+        // --------------------------------------------------------
+
+        if (sort === "price_asc") {
+            pipeline.push({
+                $sort: {
+                    price: 1
+                }
+            })
+        }
+        else if (sort === "price_desc") {
+            pipeline.push({
+                $sort: {
+                    price: -1
+                }
+            })
+        }
+        else if (sort === "newest") {
+            pipeline.push({
+                $sort: {
+                    createdAt: -1
+                }
+            })
+        }
+        else if (sort === "oldest") {
+            pipeline.push({
+                $sort: {
+                    createdAt: 1
+                }
+            })
+        }
+
+        // --------------------------------------------------------
+        // Pagination
+        // --------------------------------------------------------
+
+        pipeline.push(
+            {
+                $skip: skip
+            },
+            {
+                $limit: currentLimit
+            }
+        )
+
+        // --------------------------------------------------------
+        // Execute aggregation
+        // --------------------------------------------------------
+
+        const nearbyproperties =
+            await rentalmodel.aggregate(
+                pipeline
+            )
+
+        // --------------------------------------------------------
+        // Populate owner manually
+        // because aggregate() doesn't automatically populate
+        // --------------------------------------------------------
+
+        await rentalmodel.populate(
+            nearbyproperties,
+            {
+                path: "owner",
+                select: "name phone profilePicture"
+            }
+        )
+
+        return res.status(200).json({
+            properties:
+                nearbyproperties,
+
+            pagination: {
+                currentPage,
+                totalPages,
+                totalCount,
+                limit: currentLimit
+            }
+        })
+    }
+    catch (e) {
+        console.error(
+            "Nearby properties error:",
+            e
+        )
+
+        return res.status(500).json({
+            message:
+                "Something went wrong on our side"
+        })
+    }
+}
+
+
+// ============================================================
+// GET PROPERTIES INSIDE POLYGON
+// ============================================================
+
+async function getpropertiesinpolygon(req, res) {
+    try {
+        const {
+            polygon,
+            minPrice,
+            maxPrice,
+            search,
+            sort,
+            page,
+            limit
+        } = req.body
+
+        // --------------------------------------------------------
+        // Validate polygon
+        // --------------------------------------------------------
+
+        if (
+            !Array.isArray(polygon) ||
+            polygon.length < 4
+        ) {
+            return res.status(400).json({
+                message:
+                    "A closed polygon with at least 4 points is required"
+            })
+        }
+
+        // --------------------------------------------------------
+        // Validate every coordinate
+        // --------------------------------------------------------
+
+        for (const point of polygon) {
+            if (
+                !Array.isArray(point) ||
+                point.length !== 2
+            ) {
+                return res.status(400).json({
+                    message:
+                        "Each polygon point must be [lng, lat]"
+                })
+            }
+
+            const longitude = Number(point[0])
+            const latitude = Number(point[1])
+
+            if (
+                !Number.isFinite(longitude) ||
+                !Number.isFinite(latitude)
+            ) {
+                return res.status(400).json({
+                    message:
+                        "Polygon coordinates must be valid numbers"
+                })
+            }
+
+            if (
+                longitude < -180 ||
+                longitude > 180 ||
+                latitude < -90 ||
+                latitude > 90
+            ) {
+                return res.status(400).json({
+                    message:
+                        "Invalid polygon longitude or latitude"
+                })
+            }
+        }
+
+        // --------------------------------------------------------
+        // Check polygon is closed
+        // First point must equal last point
+        // --------------------------------------------------------
+
+        const firstPoint = polygon[0]
+        const lastPoint =
+            polygon[polygon.length - 1]
+
+        if (
+            Number(firstPoint[0]) !==
+            Number(lastPoint[0]) ||
+            Number(firstPoint[1]) !==
+            Number(lastPoint[1])
+        ) {
+            return res.status(400).json({
+                message:
+                    "Polygon must be closed. First and last points must be the same."
+            })
+        }
+
+        // --------------------------------------------------------
+        // Base geo filter
+        // --------------------------------------------------------
+
+        const filter = {
+            location: {
+                $geoWithin: {
+                    $geometry: {
+                        type: "Polygon",
+                        coordinates: [polygon]
+                    }
+                }
+            }
+        }
+
+        // --------------------------------------------------------
+        // Price filter
+        // --------------------------------------------------------
+
+        if (
+            minPrice !== undefined ||
+            maxPrice !== undefined
+        ) {
+            filter.price = {}
+
+            if (minPrice !== undefined) {
+                const min = Number(minPrice)
+
+                if (!Number.isFinite(min)) {
+                    return res.status(400).json({
+                        message:
+                            "minPrice must be a valid number"
+                    })
+                }
+
+                filter.price.$gte = min
+            }
+
+            if (maxPrice !== undefined) {
+                const max = Number(maxPrice)
+
+                if (!Number.isFinite(max)) {
+                    return res.status(400).json({
+                        message:
+                            "maxPrice must be a valid number"
+                    })
+                }
+
+                filter.price.$lte = max
+            }
+        }
+
+        // --------------------------------------------------------
+        // Search
+        // --------------------------------------------------------
+
+        if (search) {
+            filter.title = {
+                $regex: search,
+                $options: "i"
+            }
+        }
+
+        // --------------------------------------------------------
+        // Sorting
+        // --------------------------------------------------------
+
+        let sortOption = {}
+
+        if (sort === "price_asc") {
+            sortOption.price = 1
+        }
+        else if (sort === "price_desc") {
+            sortOption.price = -1
+        }
+        else if (sort === "newest") {
+            sortOption.createdAt = -1
+        }
+        else if (sort === "oldest") {
+            sortOption.createdAt = 1
+        }
+
+        // --------------------------------------------------------
+        // Pagination
+        // --------------------------------------------------------
+
+        const currentPage =
+            Math.max(
+                Number(page) || 1,
+                1
+            )
+
+        const currentLimit =
+            Math.max(
+                Number(limit) || 10,
+                1
+            )
+
+        const skip =
+            (currentPage - 1) * currentLimit
+
+        // --------------------------------------------------------
+        // Query
+        // --------------------------------------------------------
+
+        const propertiesinpolygon =
+            await rentalmodel
+                .find(filter)
+                .sort(sortOption)
+                .skip(skip)
+                .limit(currentLimit)
+                .populate(
+                    "owner",
+                    "name phone profilePicture"
+                )
+
+        // --------------------------------------------------------
+        // Count
+        // --------------------------------------------------------
+
+        const totalCount =
+            await rentalmodel.countDocuments(
+                filter
+            )
+
+        const totalPages =
+            Math.ceil(
+                totalCount / currentLimit
+            )
+
+        return res.status(200).json({
+            properties:
+                propertiesinpolygon,
+
+            pagination: {
+                currentPage,
+                totalPages,
+                totalCount,
+                limit: currentLimit
+            }
+        })
+    }
+    catch (e) {
+        console.error(
+            "Polygon properties error:",
+            e
+        )
+
+        return res.status(500).json({
+            message:
+                "Something went wrong on our side"
+        })
+    }
+}
+
+
+// ============================================================
+// EXPORTS
+// ============================================================
+
+module.exports = {
+    uploadimage,
+    createproperty,
+    getallproperties,
+    getoneproperty,
+    updateproperty,
+    deleteproperty,
+    getmyproperties,
+    getnearbyproperties,
+    getpropertiesinpolygon
+}
+
+
+
+============================================================
+FILE: backend/src/routes/property.routes.js
+============================================================
+const express = require("express")
+const router = express.Router()
+
+const authMiddleware = require("../middleware/auth.middleware")
+const ownershipMiddleware = require("../middleware/owner.middleware")
+const verifyPropertyMiddleware = require("../middleware/verifyproperty.middleware")
+const upload = require("../middleware/upload.middleware")
+
+const propertycontroller = require("../controller/property.controller")
+
+function handleUpload(req, res, next) {
+    upload.array("images", 5)(
+        req,
+        res,
+        function (err) {
+            if (err) {
+                console.error("UPLOAD ERROR:", err)
+
+                return res.status(400).json({
+                    message: "Image upload failed",
+                    error: err.message || err
+                })
+            }
+
+            next()
+        }
+    )
+}
+
+function handleSingleUpload(req, res, next) {
+    upload.single("image")(
+        req,
+        res,
+        function (err) {
+            if (err) {
+                console.error("UPLOAD ERROR:", err)
+
+                return res.status(400).json({
+                    message: "Image upload failed",
+                    error: err.message || err
+                })
+            }
+
+            next()
+        }
+    )
+}
+
+router.post(
+    "/upload-image",
+    authMiddleware,
+    ownershipMiddleware,
+    handleSingleUpload,
+    propertycontroller.uploadimage
+)
+
+router.post(
+    "/add-property",
+    authMiddleware,
+    ownershipMiddleware,
+    handleUpload,
+    propertycontroller.createproperty
+)
+
+router.get(
+    "/get-all-properties",
+    propertycontroller.getallproperties
+)
+
+router.get(
+    "/nearby",
+    propertycontroller.getnearbyproperties
+)
+
+router.post(
+    "/polygon-search",
+    propertycontroller.getpropertiesinpolygon
+)
+
+router.get(
+    "/get-property/:id",
+    propertycontroller.getoneproperty
+)
+
+router.put(
+    "/update-property/:id",
+    authMiddleware,
+    ownershipMiddleware,
+    verifyPropertyMiddleware,
+    handleUpload,
+    propertycontroller.updateproperty
+)
+
+router.delete(
+    "/delete-property/:id",
+    authMiddleware,
+    ownershipMiddleware,
+    verifyPropertyMiddleware,
+    propertycontroller.deleteproperty
+)
+
+router.get(
+    "/view-my-listings",
+    authMiddleware,
+    ownershipMiddleware,
+    propertycontroller.getmyproperties
+)
+
+module.exports = router
+
+
+
+============================================================
+FILE: frontend/src/api/listings.api.js
+============================================================
+// frontend/src/api/listings.api.js
+import client from "./client";
+
+export function getListings(params = {}) {
+  return client.get("/properties/get-all-properties", { params }).then((res) => res.data);
+}
+
+export function getNearbyProperties(params) {
+  return client.get("/properties/nearby", { params }).then((res) => res.data);
+}
+
+export function polygonSearch(polygon, filters = {}) {
+  return client.post("/properties/polygon-search", { polygon, ...filters }).then((res) => res.data);
+}
+
+export function getListing(id) {
+  return client.get(`/properties/get-property/${id}`).then((res) => res.data);
+}
+
+export function createListing(payload) {
+  return client.post("/properties/add-property", payload).then((res) => res.data);
+}
+
+export function updateListing(id, payload) {
+  return client.put(`/properties/update-property/${id}`, payload).then((res) => res.data);
+}
+
+export function deleteListing(id) {
+  return client.delete(`/properties/delete-property/${id}`).then((res) => res.data);
+}
+
+export function getMyListings(params = {}) {
+  return client.get("/properties/view-my-listings", { params }).then((res) => res.data);
+}
+
+export function uploadImage(file) {
+  const formData = new FormData();
+  formData.append("image", file);
+  return client
+    .post("/properties/upload-image", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+    .then((res) => res.data);
+}
+
+
+
+============================================================
+FILE: frontend/src/pages/listings/ListingDetail.jsx
+============================================================
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+
+import { useTranslation } from "react-i18next";
+
+import { useQuery } from "@tanstack/react-query";
+
+import { MapPin, Wifi, Car, Droplet, Zap, Check, X, Heart } from "lucide-react";
+
+import AppShell from "../../components/layout/AppShell.jsx";
+
+import ListingGallery from "../../features/listings/components/ListingGallery.jsx";
+
+import ListingMap from "../../features/listings/components/ListingMap.jsx";
+
+import Badge from "../../components/ui/Badge.jsx";
+
+import ErrorState from "../../components/ui/ErrorState.jsx";
+
+import ReviewCard from "../../features/reviews/components/ReviewCard.jsx";
+
+import ReviewForm from "../../features/reviews/components/ReviewForm.jsx";
+
+import { formatRelativeDate } from "../../utils/formatDate";
+
+import {
+  useReviews,
+  useCreateReview,
+  useDeleteReview,
+  useReplyToReview,
+  useEditReply,
+} from "../../features/reviews/hooks/useReviews.js";
+
+import { useListing } from "../../features/listings/hooks/useListing.js";
+
+import {
+  useFavorites,
+  useToggleFavorite,
+} from "../../features/favorites/hooks/useFavorites.js";
+
+import { getNearbyProperties } from "../../api/listings.api.js";
+
+import { createVisitRequest } from "../../api/visitRequests.api.js";
+
+import { useAuth } from "../../features/auth/AuthContext.jsx";
+
+import { formatPrice } from "../../utils/formatPrice.js";
+
+/* =========================================================
+   AMENITY ICONS
+========================================================= */
+
+const AMENITY_ICONS = [
+  {
+    match: /wifi|internet/i,
+    icon: Wifi,
+  },
+  {
+    match: /park/i,
+    icon: Car,
+  },
+  {
+    match: /water/i,
+    icon: Droplet,
+  },
+  {
+    match: /electric|backup|power/i,
+    icon: Zap,
+  },
+];
+
+function amenityIcon(label) {
+  const found = AMENITY_ICONS.find((amenity) => amenity.match.test(label));
+
+  return found ? found.icon : Check;
+}
+
+/* =========================================================
+   VISIT REQUEST MODAL
+========================================================= */
+
+function VisitRequestModal({ listing, onClose }) {
+  const [date, setDate] = useState("");
+
+  const [time, setTime] = useState("");
+
+  const [message, setMessage] = useState("");
+
+  const [sent, setSent] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [submitError, setSubmitError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setSubmitError(null);
+
+    setIsSubmitting(true);
+
+    const composedMessage = [
+      date ? `Preferred date: ${date}` : null,
+
+      time ? `Preferred time: ${time}` : null,
+
+      message?.trim() || null,
+    ]
+      .filter(Boolean)
+      .join(" | ");
+
+    try {
+      await createVisitRequest({
+        propertyId: listing._id,
+        message: composedMessage,
+      });
+
+      setSent(true);
+    } catch (err) {
+      setSubmitError(
+        err?.response?.data?.message ||
+          "Couldn't send request. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/40 backdrop-blur-sm px-4">
+      <div className="bg-bg rounded-2xl w-full max-w-md p-6 relative shadow-2xl">
+        {/* CLOSE */}
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-ivory transition-colors"
+          aria-label="Close"
+        >
+          <X size={16} />
+        </button>
+
+        {sent ? (
+          <div className="py-6 text-center">
+            <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-brass-light flex items-center justify-center">
+              <Check size={20} className="text-brass" />
+            </div>
+
+            <p className="font-display text-lg text-text mb-2">Request sent</p>
+
+            <p className="text-sm text-text/60">
+              Your visit request has been sent to the owner.
+            </p>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-5 bg-ink text-ivory text-sm font-medium px-6 py-2.5 rounded-full hover:opacity-90 transition-opacity"
+            >
+              Close
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <p className="font-display text-lg text-text">Request to visit</p>
+
+              <p className="text-sm text-text/60 mt-1">{listing.title}</p>
+            </div>
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-medium text-text/70">Date</span>
+
+              <input
+                type="date"
+                required
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="border border-stone rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brass bg-transparent"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-medium text-text/70">Time</span>
+
+              <input
+                type="time"
+                required
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="border border-stone rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brass bg-transparent"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-medium text-text/70">
+                Message (optional)
+              </span>
+
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={3}
+                placeholder="Anything the owner should know..."
+                className="border border-stone rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brass resize-none bg-transparent"
+              />
+            </label>
+
+            {submitError && (
+              <p role="alert" className="text-sm text-red-600">
+                {submitError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full mt-1 disabled:opacity-60 hover:opacity-90 transition-opacity"
+            >
+              {isSubmitting ? "Sending..." : "Send request"}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   LISTING DETAIL
+========================================================= */
+
+export default function ListingDetail() {
+  const { t } = useTranslation();
+
+  const { id } = useParams();
+
+  const navigate = useNavigate();
+
+  const { user } = useAuth();
+
+  const { data: listing, isLoading, error } = useListing(id);
+
+  const [expanded, setExpanded] = useState(false);
+
+  const [visitModalOpen, setVisitModalOpen] = useState(false);
+
+  /* =======================================================
+     FAVORITES / SAVE
+  ======================================================= */
+
+  const { favoriteIds } = useFavorites({
+    enabled: user?.role === "renter",
+  });
+
+  const { toggle, add, remove } = useToggleFavorite();
+
+  const isSaved =
+    favoriteIds?.some((favoriteId) => String(favoriteId) === String(id)) ??
+    false;
+
+  const isSaving = add.isPending || remove.isPending;
+
+  function handleToggleSave() {
+    if (!listing?._id) return;
+
+    if (user?.role !== "renter") {
+      navigate("/login");
+      return;
+    }
+
+    toggle(listing._id, isSaved);
+  }
+
+  /* =======================================================
+     REVIEWS
+  ======================================================= */
+
+  const {
+    data: reviewData,
+    isError: reviewsError,
+    refetch: refetchReviews,
+  } = useReviews(id);
+
+  const createReview = useCreateReview(id);
+
+  const deleteReview = useDeleteReview(id);
+
+  const replyToReviewMutation = useReplyToReview(id);
+
+  const editReplyMutation = useEditReply(id);
+
+  /* =======================================================
+     NEARBY PROPERTIES
+  ======================================================= */
+
+  const coordinates = listing?.location?.coordinates;
+
+  const { data: nearbyData } = useQuery({
+    queryKey: ["nearby-on-detail", coordinates],
+
+    queryFn: () =>
+      getNearbyProperties({
+        lng: coordinates[0],
+        lat: coordinates[1],
+        radius: 3,
+        limit: 12,
+      }),
+
+    enabled: !!coordinates,
+  });
+
+  const nearbyListings = nearbyData?.properties ?? [];
+
+  /* =======================================================
+     REVIEW DATA
+  ======================================================= */
+
+  const reviews = reviewData?.reviews ?? [];
+
+  const avgRating = useMemo(() => {
+    if (!reviews.length) {
+      return null;
+    }
+
+    const validRatings = reviews.filter((review) =>
+      Number.isFinite(Number(review.rating)),
+    );
+
+    if (!validRatings.length) {
+      return null;
+    }
+
+    const sum = validRatings.reduce(
+      (acc, review) => acc + Number(review.rating),
+      0,
+    );
+
+    return (sum / validRatings.length).toFixed(1);
+  }, [reviews]);
+
+  /* =======================================================
+     LOADING
+  ======================================================= */
+
+  if (isLoading) {
+    return (
+      <AppShell>
+        <div className="flex items-center justify-center min-h-[300px]">
+          <p className="text-sm text-text/70">
+            {t("dashboard.loading", "Loading...")}
+          </p>
+        </div>
+      </AppShell>
+    );
+  }
+
+  /* =======================================================
+     ERROR
+  ======================================================= */
+
+  if (error || !listing) {
+    return (
+      <AppShell>
+        <div className="flex items-center justify-center min-h-[300px]">
+          <p className="text-sm text-red-600">
+            {t("listing.notFound", "Listing not found.")}
+          </p>
+        </div>
+      </AppShell>
+    );
+  }
+
+  /* =======================================================
+     LISTING DATA
+  ======================================================= */
+
+  const description = listing.description;
+
+  const address = listing.location?.address;
+
+  const images =
+    listing.images
+      ?.map((img) => (typeof img === "string" ? img : img?.url))
+      .filter(Boolean) ?? [];
+
+  const amenities = listing.amenities ?? [];
+
+  /* =======================================================
+     OWNER CHECK
+  ======================================================= */
+
+  const currentUserId = user?.id || user?._id;
+
+  const listingOwnerId = listing.owner?._id || listing.owner?.id;
+
+  const isOwnerOfThis =
+    user?.role === "owner" &&
+    currentUserId &&
+    listingOwnerId &&
+    String(currentUserId) === String(listingOwnerId);
+
+  const canReview = user?.role === "renter" && !isOwnerOfThis;
+
+  /* =======================================================
+     REVIEW OWNERSHIP
+  ======================================================= */
+
+  const isOwnReview = (review) => {
+    const reviewerId = review?.reviewer?._id || review?.reviewer?.id;
+
+    return (
+      currentUserId &&
+      reviewerId &&
+      String(currentUserId) === String(reviewerId)
+    );
+  };
+
+  /* =======================================================
+     RENDER
+  ======================================================= */
+
+  return (
+    <AppShell>
+      <div className="max-w-7xl mx-auto pb-24 lg:pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.15fr] gap-6 lg:gap-8">
+          {/* LEFT SIDE — MAP */}
+
+          <div className="lg:sticky lg:top-6 lg:self-start h-[420px] lg:h-[calc(100vh-96px)]">
+            {coordinates ? (
+              <ListingMap
+                coordinates={coordinates}
+                listings={nearbyListings}
+                currentId={listing._id}
+                onSelect={(nextId) => navigate(`/listings/${nextId}`)}
+                className="w-full h-full rounded-2xl overflow-hidden border border-stone"
+              />
+            ) : (
+              <div className="w-full h-full rounded-2xl bg-ivory border border-stone flex items-center justify-center text-sm text-text/50">
+                Location unavailable
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT SIDE — LISTING CONTENT */}
+
+          <div className="flex flex-col gap-6">
+            <ListingGallery
+              photos={images}
+              rating={avgRating}
+              listingId={listing._id}
+              title={listing.title}
+            />
+
+            {/* TITLE / LOCATION */}
+
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge>{listing.type}</Badge>
+
+                {reviews.length > 0 && avgRating && (
+                  <span className="text-xs text-text/50">
+                    {avgRating} · {reviews.length} review
+                    {reviews.length !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </div>
+
+              <h1 className="font-display text-2xl sm:text-3xl text-text">
+                {listing.title}
+              </h1>
+
+              {address && (
+                <p className="text-sm text-text/70 flex items-center gap-1.5 mt-2">
+                  <MapPin size={14} className="text-text/40 shrink-0" />
+
+                  {address}
+                </p>
+              )}
+
+              {listing.createdAt && (
+                <p className="text-xs text-text/40 mt-1.5">
+                  Listed {formatRelativeDate(listing.createdAt)}
+                </p>
+              )}
+            </div>
+
+            {/* =================================================
+                AMENITIES
+            ================================================= */}
+
+            {amenities.length > 0 && (
+              <div>
+                <h2 className="font-display text-lg text-text mb-3">
+                  {t("listing.amenities", "Amenities")}
+                </h2>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {amenities.map((amenity) => {
+                    const AmenityIcon = amenityIcon(amenity);
+
+                    return (
+                      <div
+                        key={amenity}
+                        className="
+                            flex items-center gap-3
+                            min-h-[72px]
+                            rounded-xl
+                            border border-stone/70
+                            bg-bg
+                            px-4 py-3
+                            transition-colors duration-200
+                            hover:border-brass/40
+                            hover:bg-ivory/30
+                          "
+                      >
+                        <div
+                          className="
+                              flex h-9 w-9 shrink-0
+                              items-center justify-center
+                              rounded-lg
+                              border border-stone/60
+                              bg-ivory/60
+                              text-text/70
+                            "
+                        >
+                          <AmenityIcon size={18} strokeWidth={1.8} />
+                        </div>
+
+                        <span className="text-sm font-medium text-text/80 leading-tight">
+                          {amenity}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* DESCRIPTION */}
+
+            {description && (
+              <div>
+                <h2 className="font-display text-lg text-text mb-2">
+                  {t("listing.description", "Description")}
+                </h2>
+
+                <p
+                  className={`text-sm text-text/70 leading-relaxed ${
+                    expanded ? "" : "line-clamp-4"
+                  }`}
+                >
+                  {description}
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => setExpanded((previous) => !previous)}
+                  className="text-sm text-text font-medium mt-1 underline underline-offset-2 hover:text-brass transition-colors"
+                >
+                  {expanded
+                    ? t("listing.showLess", "Show less")
+                    : t("listing.readMore", "Read More...")}
+                </button>
+              </div>
+            )}
+
+            {/* PRICE / CONTACT */}
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1">
+              <p className="text-2xl text-text font-semibold whitespace-nowrap">
+                {formatPrice(listing.price)}
+
+                <span className="text-sm text-text/50 font-normal">
+                  {" "}
+                  /Month
+                </span>
+              </p>
+
+              {!isOwnerOfThis && (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleToggleSave}
+                    disabled={isSaving}
+                    aria-pressed={isSaved}
+                    className={`flex items-center justify-center gap-1.5 border text-sm font-medium px-5 py-3 rounded-full transition-colors disabled:opacity-60 ${
+                      isSaved
+                        ? "border-brass bg-brass-light text-brass"
+                        : "border-stone text-text hover:bg-ivory"
+                    }`}
+                  >
+                    <Heart size={16} className={isSaved ? "fill-brass" : ""} />
+
+                    {isSaved
+                      ? t("listing.saved", "Saved")
+                      : t("listing.save", "Save")}
+                  </button>
+
+                  {listing.owner?.phone && (
+                    <a
+                      href={`tel:${listing.owner.phone}`}
+                      className="border border-stone text-text text-sm font-medium px-5 py-3 rounded-full hover:bg-ivory transition-colors text-center"
+                    >
+                      {t("listing.contact", "Contact")} · {listing.owner.phone}
+                    </a>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setVisitModalOpen(true)}
+                    className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full hover:opacity-90 transition-opacity"
+                  >
+                    {t("listing.requestVisit", "Request to visit")}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* REVIEWS */}
+
+            <div className="pt-2 border-t border-stone">
+              <div className="flex items-center justify-between gap-3 mb-3 mt-4">
+                <h2 className="font-display text-lg text-text">
+                  {t("reviews.title", "Reviews")}
+
+                  {reviews.length > 0 && ` (${reviews.length})`}
+                </h2>
+
+                {avgRating && (
+                  <div className="flex items-center gap-1.5 text-sm">
+                    <span className="text-brass">★</span>
+
+                    <span className="font-semibold text-text">{avgRating}</span>
+                  </div>
+                )}
+              </div>
+
+              {reviewsError && <ErrorState onRetry={refetchReviews} />}
+
+              {canReview && (
+                <div className="mb-4">
+                  <ReviewForm
+                    onSubmit={(payload, opts) =>
+                      createReview.mutate(payload, opts)
+                    }
+                    isSubmitting={createReview.isPending}
+                  />
+                </div>
+              )}
+
+              {!reviewsError && reviews.length === 0 && (
+                <div className="rounded-2xl border border-stone bg-ivory p-5">
+                  <p className="text-sm text-text/60">
+                    {t("reviews.empty", "No reviews yet.")}
+                  </p>
+                </div>
+              )}
+
+              {reviews.length > 0 && (
+                <div className="flex flex-col gap-3">
+                  {reviews.map((review) => (
+                    <ReviewCard
+                      key={review._id}
+                      review={review}
+                      isOwner={Boolean(isOwnerOfThis)}
+                      isOwnReview={isOwnReview(review)}
+                      onReply={(reviewId, comment) =>
+                        replyToReviewMutation.mutate({
+                          reviewId,
+                          comment,
+                        })
+                      }
+                      onEditReply={(reviewId, comment) =>
+                        editReplyMutation.mutate({
+                          reviewId,
+                          comment,
+                        })
+                      }
+                      isReplying={replyToReviewMutation.isPending}
+                      isEditingReply={editReplyMutation.isPending}
+                      onDelete={(reviewId) => deleteReview.mutate(reviewId)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {visitModalOpen && (
+        <VisitRequestModal
+          listing={listing}
+          onClose={() => setVisitModalOpen(false)}
+        />
+      )}
+
+      {/* MOBILE BOTTOM BAR */}
+
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-bg border-t border-stone p-4 flex items-center justify-between gap-4 z-40">
+        <p className="text-lg text-text font-semibold shrink-0">
+          {formatPrice(listing.price)}
+
+          <span className="text-xs text-text/50 font-normal block leading-none">
+            /Month
+          </span>
+        </p>
+
+        {!isOwnerOfThis && (
+          <div className="flex items-center gap-2 flex-1">
+            <button
+              type="button"
+              onClick={handleToggleSave}
+              disabled={isSaving}
+              aria-pressed={isSaved}
+              aria-label={isSaved ? "Remove from saved" : "Save listing"}
+              className={`w-12 h-12 shrink-0 flex items-center justify-center rounded-full border transition-colors disabled:opacity-60 ${
+                isSaved
+                  ? "border-brass bg-brass-light text-brass"
+                  : "border-stone text-text"
+              }`}
+            >
+              <Heart size={18} className={isSaved ? "fill-brass" : ""} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setVisitModalOpen(true)}
+              className="bg-ink text-ivory text-sm font-medium px-6 py-3 rounded-full flex-1 hover:opacity-90 transition-opacity"
+            >
+              {t("listing.bookNow", "Book Now")}
+            </button>
+          </div>
+        )}
+      </div>
+    </AppShell>
+  );
+}
+
+
+
+============================================================
+FILE: frontend/src/pages/owner/MyListings.jsx
+============================================================
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import {
+  Home,
+  PlusCircle,
+  Heart,
+  Settings,
+  MessageSquare,
+  Compass,
+  Building2,
+  LayoutGrid,
+  RefreshCw,
+} from "lucide-react";
+
+import AppShell from "../../components/layout/AppShell.jsx";
+import Sidebar from "../../components/layout/Sidebar.jsx";
+import ListingCard from "../../features/listings/components/ListingCard.jsx";
+import { StaggerGrid, StaggerItem } from "../../components/ui/StaggerGrid.jsx";
+import { useMyListings } from "../../features/listings/hooks/useMyListings.js";
+import Button from "../../components/ui/Button.jsx";
+
+const links = [
+  {
+    to: "/owner",
+    label: "Overview",
+    icon: Home,
+    end: true,
+  },
+  {
+    to: "/owner/listings",
+    label: "My Listings",
+    icon: Compass,
+  },
+  {
+    to: "/owner/messages",
+    label: "Messages",
+    icon: MessageSquare,
+  },
+  {
+    to: "/owner/favorites",
+    label: "Favorites",
+    icon: Heart,
+  },
+  {
+    to: "/owner/settings",
+    label: "Settings",
+    icon: Settings,
+  },
+];
+
+export default function MyListings() {
+  const { t } = useTranslation();
+
+  const { data, isLoading, isError, refetch, isFetching } = useMyListings();
+
+  /*
+   * Your backend uses `myproperties`.
+   * `listings` is kept as a fallback in case the backend response changes.
+   */
+  const listings = data?.myproperties ?? data?.listings ?? [];
+
+  return (
+    <AppShell sidebar={<Sidebar links={links} />}>
+      <div className="space-y-6">
+        {/* HERO */}
+        <section
+          className="
+            relative overflow-hidden rounded-[30px] border border-black/[0.06]
+            bg-gradient-to-br from-[#f3f2ee] via-[#e9e8e4] to-[#d8d7d3]
+            px-6 py-7 shadow-[0_20px_60px_rgba(20,23,31,0.055)]
+            sm:px-8 sm:py-8
+            dark:border-white/[0.06]
+            dark:from-[#1c1f26] dark:via-[#181b20] dark:to-[#121419]
+            dark:shadow-none
+          "
+        >
+          <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-white/50 blur-3xl dark:bg-white/[0.03]" />
+
+          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex max-w-2xl items-start gap-4">
+              <div
+                className="
+                  mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl
+                  border border-black/[0.07] bg-white/55 text-[#202226]
+                  shadow-[0_10px_28px_rgba(20,23,31,0.055)]
+                  dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-white
+                "
+              >
+                <Building2 size={18} strokeWidth={1.8} />
+              </div>
+
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-[#2b2d31]/42 dark:text-white/40">
+                  Property management
+                </p>
+
+                <h1 className="mt-2 font-display text-[30px] font-bold tracking-[-0.045em] text-[#202226] sm:text-[36px] dark:text-white">
+                  {t("dashboard.owner.myListingsTitle", "My Listings")}
+                </h1>
+
+                <p className="mt-3 max-w-xl text-[14px] leading-6 text-[#2b2d31]/58 dark:text-white/52">
+                  Manage every property you have published and keep your rental
+                  portfolio organized in one place.
+                </p>
+              </div>
+            </div>
+
+            <Link to="/owner/listings/new" className="shrink-0 no-underline">
+              <Button
+                pill
+                className="
+                  flex items-center gap-2 border-0 bg-[#202226] text-white
+                  hover:bg-[#303238]
+                  dark:bg-white dark:text-[#17191d] dark:hover:bg-white/90
+                "
+              >
+                <PlusCircle size={15} strokeWidth={1.9} />
+                <span>Add listing</span>
+              </Button>
+            </Link>
+          </div>
+        </section>
+
+        {/* LISTING CONTENT */}
+        <section
+          className="
+            overflow-hidden rounded-[26px] border border-black/[0.07]
+            bg-white/52 shadow-[0_18px_52px_rgba(20,23,31,0.045)]
+            backdrop-blur
+            dark:border-white/[0.07] dark:bg-white/[0.025] dark:shadow-none
+          "
+        >
+          <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6 dark:border-white/[0.07]">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div
+                  className="
+                    flex h-9 w-9 shrink-0 items-center justify-center rounded-xl
+                    border border-black/[0.06] bg-white/60 text-[#2a2c30]
+                    dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-white/80
+                  "
+                >
+                  <LayoutGrid size={16} strokeWidth={1.8} />
+                </div>
+
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
+                    Portfolio
+                  </p>
+
+                  <h2 className="mt-1 font-display text-xl font-bold tracking-[-0.035em] text-[#202226] dark:text-white">
+                    Published properties
+                  </h2>
+
+                  <p className="mt-1 text-[12px] text-[#2b2d31]/48 dark:text-white/43">
+                    {isLoading
+                      ? "Loading your listings..."
+                      : `${listings.length} ${
+                          listings.length === 1 ? "listing" : "listings"
+                        } in your portfolio`}
+                  </p>
+                </div>
+              </div>
+
+              {isFetching && !isLoading && (
+                <div
+                  className="
+                    inline-flex w-fit items-center gap-1.5 rounded-full
+                    border border-black/[0.07] bg-white/45 px-3 py-2
+                    text-[10px] font-semibold text-[#2b2d31]/48
+                    dark:border-white/[0.08] dark:bg-white/[0.035]
+                    dark:text-white/45
+                  "
+                >
+                  <RefreshCw
+                    size={11}
+                    strokeWidth={1.8}
+                    className="animate-spin"
+                  />
+                  Updating
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-5">
+            {/* LOADING */}
+            {isLoading && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {[1, 2, 3].map((item) => (
+                  <div
+                    key={item}
+                    className="
+                      h-72 animate-pulse rounded-[22px]
+                      border border-black/[0.06] bg-black/[0.025]
+                      dark:border-white/[0.06] dark:bg-white/[0.035]
+                    "
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* ERROR */}
+            {isError && (
+              <div
+                className="
+                  rounded-[22px] border border-rose-200/70 bg-rose-50/70
+                  px-6 py-10 text-center
+                  dark:border-rose-400/15 dark:bg-rose-400/10
+                "
+              >
+                <p className="text-sm font-semibold text-rose-700 dark:text-rose-300">
+                  {t("dashboard.error", "Couldn't load your listings.")}
+                </p>
+
+                <p className="mx-auto mt-1 max-w-sm text-[12px] leading-5 text-rose-700/70 dark:text-rose-300/70">
+                  Something went wrong while loading your property portfolio.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => refetch()}
+                  className="
+                    mt-4 inline-flex items-center gap-1.5 rounded-full
+                    border border-rose-200 bg-white/65 px-4 py-2
+                    text-[11px] font-semibold text-rose-700
+                    transition-colors hover:bg-white
+                    dark:border-rose-400/15 dark:bg-white/[0.04]
+                    dark:text-rose-300 dark:hover:bg-white/[0.08]
+                  "
+                >
+                  <RefreshCw size={12} strokeWidth={1.8} />
+                  {t("dashboard.retry", "Retry")}
+                </button>
+              </div>
+            )}
+
+            {/* EMPTY */}
+            {!isLoading && !isError && listings.length === 0 && (
+              <div
+                className="
+                  rounded-[24px] border border-dashed border-black/10
+                  bg-white/30 px-6 py-14 text-center
+                  dark:border-white/10 dark:bg-white/[0.018]
+                "
+              >
+                <div
+                  className="
+                    mx-auto flex h-12 w-12 items-center justify-center
+                    rounded-2xl border border-black/[0.07] bg-white/55
+                    text-[#202226]
+                    dark:border-white/[0.08] dark:bg-white/[0.05]
+                    dark:text-white
+                  "
+                >
+                  <PlusCircle size={19} strokeWidth={1.8} />
+                </div>
+
+                <h2 className="mt-4 font-display text-xl font-bold tracking-[-0.03em] text-[#202226] dark:text-white">
+                  No listings yet
+                </h2>
+
+                <p className="mx-auto mt-2 max-w-sm text-[12px] leading-5 text-[#2b2d31]/48 dark:text-white/43">
+                  You haven't posted any properties yet. Create your first
+                  listing and it will appear here.
+                </p>
+
+                <Link
+                  to="/owner/listings/new"
+                  className="mt-5 inline-block no-underline"
+                >
+                  <Button
+                    pill
+                    className="
+                      border-0 bg-[#202226] text-white hover:bg-[#303238]
+                      dark:bg-white dark:text-[#17191d] dark:hover:bg-white/90
+                    "
+                  >
+                    Create your first listing
+                  </Button>
+                </Link>
+              </div>
+            )}
+
+            {/* LISTINGS */}
+            {!isLoading && !isError && listings.length > 0 && (
+              <StaggerGrid className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {listings.map((listing) => (
+                  <StaggerItem key={listing._id}>
+                    <ListingCard listing={listing} />
+                  </StaggerItem>
+                ))}
+              </StaggerGrid>
+            )}
+          </div>
+        </section>
+      </div>
+    </AppShell>
+  );
+}
+
+
+
+============================================================
+FILE: frontend/src/features/listings/components/ListingCard.jsx
+============================================================
+import { formatAddress } from "../../../utils/formatAddress";
+import { formatRelativeDate } from "../../../utils/formatDate";
+import Icon from "../../../components/ui/Icon";
+
+export default function ListingCard({
+  listing,
+  selected,
+  onClick,
+  onToggleFavorite,
+  isFavorited,
+  variant = "card",
+}) {
+  const imageUrl = listing.images?.[0]?.url;
+
+  if (variant === "row") {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`w-full text-left flex gap-4 rounded-2xl border border-stone bg-bg p-3 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(20,20,26,0.08)] ${
+          selected ? "ring-2 ring-brass" : ""
+        }`}
+      >
+        <div className="w-28 h-24 sm:w-36 sm:h-28 shrink-0 rounded-xl overflow-hidden bg-ivory border border-stone">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={listing.title}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-xs text-neutral-400">
+              No photo
+            </div>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1 py-1">
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="font-semibold text-base truncate">
+              {listing.title}
+            </h3>
+
+            {onToggleFavorite && (
+              <span
+                className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center border border-stone ${
+                  isFavorited ? "bg-brass-light text-brass" : "text-neutral-500"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite(listing._id);
+                }}
+              >
+                <Icon name="heart" filled={isFavorited} size={15} />
+              </span>
+            )}
+          </div>
+
+          <p className="flex items-center gap-1.5 text-xs text-neutral-500 mt-1.5 truncate">
+            <Icon name="pin" size={12} className="shrink-0 text-neutral-400" />
+            {formatAddress(listing.location)}
+          </p>
+
+          <div className="flex items-center gap-4 text-xs text-neutral-500 mt-3">
+            <span className="flex items-center gap-1.5">
+              <Icon name="bed" size={14} />
+              {listing.rooms ?? "—"}
+            </span>
+
+            <span className="flex items-center gap-1.5">
+              <Icon name="bath" size={14} />
+              {listing.bathrooms ?? 1}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between mt-3">
+            <p className="text-sm font-semibold">
+              Rs {listing.price?.toLocaleString("en-IN")}
+              <span className="font-normal text-neutral-500"> / month</span>
+            </p>
+
+            {listing.createdAt && (
+              <span className="text-[11px] text-neutral-400 shrink-0">
+                {formatRelativeDate(listing.createdAt)}
+              </span>
+            )}
+          </div>
+        </div>
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full text-left rounded-2xl bg-bg border border-stone overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(20,20,26,0.08)] ${
+        selected ? "ring-2 ring-brass" : ""
+      }`}
+    >
+      <div className="relative aspect-[4/3] overflow-hidden bg-ivory border-b border-stone">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={listing.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-xs text-neutral-400">
+            No photo yet
+          </div>
+        )}
+
+        {onToggleFavorite && (
+          <span
+            className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center bg-white/90 backdrop-blur-sm shadow-sm ${
+              isFavorited ? "text-brass" : "text-neutral-600"
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite(listing._id);
+            }}
+          >
+            <Icon name="heart" filled={isFavorited} size={16} />
+          </span>
+        )}
+      </div>
+
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-base font-semibold">
+            Rs {listing.price?.toLocaleString("en-IN")}
+            <span className="text-xs font-normal text-neutral-500">
+              {" "}
+              / month
+            </span>
+          </span>
+
+          {listing.createdAt && (
+            <span className="text-[11px] text-neutral-400 shrink-0 mt-0.5">
+              {formatRelativeDate(listing.createdAt)}
+            </span>
+          )}
+        </div>
+
+        <h3 className="font-semibold text-sm mt-2 truncate">{listing.title}</h3>
+
+        <p className="flex items-center gap-1.5 text-xs text-neutral-500 mt-1.5">
+          <Icon name="pin" size={12} className="shrink-0 text-neutral-400" />
+          <span className="truncate">{formatAddress(listing.location)}</span>
+        </p>
+
+        <div className="flex items-center gap-4 text-xs text-neutral-500 mt-4">
+          <span className="flex items-center gap-1.5">
+            <Icon name="bed" size={14} />
+            {listing.rooms ?? "—"}
+          </span>
+
+          <span className="flex items-center gap-1.5">
+            <Icon name="bath" size={14} />
+            {listing.bathrooms ?? 1}
+          </span>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+
+
