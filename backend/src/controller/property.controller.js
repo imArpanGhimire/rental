@@ -264,7 +264,10 @@ async function createproperty(req, res) {
                 rooms,
                 furnished,
                 genderPreference,
-                waterSupply
+                waterSupply,
+
+                // New properties start as available.
+                isAvailable: true
             })
 
         return res.status(201).json({
@@ -399,7 +402,7 @@ async function getallproperties(req, res) {
                 .limit(currentLimit)
                 .populate(
                     "owner",
-                    "name phone"
+                    "name phone profilePicture"
                 )
 
         const totalCount =
@@ -508,7 +511,8 @@ async function updateproperty(req, res) {
             furnished,
             genderPreference,
             waterSupply,
-            amenities
+            amenities,
+            isAvailable
         } = req.body
 
         // --------------------------------------------------------
@@ -557,6 +561,28 @@ async function updateproperty(req, res) {
         if (furnished !== undefined) {
             propertyToEdit.furnished =
                 furnished
+        }
+
+        // --------------------------------------------------------
+        // Availability
+        // --------------------------------------------------------
+
+        if (isAvailable !== undefined) {
+            if (
+                isAvailable !== true &&
+                isAvailable !== false &&
+                isAvailable !== "true" &&
+                isAvailable !== "false"
+            ) {
+                return res.status(400).json({
+                    message:
+                        "isAvailable must be true or false"
+                })
+            }
+
+            propertyToEdit.isAvailable =
+                isAvailable === true ||
+                isAvailable === "true"
         }
 
         // --------------------------------------------------------
@@ -622,7 +648,7 @@ async function updateproperty(req, res) {
             catch {
                 return res.status(400).json({
                     message:
-                        'location must be valid JSON'
+                        "location must be valid JSON"
                 })
             }
 
@@ -735,6 +761,11 @@ async function updateproperty(req, res) {
 
         const updatedProperty =
             await propertyToEdit.save()
+
+        await updatedProperty.populate(
+            "owner",
+            "name phone profilePicture"
+        )
 
         return res.status(200).json({
             message:
@@ -1237,6 +1268,7 @@ async function getpropertiesinpolygon(req, res) {
         // --------------------------------------------------------
 
         const firstPoint = polygon[0]
+
         const lastPoint =
             polygon[polygon.length - 1]
 
