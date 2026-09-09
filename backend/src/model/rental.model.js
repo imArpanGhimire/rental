@@ -1,102 +1,109 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const rentalschema = new mongoose.Schema(
     {
         title: {
             type: String,
-            required: true
+            required: true,
         },
 
         description: {
             type: String,
-            required: true
+            required: true,
         },
 
         type: {
             type: String,
             enum: ["hostel", "rental", "flat"],
-            required: true
+            required: true,
         },
 
         location: {
             type: {
                 type: String,
                 enum: ["Point"],
-                default: "Point"
+                default: "Point",
             },
 
             coordinates: {
                 type: [Number],
-                required: true
+                required: true,
             },
 
-            address: String
+            address: String,
         },
 
         price: {
             type: Number,
-            required: true
+            required: true,
         },
 
         amenities: [
             {
-                type: String
-            }
+                type: String,
+            },
         ],
 
         rooms: {
-            type: Number
+            type: Number,
         },
 
         furnished: {
             type: Boolean,
-            default: false
+            default: false,
         },
 
         genderPreference: {
             type: String,
             enum: ["any", "male", "female"],
-            default: "any"
+            default: "any",
         },
 
         waterSupply: {
             type: String,
-            enum: ["municipal", "tanker", "jar", "borewell"]
+            enum: ["municipal", "tanker", "jar", "borewell"],
+        },
+
+        /*
+         * Property availability.
+         *
+         * true  = renters can request a visit
+         * false = property has been rented / filled
+         */
+        isAvailable: {
+            type: Boolean,
+            default: true,
         },
 
         owner: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "user",
-            required: true
+            required: true,
         },
 
         images: [
             {
                 url: {
                     type: String,
-                    required: true
+                    required: true,
                 },
 
                 publicId: {
                     type: String,
-                    required: true
-                }
-            }
-        ]
+                    required: true,
+                },
+            },
+        ],
     },
-
     {
-        timestamps: true
-    }
-)
+        timestamps: true,
+    },
+);
 
 rentalschema.index({
-    location: "2dsphere"
-})
+    location: "2dsphere",
+});
 
-const rentalmodel = mongoose.model(
-    "rental",
-    rentalschema
-)
+const rentalmodel = mongoose.model("rental", rentalschema);
 
-module.exports = rentalmodel
+module.exports = rentalmodel;
