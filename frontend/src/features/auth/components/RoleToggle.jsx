@@ -18,7 +18,7 @@ export default function RoleToggle({ value, onChange }) {
 
   return (
     <div className="mb-5">
-      <p className="mb-2 text-[11px] font-semibold text-[#2b2d31]/58 dark:text-white/55">
+      <p className="mb-2 text-[11px] font-semibold !text-white/75">
         Account type
       </p>
 
@@ -66,11 +66,12 @@ export default function RoleToggle({ value, onChange }) {
                 <span className="block text-[12px] font-semibold">
                   {option.label}
                 </span>
+
                 <span
                   className={`mt-0.5 block truncate text-[9px] font-medium ${
                     selected
                       ? "text-white/55 dark:text-[#17191d]/50"
-                      : "text-[#2b2d31]/36 dark:text-white/32"
+                      : "text-[#2b2d31]/36 dark:text-white/45"
                   }`}
                 >
                   {option.helper}
