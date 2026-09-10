@@ -1,37 +1,130 @@
 {
+  "common": {
+    "cancel": "Cancel",
+    "recently": "Recently",
+    "profile": "Profile"
+  },
+  "roles": {
+    "owner": "Owner",
+    "renter": "Renter"
+  },
+  "nav": {
+    "browse": "Browse",
+    "myListings": "My Listings",
+    "addListing": "Add Listing",
+    "saved": "Saved",
+    "dashboard": "Dashboard",
+    "personalInformation": "Personal information",
+    "listYourProperty": "List your property"
+  },
+  "language": {
+    "language": "Language",
+    "description": "Choose your preferred language"
+  },
   "auth": {
     "login": {
-      "title": "Log in"
+      "title": "Log in",
+      "button": "Log in"
     },
     "register": {
       "title": "Create an account"
-    }
+    },
+    "logout": "Log out"
   },
   "listings": {
     "filters": {
       "priceRange": "Price range"
     }
   },
-  "dashboard": {
-  "loading": "Loading...",
-  "error": "Something went wrong.",
-  "retry": "Retry",
-  "viewAll": "View all",
-  "browse": "Browse listings",
-  "renter": {
-    "title": "Renter Dashboard",
-    "savedTitle": "Saved Listings",
-    "savedCount": "Saved listings",
-    "recent": "Recently saved",
-    "empty": "You haven't saved any listings yet."
+  "listing": {
+    "available": "Available",
+    "rented": "Rented",
+    "propertyAvailable": "Property available",
+    "currentlyRented": "Currently rented",
+    "save": "Save",
+    "saved": "Saved",
+    "requestVisit": "Request to visit",
+    "amenities": "Amenities",
+    "description": "Description",
+    "readMore": "Read More...",
+    "showLess": "Show less",
+    "propertyOwner": "Property owner",
+    "contactOwner": "Contact owner",
+    "perMonth": "/Month",
+    "notFound": "Listing not found."
   },
-  "owner": {
-    "title": "Owner Dashboard",
-    "myListingsTitle": "My Listings",
-    "totalListings": "Total listings",
-    "newListing": "New listing",
-    "recent": "Recent listings",
-    "empty": "You haven't posted any listings yet."
+  "requests": {
+    "accept": "Accept",
+    "decline": "Decline",
+    "status": {
+      "pending": "pending",
+      "accepted": "accepted",
+      "declined": "declined"
+    }
+  },
+  "topbar": {
+    "logout": {
+      "title": "Log out?",
+      "description": "You'll need to log in again to access your account."
+    },
+    "theme": {
+      "appearance": "Appearance",
+      "description": "Switch between light and dark mode",
+      "switchLight": "Switch to light mode",
+      "switchDark": "Switch to dark mode"
+    },
+    "mobile": {
+      "openMenu": "Open navigation menu",
+      "closeMenu": "Close navigation menu",
+      "closeNavigation": "Close mobile navigation"
+    },
+    "account": {
+      "label": "Account",
+      "workspace": "Workspace",
+      "openWorkspace": "Open your workspace",
+      "profileDetails": "Profile and account details",
+      "signOutDescription": "Sign out of Rentora"
+    },
+    "notifications": {
+      "activity": "Activity",
+      "title": "Notifications",
+      "unread_one": "{{count}} unread notification",
+      "unread_other": "{{count}} unread notifications",
+      "caughtUp": "You're all caught up",
+      "markAllRead": "Mark all read",
+      "emptyTitle": "No notifications",
+      "emptyDescription": "New activity will appear here.",
+      "yourProperty": "your property",
+      "yourRequestedProperty": "your requested property",
+      "aRenter": "A renter",
+      "newVisitRequest": "New visit request",
+      "visitRequestStatus": "Visit request {{status}}",
+      "ownerRequestMessage": "{{renterName}} requested a visit for {{propertyTitle}}.",
+      "visitAccepted": "Visit request accepted",
+      "visitDeclined": "Visit request declined",
+      "renterRequestMessage": "Your visit request for {{propertyTitle}} was {{status}}."
+    }
+  },
+  "dashboard": {
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "retry": "Retry",
+    "viewAll": "View all",
+    "browse": "Browse listings",
+    "renter": {
+      "title": "Renter Dashboard",
+      "savedTitle": "Saved Listings",
+      "savedCount": "Saved listings",
+      "recent": "Recently saved",
+      "empty": "You haven't saved any listings yet."
+    },
+    "owner": {
+      "title": "Owner Dashboard",
+      "myListingsTitle": "My Listings",
+      "totalListings": "Total listings",
+      "newListing": "New listing",
+      "recent": "Recent listings",
+      "empty": "You haven't posted any listings yet."
+    }
   }
-}
 }

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import {
   LayoutDashboard,
@@ -33,6 +34,8 @@ import {
 ========================================================= */
 
 function LogoutConfirmModal({ onConfirm, onCancel }) {
+  const { t } = useTranslation();
+
   return createPortal(
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-ink/45 backdrop-blur-[6px] px-4">
       <div className="w-full max-w-sm overflow-hidden rounded-xl border border-stone bg-bg shadow-[0_24px_70px_rgba(20,20,26,0.22)]">
@@ -40,11 +43,11 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="font-display text-xl tracking-tight text-ink">
-                Log out?
+                {t("topbar.logout.title")}
               </p>
 
               <p className="mt-2 text-sm leading-relaxed text-ink/55">
-                You'll need to log in again to access your account.
+                {t("topbar.logout.description")}
               </p>
             </div>
 
@@ -52,7 +55,7 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
               type="button"
               onClick={onCancel}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-ink/45 transition-all duration-200 hover:bg-ivory hover:text-ink"
-              aria-label="Cancel"
+              aria-label={t("common.cancel")}
             >
               <X size={17} strokeWidth={1.8} />
             </button>
@@ -64,7 +67,7 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
               onClick={onCancel}
               className="flex-1 rounded-xl border border-stone bg-bg py-2.5 text-sm font-medium text-ink transition-all duration-200 hover:border-ink/20 hover:bg-ivory"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
 
             <button
@@ -72,7 +75,7 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
               onClick={onConfirm}
               className="flex-1 rounded-xl bg-ink py-2.5 text-sm font-semibold text-ivory transition-all duration-200 hover:-translate-y-px hover:opacity-90"
             >
-              Log out
+              {t("auth.logout")}
             </button>
           </div>
         </div>
@@ -123,6 +126,7 @@ function NotificationPanel({
   onMarkAllRead,
   onOpenNotification,
 }) {
+  const { t } = useTranslation();
   const updateStatus = useUpdateVisitRequestStatus();
   const [updatingId, setUpdatingId] = useState(null);
 
@@ -179,19 +183,17 @@ function NotificationPanel({
 
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#2b2d31]/45 dark:text-white/40">
-                Activity
+                {t("topbar.notifications.activity")}
               </p>
 
               <h3 className="mt-0.5 font-display text-[17px] font-bold tracking-[-0.035em] text-[#1f2125] dark:text-white">
-                Notifications
+                {t("topbar.notifications.title")}
               </h3>
 
               <p className="mt-0.5 text-[11px] leading-4 text-[#2b2d31]/55 dark:text-white/50">
                 {unreadCount > 0
-                  ? `${unreadCount} unread notification${
-                      unreadCount === 1 ? "" : "s"
-                    }`
-                  : "You're all caught up"}
+                  ? t("topbar.notifications.unread", { count: unreadCount })
+                  : t("topbar.notifications.caughtUp")}
               </p>
             </div>
           </div>
@@ -208,7 +210,7 @@ function NotificationPanel({
                 dark:text-white/65 dark:hover:bg-white/10 dark:hover:text-white
               "
             >
-              Mark all read
+              {t("topbar.notifications.markAllRead")}
             </button>
           )}
         </div>
@@ -235,11 +237,11 @@ function NotificationPanel({
             </div>
 
             <p className="mt-3 font-display text-[14px] font-semibold tracking-[-0.02em] text-[#1f2125] dark:text-white">
-              No notifications
+              {t("topbar.notifications.emptyTitle")}
             </p>
 
             <p className="mt-1 text-[11px] leading-4 text-[#2b2d31]/50 dark:text-white/45">
-              New activity will appear here.
+              {t("topbar.notifications.emptyDescription")}
             </p>
           </div>
         ) : (
@@ -324,7 +326,7 @@ function NotificationPanel({
                               dark:bg-white dark:text-[#16181c] dark:hover:bg-white/90
                             "
                           >
-                            {isUpdatingThis ? "..." : "Accept"}
+                            {isUpdatingThis ? "..." : t("requests.accept")}
                           </button>
 
                           <button
@@ -343,7 +345,7 @@ function NotificationPanel({
                               dark:hover:text-white
                             "
                           >
-                            {isUpdatingThis ? "..." : "Decline"}
+                            {isUpdatingThis ? "..." : t("requests.decline")}
                           </button>
                         </div>
                       )}
@@ -364,6 +366,7 @@ function NotificationPanel({
 ========================================================= */
 
 function ThemeToggleButton({ className = "" }) {
+  const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
 
@@ -371,8 +374,12 @@ function ThemeToggleButton({ className = "" }) {
     <button
       type="button"
       onClick={toggleTheme}
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={
+        isDark ? t("topbar.theme.switchLight") : t("topbar.theme.switchDark")
+      }
+      title={
+        isDark ? t("topbar.theme.switchLight") : t("topbar.theme.switchDark")
+      }
       className={`group flex h-9 w-9 items-center justify-center rounded-full border border-stone bg-bg text-ink/55 transition-all duration-200 hover:border-ink/20 hover:bg-ivory hover:text-ink ${className}`}
     >
       {isDark ? (
@@ -393,10 +400,58 @@ function ThemeToggleButton({ className = "" }) {
 }
 
 /* =========================================================
+   LANGUAGE TOGGLE
+========================================================= */
+
+function LanguageToggle({ className = "" }) {
+  const { i18n, t } = useTranslation();
+
+  const currentLanguage = i18n.resolvedLanguage?.startsWith("ne") ? "ne" : "en";
+
+  function changeLanguage(language) {
+    i18n.changeLanguage(language);
+  }
+
+  return (
+    <div
+      className={`flex h-9 items-center rounded-full border border-stone bg-bg p-1 ${className}`}
+      aria-label={t("language.language")}
+    >
+      <button
+        type="button"
+        onClick={() => changeLanguage("en")}
+        aria-pressed={currentLanguage === "en"}
+        className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors ${
+          currentLanguage === "en"
+            ? "bg-ink text-ivory"
+            : "text-ink/45 hover:text-ink"
+        }`}
+      >
+        EN
+      </button>
+
+      <button
+        type="button"
+        onClick={() => changeLanguage("ne")}
+        aria-pressed={currentLanguage === "ne"}
+        className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors ${
+          currentLanguage === "ne"
+            ? "bg-ink text-ivory"
+            : "text-ink/45 hover:text-ink"
+        }`}
+      >
+        नेपाली
+      </button>
+    </div>
+  );
+}
+
+/* =========================================================
    TOP BAR
 ========================================================= */
 
 export default function TopBar() {
+  const { t, i18n } = useTranslation();
   const { user, role, isAuthenticated, isLoading, logout } = useAuth();
 
   const navigate = useNavigate();
@@ -500,9 +555,11 @@ export default function TopBar() {
     if (role === "owner") {
       return ownerRequests
         .map((request) => {
-          const propertyTitle = request.property?.title || "your property";
+          const propertyTitle =
+            request.property?.title || t("topbar.notifications.yourProperty");
 
-          const renterName = request.renter?.name || "A renter";
+          const renterName =
+            request.renter?.name || t("topbar.notifications.aRenter");
 
           const key = `owner:${request._id}:${request.status}`;
 
@@ -518,14 +575,21 @@ export default function TopBar() {
 
             title:
               request.status === "pending"
-                ? "New visit request"
-                : `Visit request ${request.status}`,
+                ? t("topbar.notifications.newVisitRequest")
+                : t("topbar.notifications.visitRequestStatus", {
+                    status: t(`requests.status.${request.status}`),
+                  }),
 
-            message: `${renterName} requested a visit for ${propertyTitle}.`,
+            message: t("topbar.notifications.ownerRequestMessage", {
+              renterName,
+              propertyTitle,
+            }),
 
             date: request.createdAt
-              ? new Date(request.createdAt).toLocaleDateString()
-              : "Recently",
+              ? new Date(request.createdAt).toLocaleDateString(
+                  i18n.resolvedLanguage?.startsWith("ne") ? "ne-NP" : "en-US",
+                )
+              : t("common.recently"),
 
             unread: !seenKeys.has(key),
 
@@ -547,7 +611,8 @@ export default function TopBar() {
         )
         .map((request) => {
           const propertyTitle =
-            request.property?.title || "your requested property";
+            request.property?.title ||
+            t("topbar.notifications.yourRequestedProperty");
 
           const key = `renter:${request._id}:${request.status}`;
 
@@ -558,14 +623,19 @@ export default function TopBar() {
 
             title:
               request.status === "accepted"
-                ? "Visit request accepted"
-                : "Visit request declined",
+                ? t("topbar.notifications.visitAccepted")
+                : t("topbar.notifications.visitDeclined"),
 
-            message: `Your visit request for ${propertyTitle} was ${request.status}.`,
+            message: t("topbar.notifications.renterRequestMessage", {
+              propertyTitle,
+              status: t(`requests.status.${request.status}`),
+            }),
 
             date: request.createdAt
-              ? new Date(request.createdAt).toLocaleDateString()
-              : "Recently",
+              ? new Date(request.createdAt).toLocaleDateString(
+                  i18n.resolvedLanguage?.startsWith("ne") ? "ne-NP" : "en-US",
+                )
+              : t("common.recently"),
 
             unread: !seenKeys.has(key),
 
@@ -580,7 +650,15 @@ export default function TopBar() {
     }
 
     return [];
-  }, [isAuthenticated, role, ownerRequests, renterRequests, seenKeys]);
+  }, [
+    isAuthenticated,
+    role,
+    ownerRequests,
+    renterRequests,
+    seenKeys,
+    t,
+    i18n.resolvedLanguage,
+  ]);
 
   const unreadCount = notifications.filter(
     (notification) => notification.unread,
@@ -645,18 +723,18 @@ export default function TopBar() {
   const navItems = [
     {
       to: "/",
-      label: "Browse",
+      label: t("nav.browse"),
     },
 
     ...(role === "owner"
       ? [
           {
             to: "/owner/listings",
-            label: "My Listings",
+            label: t("nav.myListings"),
           },
           {
             to: "/owner/listings/new",
-            label: "Add Listing",
+            label: t("nav.addListing"),
           },
         ]
       : []),
@@ -665,7 +743,7 @@ export default function TopBar() {
       ? [
           {
             to: "/renter/saved",
-            label: "Saved",
+            label: t("nav.saved"),
           },
         ]
       : []),
@@ -757,6 +835,7 @@ export default function TopBar() {
                 ========================================= */}
 
                 <ThemeToggleButton className="hidden sm:flex" />
+                <LanguageToggle className="hidden md:flex" />
 
                 {/* =========================================
                     NOTIFICATIONS
@@ -765,7 +844,7 @@ export default function TopBar() {
                 <div className="relative" ref={notificationRef}>
                   <button
                     type="button"
-                    aria-label="Notifications"
+                    aria-label={t("topbar.notifications.title")}
                     aria-expanded={notificationsOpen}
                     onClick={() => {
                       setNotificationsOpen((value) => !value);
@@ -825,7 +904,7 @@ export default function TopBar() {
                     {user?.profilePicture ? (
                       <img
                         src={user.profilePicture}
-                        alt={user?.name || "Profile"}
+                        alt={user?.name || t("common.profile")}
                         className="h-8 w-8 rounded-full object-cover border border-brass/30"
                       />
                     ) : (
@@ -864,14 +943,14 @@ export default function TopBar() {
                         <div className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-white/45 blur-2xl dark:bg-white/[0.025]" />
 
                         <p className="relative text-[9px] font-semibold uppercase tracking-[0.16em] text-[#2b2d31]/38 dark:text-white/35">
-                          Account
+                          {t("topbar.account.label")}
                         </p>
 
                         <div className="relative mt-3 flex items-center gap-3">
                           {user?.profilePicture ? (
                             <img
                               src={user.profilePicture}
-                              alt={user?.name || "Profile"}
+                              alt={user?.name || t("common.profile")}
                               className="
                                 h-11 w-11 shrink-0 rounded-[14px] object-cover
                                 border border-black/[0.08]
@@ -901,7 +980,7 @@ export default function TopBar() {
 
                             <div className="mt-1 flex items-center gap-2">
                               <span className="rounded-full border border-black/[0.07] bg-white/45 px-2 py-0.5 text-[9px] font-semibold capitalize text-[#2b2d31]/50 dark:border-white/[0.08] dark:bg-white/[0.035] dark:text-white/45">
-                                {role}
+                                {t(`roles.${role}`, role)}
                               </span>
                             </div>
                           </div>
@@ -910,7 +989,7 @@ export default function TopBar() {
 
                       <div className="p-2.5">
                         <p className="px-2 pb-1.5 pt-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#2b2d31]/32 dark:text-white/30">
-                          Workspace
+                          {t("topbar.account.workspace")}
                         </p>
 
                         <NavLink
@@ -937,9 +1016,9 @@ export default function TopBar() {
                           </span>
 
                           <span className="min-w-0 flex-1">
-                            <span className="block">Dashboard</span>
+                            <span className="block">{t("nav.dashboard")}</span>
                             <span className="mt-0.5 block text-[9px] font-medium text-[#2b2d31]/34 dark:text-white/30">
-                              Open your workspace
+                              {t("topbar.account.openWorkspace")}
                             </span>
                           </span>
                         </NavLink>
@@ -968,9 +1047,11 @@ export default function TopBar() {
                           </span>
 
                           <span className="min-w-0 flex-1">
-                            <span className="block">Personal information</span>
+                            <span className="block">
+                              {t("nav.personalInformation")}
+                            </span>
                             <span className="mt-0.5 block text-[9px] font-medium text-[#2b2d31]/34 dark:text-white/30">
-                              Profile and account details
+                              {t("topbar.account.profileDetails")}
                             </span>
                           </span>
                         </NavLink>
@@ -1003,9 +1084,9 @@ export default function TopBar() {
                           </span>
 
                           <span className="min-w-0 flex-1">
-                            <span className="block">Log out</span>
+                            <span className="block">{t("auth.logout")}</span>
                             <span className="mt-0.5 block text-[9px] font-medium text-current opacity-55">
-                              Sign out of Rentora
+                              {t("topbar.account.signOutDescription")}
                             </span>
                           </span>
                         </button>
@@ -1022,7 +1103,7 @@ export default function TopBar() {
                   {user?.profilePicture ? (
                     <img
                       src={user.profilePicture}
-                      alt={user?.name || "Profile"}
+                      alt={user?.name || t("common.profile")}
                       className="h-9 w-9 rounded-full object-cover border border-brass/30"
                     />
                   ) : (
@@ -1043,8 +1124,8 @@ export default function TopBar() {
                   type="button"
                   aria-label={
                     mobileMenuOpen
-                      ? "Close navigation menu"
-                      : "Open navigation menu"
+                      ? t("topbar.mobile.closeMenu")
+                      : t("topbar.mobile.openMenu")
                   }
                   aria-expanded={mobileMenuOpen}
                   onClick={toggleMobileMenu}
@@ -1068,6 +1149,7 @@ export default function TopBar() {
                 ========================================= */}
 
                 <ThemeToggleButton className="hidden sm:flex" />
+                <LanguageToggle className="hidden md:flex" />
 
                 {/* =========================================
                     LOGIN
@@ -1077,7 +1159,7 @@ export default function TopBar() {
                   to="/login"
                   className="rounded-full px-3 py-2 text-[13px] font-medium text-ink/55 no-underline transition-colors hover:bg-ivory hover:text-ink"
                 >
-                  Log in
+                  {t("auth.login.button")}
                 </NavLink>
 
                 {/* =========================================
@@ -1088,7 +1170,7 @@ export default function TopBar() {
                   to="/register"
                   className="hidden items-center rounded-full bg-ink px-4 py-2.5 text-[13px] font-semibold text-ivory no-underline shadow-sm transition-all duration-200 hover:-translate-y-px hover:opacity-90 sm:flex"
                 >
-                  List your property
+                  {t("nav.listYourProperty")}
                 </NavLink>
 
                 {/* =========================================
@@ -1099,8 +1181,8 @@ export default function TopBar() {
                   type="button"
                   aria-label={
                     mobileMenuOpen
-                      ? "Close navigation menu"
-                      : "Open navigation menu"
+                      ? t("topbar.mobile.closeMenu")
+                      : t("topbar.mobile.openMenu")
                   }
                   aria-expanded={mobileMenuOpen}
                   onClick={toggleMobileMenu}
@@ -1132,7 +1214,7 @@ export default function TopBar() {
 
           <button
             type="button"
-            aria-label="Close mobile navigation"
+            aria-label={t("topbar.mobile.closeNavigation")}
             onClick={() => setMobileMenuOpen(false)}
             className="fixed inset-0 top-[68px] z-[9997] bg-ink/10 backdrop-blur-[2px] md:hidden"
           />
@@ -1145,14 +1227,32 @@ export default function TopBar() {
 
               <div className="mb-2 flex min-h-[50px] items-center justify-between rounded-xl px-4">
                 <div>
-                  <p className="text-sm font-medium text-ink">Appearance</p>
+                  <p className="text-sm font-medium text-ink">
+                    {t("topbar.theme.appearance")}
+                  </p>
 
                   <p className="mt-0.5 text-[11px] text-ink/40">
-                    Switch between light and dark mode
+                    {t("topbar.theme.description")}
                   </p>
                 </div>
 
                 <ThemeToggleButton />
+              </div>
+
+              {/* LANGUAGE */}
+
+              <div className="mb-2 flex min-h-[50px] items-center justify-between rounded-xl px-4">
+                <div>
+                  <p className="text-sm font-medium text-ink">
+                    {t("language.language")}
+                  </p>
+
+                  <p className="mt-0.5 text-[11px] text-ink/40">
+                    {t("language.description")}
+                  </p>
+                </div>
+
+                <LanguageToggle />
               </div>
 
               {/* NAVIGATION */}
@@ -1189,7 +1289,7 @@ export default function TopBar() {
                     {user?.profilePicture ? (
                       <img
                         src={user.profilePicture}
-                        alt={user?.name || "Profile"}
+                        alt={user?.name || t("common.profile")}
                         className="h-9 w-9 rounded-xl object-cover border border-brass/30"
                       />
                     ) : (
@@ -1204,7 +1304,7 @@ export default function TopBar() {
                       </p>
 
                       <p className="mt-0.5 text-[11px] capitalize text-ink/40">
-                        {role}
+                        {t(`roles.${role}`, role)}
                       </p>
                     </div>
                   </div>
@@ -1217,7 +1317,7 @@ export default function TopBar() {
                     className="flex min-h-[48px] items-center gap-3 rounded-xl px-4 text-sm font-medium text-ink/65 no-underline transition-colors hover:bg-ivory hover:text-ink"
                   >
                     <UserCog size={17} strokeWidth={1.8} />
-                    Personal information
+                    {t("nav.personalInformation")}
                   </NavLink>
 
                   {/* DASHBOARD */}
@@ -1228,7 +1328,7 @@ export default function TopBar() {
                     className="flex min-h-[48px] items-center gap-3 rounded-xl px-4 text-sm font-medium text-ink/65 no-underline transition-colors hover:bg-ivory hover:text-ink"
                   >
                     <LayoutDashboard size={17} strokeWidth={1.8} />
-                    Dashboard
+                    {t("nav.dashboard")}
                   </NavLink>
 
                   {/* LOGOUT */}
@@ -1242,7 +1342,7 @@ export default function TopBar() {
                     className="flex min-h-[48px] w-full items-center gap-3 rounded-xl px-4 text-left text-sm font-medium text-[#B5502E] transition-colors hover:bg-[#B5502E]/[0.06]"
                   >
                     <LogOut size={17} strokeWidth={1.8} />
-                    Log out
+                    {t("auth.logout")}
                   </button>
                 </>
               )}
@@ -1258,7 +1358,7 @@ export default function TopBar() {
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex min-h-[48px] items-center justify-center rounded-xl border border-stone text-sm font-medium text-ink no-underline transition-all hover:bg-ivory"
                   >
-                    Log in
+                    {t("auth.login.button")}
                   </NavLink>
 
                   <NavLink
@@ -1266,7 +1366,7 @@ export default function TopBar() {
                     onClick={() => setMobileMenuOpen(false)}
                     className="mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-ink text-sm font-semibold text-ivory no-underline shadow-sm transition-opacity hover:opacity-90"
                   >
-                    List your property
+                    {t("nav.listYourProperty")}
                   </NavLink>
                 </>
               )}

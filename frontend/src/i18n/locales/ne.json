@@ -1,37 +1,129 @@
 {
+  "common": {
+    "cancel": "रद्द गर्नुहोस्",
+    "recently": "भर्खरै",
+    "profile": "प्रोफाइल"
+  },
+  "roles": {
+    "owner": "घरधनी",
+    "renter": "भाडावाला"
+  },
+  "nav": {
+    "browse": "खोज्नुहोस्",
+    "myListings": "मेरा लिस्टिङहरू",
+    "addListing": "लिस्टिङ थप्नुहोस्",
+    "saved": "सुरक्षित",
+    "dashboard": "ड्यासबोर्ड",
+    "personalInformation": "व्यक्तिगत जानकारी",
+    "listYourProperty": "आफ्नो सम्पत्ति सूचीबद्ध गर्नुहोस्"
+  },
+  "language": {
+    "language": "भाषा",
+    "description": "आफ्नो मनपर्ने भाषा छान्नुहोस्"
+  },
   "auth": {
     "login": {
-      "title": "लगइन गर्नुहोस्"
+      "title": "लगइन गर्नुहोस्",
+      "button": "लगइन गर्नुहोस्"
     },
     "register": {
       "title": "खाता बनाउनुहोस्"
-    }
+    },
+    "logout": "लगआउट गर्नुहोस्"
   },
   "listings": {
     "filters": {
       "priceRange": "मूल्य दायरा"
     }
   },
-  "dashboard": {
-  "loading": "लोड हुँदैछ...",
-  "error": "केही समस्या भयो।",
-  "retry": "पुनः प्रयास गर्नुहोस्",
-  "viewAll": "सबै हेर्नुहोस्",
-  "browse": "लिस्टिङहरू ब्राउज गर्नुहोस्",
-  "renter": {
-    "title": "भाडावाल ड्यासबोर्ड",
-    "savedTitle": "सुरक्षित लिस्टिङहरू",
-    "savedCount": "सुरक्षित लिस्टिङहरू",
-    "recent": "भर्खरै सुरक्षित",
-    "empty": "तपाईंले अहिलेसम्म कुनै लिस्टिङ सुरक्षित गर्नुभएको छैन।"
+  "listing": {
+    "available": "उपलब्ध",
+    "rented": "भाडामा दिइएको",
+    "propertyAvailable": "सम्पत्ति उपलब्ध छ",
+    "currentlyRented": "हाल भाडामा दिइएको",
+    "save": "सुरक्षित गर्नुहोस्",
+    "saved": "सुरक्षित गरिएको",
+    "requestVisit": "हेर्न अनुरोध गर्नुहोस्",
+    "amenities": "सुविधाहरू",
+    "description": "विवरण",
+    "readMore": "थप पढ्नुहोस्...",
+    "showLess": "कम देखाउनुहोस्",
+    "propertyOwner": "घरधनी",
+    "contactOwner": "घरधनीलाई सम्पर्क गर्नुहोस्",
+    "perMonth": "/महिना",
+    "notFound": "लिस्टिङ फेला परेन।"
   },
-  "owner": {
-    "title": "मालिक ड्यासबोर्ड",
-    "myListingsTitle": "मेरा लिस्टिङहरू",
-    "totalListings": "कुल लिस्टिङहरू",
-    "newListing": "नयाँ लिस्टिङ",
-    "recent": "भर्खरका लिस्टिङहरू",
-    "empty": "तपाईंले अहिलेसम्म कुनै लिस्टिङ पोस्ट गर्नुभएको छैन।"
+  "requests": {
+    "accept": "स्वीकार गर्नुहोस्",
+    "decline": "अस्वीकार गर्नुहोस्",
+    "status": {
+      "pending": "विचाराधीन",
+      "accepted": "स्वीकार गरिएको",
+      "declined": "अस्वीकार गरिएको"
+    }
+  },
+  "topbar": {
+    "logout": {
+      "title": "लगआउट गर्ने?",
+      "description": "आफ्नो खातामा पहुँच गर्न तपाईंले फेरि लगइन गर्नुपर्नेछ।"
+    },
+    "theme": {
+      "appearance": "रूप",
+      "description": "उज्यालो र अँध्यारो मोडबीच परिवर्तन गर्नुहोस्",
+      "switchLight": "उज्यालो मोडमा जानुहोस्",
+      "switchDark": "अँध्यारो मोडमा जानुहोस्"
+    },
+    "mobile": {
+      "openMenu": "नेभिगेसन मेनु खोल्नुहोस्",
+      "closeMenu": "नेभिगेसन मेनु बन्द गर्नुहोस्",
+      "closeNavigation": "मोबाइल नेभिगेसन बन्द गर्नुहोस्"
+    },
+    "account": {
+      "label": "खाता",
+      "workspace": "कार्यस्थान",
+      "openWorkspace": "आफ्नो कार्यस्थान खोल्नुहोस्",
+      "profileDetails": "प्रोफाइल र खाताको विवरण",
+      "signOutDescription": "Rentora बाट लगआउट गर्नुहोस्"
+    },
+    "notifications": {
+      "activity": "गतिविधि",
+      "title": "सूचनाहरू",
+      "unread": "{{count}} नपढिएको सूचना",
+      "caughtUp": "सबै सूचनाहरू हेरिसक्नुभएको छ",
+      "markAllRead": "सबै पढिएको चिन्ह लगाउनुहोस्",
+      "emptyTitle": "कुनै सूचना छैन",
+      "emptyDescription": "नयाँ गतिविधि यहाँ देखिनेछ।",
+      "yourProperty": "तपाईंको सम्पत्ति",
+      "yourRequestedProperty": "तपाईंले अनुरोध गरेको सम्पत्ति",
+      "aRenter": "एक भाडावाला",
+      "newVisitRequest": "नयाँ अवलोकन अनुरोध",
+      "visitRequestStatus": "अवलोकन अनुरोध {{status}}",
+      "ownerRequestMessage": "{{renterName}} ले {{propertyTitle}} हेर्न अनुरोध गरेका छन्।",
+      "visitAccepted": "अवलोकन अनुरोध स्वीकार गरियो",
+      "visitDeclined": "अवलोकन अनुरोध अस्वीकार गरियो",
+      "renterRequestMessage": "{{propertyTitle}} का लागि तपाईंको अवलोकन अनुरोध {{status}} छ।"
+    }
+  },
+  "dashboard": {
+    "loading": "लोड हुँदैछ...",
+    "error": "केही समस्या भयो।",
+    "retry": "पुनः प्रयास गर्नुहोस्",
+    "viewAll": "सबै हेर्नुहोस्",
+    "browse": "लिस्टिङहरू ब्राउज गर्नुहोस्",
+    "renter": {
+      "title": "भाडावाला ड्यासबोर्ड",
+      "savedTitle": "सुरक्षित लिस्टिङहरू",
+      "savedCount": "सुरक्षित लिस्टिङहरू",
+      "recent": "भर्खरै सुरक्षित",
+      "empty": "तपाईंले अहिलेसम्म कुनै लिस्टिङ सुरक्षित गर्नुभएको छैन।"
+    },
+    "owner": {
+      "title": "घरधनी ड्यासबोर्ड",
+      "myListingsTitle": "मेरा लिस्टिङहरू",
+      "totalListings": "कुल लिस्टिङहरू",
+      "newListing": "नयाँ लिस्टिङ",
+      "recent": "भर्खरका लिस्टिङहरू",
+      "empty": "तपाईंले अहिलेसम्म कुनै लिस्टिङ पोस्ट गर्नुभएको छैन।"
+    }
   }
-}
 }
