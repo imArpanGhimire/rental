@@ -9,6 +9,7 @@ import ErrorBoundary from "./components/routing/ErrorBoundary.jsx";
 import "./i18n";
 import "./index.css";
 import App from "./App.jsx";
+import AutoTranslate from "./i18n/AutoTranslate.jsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +28,9 @@ createRoot(document.getElementById("root")).render(
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
             <AuthProvider>
-              <App />
+              <AutoTranslate>
+                <App />
+              </AutoTranslate>
             </AuthProvider>
           </ThemeProvider>
         </QueryClientProvider>
