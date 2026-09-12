@@ -409,19 +409,30 @@ function LanguageToggle({ className = "" }) {
   const currentLanguage = i18n.resolvedLanguage?.startsWith("ne") ? "ne" : "en";
 
   function changeLanguage(language) {
-    i18n.changeLanguage(language);
+    if (language === currentLanguage) return;
+
+    const root = document.documentElement;
+    root.classList.add("language-switching");
+
+    Promise.resolve(i18n.changeLanguage(language)).finally(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          root.classList.remove("language-switching");
+        });
+      });
+    });
   }
 
   return (
     <div
-      className={`flex h-9 items-center rounded-full border border-stone bg-bg p-1 ${className}`}
+      className={`flex h-9 w-[104px] shrink-0 items-center rounded-full border border-stone bg-bg p-1 ${className}`}
       aria-label={t("language.language")}
     >
       <button
         type="button"
         onClick={() => changeLanguage("en")}
         aria-pressed={currentLanguage === "en"}
-        className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors ${
+        className={`flex h-7 flex-1 items-center justify-center rounded-full px-1 text-[10px] font-semibold transition-colors ${
           currentLanguage === "en"
             ? "bg-ink text-ivory"
             : "text-ink/45 hover:text-ink"
@@ -434,7 +445,7 @@ function LanguageToggle({ className = "" }) {
         type="button"
         onClick={() => changeLanguage("ne")}
         aria-pressed={currentLanguage === "ne"}
-        className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors ${
+        className={`flex h-7 flex-1 items-center justify-center rounded-full px-1 text-[10px] font-semibold transition-colors ${
           currentLanguage === "ne"
             ? "bg-ink text-ivory"
             : "text-ink/45 hover:text-ink"
@@ -806,7 +817,7 @@ export default function TopBar() {
                 to={item.to}
                 end={item.to === "/"}
                 className={({ isActive }) =>
-                  `relative rounded-full px-4 py-2 text-[13px] font-medium no-underline transition-all duration-200 ${
+                  `relative min-w-[104px] rounded-full px-3 py-2 text-center text-[13px] font-medium no-underline transition-colors duration-200 ${
                     isActive
                       ? "bg-ink text-ivory shadow-sm"
                       : "text-ink/55 hover:bg-ivory hover:text-ink"
