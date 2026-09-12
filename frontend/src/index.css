@@ -1,5 +1,5 @@
 /* frontend/src/index.css */
-@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /*
@@ -28,7 +28,7 @@
   --color-brick: #b5502e;
   --color-brick-light: #f4e6df;
   --font-display: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "Instrument Sans", "Noto Sans Devanagari", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   --ease-honey: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-honey-soft: cubic-bezier(0.16, 1, 0.3, 1);
@@ -479,10 +479,56 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
 }
 
 body {
   color: var(--color-text);
+
+  /*
+   * IMPORTANT:
+   * Do not use overflow-x: hidden here.
+   * `hidden` creates an overflow/scroll container and can stop descendants
+   * using position: sticky (such as the Browse map) from sticking to the
+   * viewport. `clip` prevents horizontal spill without creating that
+   * scrolling ancestor.
+   */
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* Keep the main app wrappers from becoming sticky-breaking containers. */
+.app-backdrop,
+.app-shell {
+  overflow: visible;
+}
+
+/*
+  Language changes replace a lot of text in one render. Temporarily disable
+  motion so those content-width changes do not animate or look like a jerk.
+*/
+html.language-switching *,
+html.language-switching *::before,
+html.language-switching *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Keep Devanagari metrics/readability consistent instead of using a random OS fallback. */
+html[lang="ne"] body,
+html[lang="ne"] input,
+html[lang="ne"] button,
+html[lang="ne"] textarea,
+html[lang="ne"] select {
+  font-family: "Noto Sans Devanagari", "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 * {
