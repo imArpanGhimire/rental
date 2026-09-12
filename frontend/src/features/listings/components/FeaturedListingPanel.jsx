@@ -7,6 +7,8 @@ import {
   ArrowUpRight,
   MoreHorizontal,
   Copy,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 import { useAuth } from "../../auth/AuthContext.jsx";
@@ -51,6 +53,7 @@ async function copyToClipboard(text) {
 export default function FeaturedListingPanel({ listings = [], isLoading }) {
   const [selected, setSelected] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [rotationKey, setRotationKey] = useState(0);
 
   const navigate = useNavigate();
 
@@ -114,7 +117,55 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
     return () => {
       window.clearInterval(interval);
     };
-  }, [listings]);
+  }, [listings, rotationKey]);
+
+  /* =========================================================
+     MANUAL PROPERTY NAVIGATION
+  ========================================================= */
+
+  function showPreviousListing(event) {
+    event.stopPropagation();
+
+    if (listings.length <= 1) {
+      return;
+    }
+
+    setSelected((current) => {
+      const currentIndex = listings.findIndex(
+        (listing) => String(listing._id) === String(current?._id),
+      );
+
+      const previousIndex =
+        currentIndex <= 0 ? listings.length - 1 : currentIndex - 1;
+
+      return listings[previousIndex];
+    });
+
+    // Restart the 7-second auto-rotation timer after a manual change.
+    setRotationKey((key) => key + 1);
+  }
+
+  function showNextListing(event) {
+    event.stopPropagation();
+
+    if (listings.length <= 1) {
+      return;
+    }
+
+    setSelected((current) => {
+      const currentIndex = listings.findIndex(
+        (listing) => String(listing._id) === String(current?._id),
+      );
+
+      const nextIndex =
+        currentIndex === -1 ? 0 : (currentIndex + 1) % listings.length;
+
+      return listings[nextIndex];
+    });
+
+    // Restart the 7-second auto-rotation timer after a manual change.
+    setRotationKey((key) => key + 1);
+  }
 
   /* =========================================================
      LOADING / EMPTY
@@ -274,6 +325,72 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
               to-transparent
             "
           />
+
+          {/* previous / next property controls */}
+
+          {listings.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={showPreviousListing}
+                aria-label="Previous property"
+                className="
+                  absolute
+                  left-3
+                  top-1/2
+                  z-20
+                  flex
+                  h-10
+                  w-10
+                  -translate-y-1/2
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-white/20
+                  bg-black/25
+                  text-white
+                  shadow-[0_8px_24px_rgba(0,0,0,0.16)]
+                  backdrop-blur-md
+                  transition-colors
+                  duration-200
+                  hover:bg-black/45
+                "
+              >
+                <ChevronLeft size={20} strokeWidth={2} />
+              </button>
+
+              <button
+                type="button"
+                onClick={showNextListing}
+                aria-label="Next property"
+                className="
+                  absolute
+                  right-3
+                  top-1/2
+                  z-20
+                  flex
+                  h-10
+                  w-10
+                  -translate-y-1/2
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-white/20
+                  bg-black/25
+                  text-white
+                  shadow-[0_8px_24px_rgba(0,0,0,0.16)]
+                  backdrop-blur-md
+                  transition-colors
+                  duration-200
+                  hover:bg-black/45
+                "
+              >
+                <ChevronRight size={20} strokeWidth={2} />
+              </button>
+            </>
+          )}
 
           {/* top controls */}
 
