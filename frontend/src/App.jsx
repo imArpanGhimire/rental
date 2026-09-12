@@ -1,6 +1,9 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 
+import Home from "./pages/Home.jsx";
+import ForOwners from "./pages/ForOwners.jsx";
+
 import Login from "./pages/auth/Login.jsx";
 import Register from "./pages/auth/Register.jsx";
 import ForgetPassword from "./pages/auth/ForgetPassword.jsx";
@@ -26,6 +29,29 @@ import Help from "./pages/static/Help.jsx";
 import Privacy from "./pages/static/Privacy.jsx";
 import Terms from "./pages/static/Terms.jsx";
 
+import { useAuth } from "./features/auth/AuthContext.jsx";
+
+function HomeRoute() {
+  const { role, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center bg-ivory">
+        <div className="flex items-center gap-2 text-sm text-ink/45">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-brass" />
+          Loading Rentora...
+        </div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated && role === "owner") {
+    return <ForOwners />;
+  }
+
+  return <Home />;
+}
+
 function App() {
   const location = useLocation();
 
@@ -37,16 +63,22 @@ function App() {
       <main className="flex-1">
         <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Browse />} />
+            {/* ROLE-AWARE LANDING PAGE */}
+            <Route path="/" element={<HomeRoute />} />
+
+            {/* PUBLIC LISTING ROUTES */}
+            <Route path="/browse" element={<Browse />} />
 
             <Route path="/listings/:id" element={<ListingDetail />} />
 
+            {/* AUTH */}
             <Route path="/login" element={<Login />} />
 
             <Route path="/register" element={<Register />} />
 
             <Route path="/forgot-password" element={<ForgetPassword />} />
 
+            {/* STATIC */}
             <Route path="/about" element={<About />} />
 
             <Route path="/how-it-works" element={<HowItWorks />} />
@@ -57,6 +89,7 @@ function App() {
 
             <Route path="/terms" element={<Terms />} />
 
+            {/* OWNER DASHBOARD */}
             <Route
               path="/owner"
               element={
@@ -93,6 +126,7 @@ function App() {
               }
             />
 
+            {/* RENTER DASHBOARD */}
             <Route
               path="/renter"
               element={
