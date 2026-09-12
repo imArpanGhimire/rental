@@ -10,12 +10,19 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { translation: en },
-      ne: { translation: ne },
+      en: {
+        translation: en,
+      },
+      ne: {
+        translation: ne,
+      },
     },
 
     fallbackLng: "en",
+
     supportedLngs: ["en", "ne"],
+
+    load: "languageOnly",
 
     interpolation: {
       escapeValue: false,
@@ -25,6 +32,10 @@ i18n
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
       lookupLocalStorage: "rentora-language",
+    },
+
+    react: {
+      useSuspense: false,
     },
   });
 
