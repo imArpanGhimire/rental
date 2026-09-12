@@ -12,12 +12,12 @@ import {
   Trash2,
   ShieldCheck,
   UserRound,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 import AppShell from "../../components/layout/AppShell.jsx";
 import Sidebar from "../../components/layout/Sidebar.jsx";
-import AuthField from "../../components/ui/AuthField.jsx";
-import PasswordInput from "../../components/ui/PasswordInput.jsx";
 import Button from "../../components/ui/Button.jsx";
 
 import { useAuth } from "../../features/auth/AuthContext.jsx";
@@ -413,6 +413,89 @@ function AvatarUploader({ user, onUploaded, onRemoved }) {
 }
 
 /* =========================================================
+   SETTINGS-SPECIFIC INPUTS
+   These use theme tokens instead of the dark-auth field styles.
+========================================================= */
+
+function SettingsField({ label, className = "", ...props }) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-xs font-medium text-text/70">{label}</span>
+
+      <input
+        className={`
+          h-11 w-full rounded-[13px]
+          border border-stone/80 bg-bg
+          px-3.5 text-[13px] text-text
+          outline-none
+          placeholder:text-text/30
+          transition-colors
+          hover:border-text/20
+          focus:border-brass/60
+          focus:bg-bg
+          focus:shadow-[0_0_0_3px_rgba(15,122,108,0.08)]
+          disabled:cursor-not-allowed
+          disabled:bg-ivory/55
+          disabled:text-text/45
+          ${className}
+        `}
+        {...props}
+      />
+    </label>
+  );
+}
+
+function SettingsPasswordInput({ label, name, ...props }) {
+  const [showPassword, setShowPassword] = useState(false);
+
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-xs font-medium text-text/70">{label}</span>
+
+      <div className="relative">
+        <input
+          type={showPassword ? "text" : "password"}
+          name={name}
+          className="
+            h-11 w-full rounded-[13px]
+            border border-stone/80 bg-bg
+            px-3.5 pr-11 text-[13px] text-text
+            outline-none
+            placeholder:text-text/30
+            transition-colors
+            hover:border-text/20
+            focus:border-brass/60
+            focus:bg-bg
+            focus:shadow-[0_0_0_3px_rgba(15,122,108,0.08)]
+          "
+          {...props}
+        />
+
+        <button
+          type="button"
+          onClick={() => setShowPassword((value) => !value)}
+          className="
+            absolute right-1.5 top-1/2
+            flex h-8 w-8 -translate-y-1/2
+            items-center justify-center rounded-lg
+            text-text/40 transition-colors
+            hover:bg-ivory hover:text-text
+          "
+          aria-label={showPassword ? "Hide password" : "Show password"}
+          title={showPassword ? "Hide password" : "Show password"}
+        >
+          {showPassword ? (
+            <EyeOff size={15} strokeWidth={1.8} />
+          ) : (
+            <Eye size={15} strokeWidth={1.8} />
+          )}
+        </button>
+      </div>
+    </label>
+  );
+}
+
+/* =========================================================
    PERSONAL INFORMATION
 ========================================================= */
 
@@ -453,7 +536,7 @@ function PersonalInfoForm({ user, onSaved }) {
       "
     >
       <div className="grid gap-4">
-        <AuthField
+        <SettingsField
           label="Full name"
           name="name"
           value={name}
@@ -461,7 +544,12 @@ function PersonalInfoForm({ user, onSaved }) {
           required
         />
 
-        <AuthField label="Email" value={user?.email || ""} disabled readOnly />
+        <SettingsField
+          label="Email"
+          value={user?.email || ""}
+          disabled
+          readOnly
+        />
       </div>
 
       <div className="mt-4 min-h-[20px]">
@@ -567,7 +655,7 @@ function PasswordForm() {
           md:grid-cols-3
         "
       >
-        <PasswordInput
+        <SettingsPasswordInput
           label="Current password"
           name="currentPassword"
           value={currentPassword}
@@ -575,7 +663,7 @@ function PasswordForm() {
           required
         />
 
-        <PasswordInput
+        <SettingsPasswordInput
           label="New password"
           name="newPassword"
           value={newPassword}
@@ -584,7 +672,7 @@ function PasswordForm() {
           minLength={6}
         />
 
-        <PasswordInput
+        <SettingsPasswordInput
           label="Confirm new password"
           name="confirmPassword"
           value={confirmPassword}
