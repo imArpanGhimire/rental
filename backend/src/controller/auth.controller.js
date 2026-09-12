@@ -12,8 +12,6 @@ const cookieOptions = {
     maxAge: 7 * 24 * 60 * 60 * 1000,
 }
 
-// answers are normalized before hashing/comparing so casing and
-// stray whitespace ("Rex", "rex ", "REX") all count as the same answer
 function normalizeAnswer(answer) {
     return (answer || "").trim().toLowerCase()
 }
@@ -105,7 +103,10 @@ async function registeruser(req, res) {
         const hashedSecurityQuestions = await Promise.all(
             securityAnswers.map(async (item) => ({
                 question: item.question,
-                answerHash: await bcrypt.hash(normalizeAnswer(item.answer), 10)
+                answerHash: await bcrypt.hash(
+                    normalizeAnswer(item.answer),
+                    10
+                )
             }))
         )
 
@@ -298,11 +299,9 @@ async function updateprofile(req, res) {
 
         user.name = name
 
-        // validateModifiedOnly: only re-check the fields actually changed
-        // in this save (here, just "name") instead of the whole document —
-        // otherwise accounts created before securityQuestions existed fail
-        // validation on every unrelated update because that field is empty
-        await user.save({ validateModifiedOnly: true })
+        await user.save({
+            validateModifiedOnly: true
+        })
 
         return res.status(200).json({
             message: "Profile updated",
@@ -357,7 +356,10 @@ async function updatepassword(req, res) {
             })
         }
 
-        const pswcheck = await bcrypt.compare(currentPassword, user.password)
+        const pswcheck = await bcrypt.compare(
+            currentPassword,
+            user.password
+        )
 
         if (!pswcheck) {
             return res.status(400).json({
@@ -365,7 +367,10 @@ async function updatepassword(req, res) {
             })
         }
 
-        const samePassword = await bcrypt.compare(newPassword, user.password)
+        const samePassword = await bcrypt.compare(
+            newPassword,
+            user.password
+        )
 
         if (samePassword) {
             return res.status(400).json({
@@ -373,9 +378,14 @@ async function updatepassword(req, res) {
             })
         }
 
-        user.password = await bcrypt.hash(newPassword, 10)
+        user.password = await bcrypt.hash(
+            newPassword,
+            10
+        )
 
-        await user.save({ validateModifiedOnly: true })
+        await user.save({
+            validateModifiedOnly: true
+        })
 
         return res.status(200).json({
             message: "Password updated successfully"
@@ -411,12 +421,22 @@ async function updateprofilepicture(req, res) {
         user.profilePicture = req.file.path
         user.profilePicturePublicId = req.file.filename
 
-        await user.save({ validateModifiedOnly: true })
+        await user.save({
+            validateModifiedOnly: true
+        })
 
         if (oldPublicId) {
-            cloudinary.uploader.destroy(oldPublicId, (err) => {
-                if (err) console.error("Couldn't delete old Cloudinary image:", err.message)
-            })
+            cloudinary.uploader.destroy(
+                oldPublicId,
+                (err) => {
+                    if (err) {
+                        console.error(
+                            "Couldn't delete old Cloudinary image:",
+                            err.message
+                        )
+                    }
+                }
+            )
         }
 
         return res.status(200).json({
@@ -455,12 +475,22 @@ async function removeprofilepicture(req, res) {
         user.profilePicture = ""
         user.profilePicturePublicId = ""
 
-        await user.save({ validateModifiedOnly: true })
+        await user.save({
+            validateModifiedOnly: true
+        })
 
         if (publicId) {
-            cloudinary.uploader.destroy(publicId, (err) => {
-                if (err) console.error("Couldn't delete Cloudinary image:", err.message)
-            })
+            cloudinary.uploader.destroy(
+                publicId,
+                (err) => {
+                    if (err) {
+                        console.error(
+                            "Couldn't delete Cloudinary image:",
+                            err.message
+                        )
+                    }
+                }
+            )
         }
 
         return res.status(200).json({
@@ -500,18 +530,33 @@ async function getaccountsecurityquestions(req, res) {
     }
 
     try {
-        const email = req.body.email?.trim().toLowerCase()
+        const email = req.body.email
+            ?.trim()
+            .toLowerCase()
 
-        const user = await usermodel.findOne({ email })
+        const user = await usermodel.findOne({
+            email
+        })
 
-        if (!user || !user.securityQuestions || user.securityQuestions.length !== 2) {
+        if (
+            !user ||
+            !user.securityQuestions ||
+            user.securityQuestions.length !== 2
+        ) {
             return res.status(404).json({
                 message: "No account found with that email"
             })
         }
 
+        /*
+         * IMPORTANT:
+         * We return ALL available security questions here.
+         *
+         * We do NOT return the user's two saved questions.
+         * The user must choose the questions themselves.
+         */
         return res.status(200).json({
-            questions: user.securityQuestions.map((q) => q.question)
+            questions: SECURITY_QUESTIONS
         })
     }
     catch (e) {
@@ -533,19 +578,41 @@ async function verifysecurityanswers(req, res) {
     }
 
     try {
-        const email = req.body.email?.trim().toLowerCase()
+        const email = req.body.email
+            ?.trim()
+            .toLowerCase()
+
         const { answers } = req.body
 
-        const user = await usermodel.findOne({ email })
+        const user = await usermodel.findOne({
+            email
+        })
 
-        if (!user || !user.securityQuestions || user.securityQuestions.length !== 2) {
+        if (
+            !user ||
+            !user.securityQuestions ||
+            user.securityQuestions.length !== 2
+        ) {
             return res.status(404).json({
                 message: "No account found with that email"
             })
         }
 
+        /*
+         * User selected two questions.
+         *
+         * For each question originally stored on the account:
+         * 1. Find the matching submitted question.
+         * 2. Compare the submitted answer with its stored hash.
+         *
+         * If the user chooses the wrong question, no submitted
+         * item will match the stored question, so verification fails.
+         */
         for (const stored of user.securityQuestions) {
-            const submitted = answers.find((a) => a.question === stored.question)
+            const submitted = answers.find(
+                (item) =>
+                    item.question === stored.question
+            )
 
             if (!submitted) {
                 return res.status(400).json({
@@ -565,9 +632,10 @@ async function verifysecurityanswers(req, res) {
             }
         }
 
-        // short-lived token scoped only to resetting the password —
-        // it's not the login/session token and can't be used to access
-        // anything else, and it expires in 10 minutes
+        /*
+         * Only after BOTH question + answer pairs are correct
+         * do we issue a password-reset token.
+         */
         const resetToken = jwt.sign(
             {
                 id: user._id,
@@ -602,12 +670,18 @@ async function resetpasswordwithtoken(req, res) {
     }
 
     try {
-        const { resetToken, newPassword } = req.body
+        const {
+            resetToken,
+            newPassword
+        } = req.body
 
         let payload
 
         try {
-            payload = jwt.verify(resetToken, process.env.JWT_SECRET)
+            payload = jwt.verify(
+                resetToken,
+                process.env.JWT_SECRET
+            )
         }
         catch (e) {
             return res.status(400).json({
@@ -615,13 +689,17 @@ async function resetpasswordwithtoken(req, res) {
             })
         }
 
-        if (payload.purpose !== "password_reset") {
+        if (
+            payload.purpose !== "password_reset"
+        ) {
             return res.status(400).json({
                 message: "Invalid reset request"
             })
         }
 
-        const user = await usermodel.findById(payload.id)
+        const user = await usermodel.findById(
+            payload.id
+        )
 
         if (!user) {
             return res.status(404).json({
@@ -629,9 +707,14 @@ async function resetpasswordwithtoken(req, res) {
             })
         }
 
-        user.password = await bcrypt.hash(newPassword, 10)
+        user.password = await bcrypt.hash(
+            newPassword,
+            10
+        )
 
-        await user.save({ validateModifiedOnly: true })
+        await user.save({
+            validateModifiedOnly: true
+        })
 
         return res.status(200).json({
             message: "Password reset successfully"
