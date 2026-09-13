@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from "react-router-dom";
+
 import { AnimatePresence } from "framer-motion";
 
 import Home from "./pages/Home.jsx";
@@ -14,6 +15,7 @@ import ListingDetail from "./pages/listings/ListingDetail.jsx";
 import OwnerDashboard from "./pages/owner/Dashboard.jsx";
 import MyListings from "./pages/owner/MyListings.jsx";
 import CreateListing from "./pages/owner/CreateListing.jsx";
+import EditListing from "./pages/owner/EditListing.jsx";
 
 import RenterDashboard from "./pages/renter/Dashboard.jsx";
 import SavedListings from "./pages/renter/SavedListings.jsx";
@@ -21,6 +23,7 @@ import SavedListings from "./pages/renter/SavedListings.jsx";
 import ProfileSettings from "./pages/settings/ProfileSettings.jsx";
 
 import ProtectedRoute from "./components/routing/ProtectedRoute.jsx";
+
 import Footer from "./components/footer.jsx";
 
 import About from "./pages/static/About.jsx";
@@ -63,22 +66,18 @@ function App() {
       <main className="flex-1">
         <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>
-            {/* ROLE-AWARE LANDING PAGE */}
             <Route path="/" element={<HomeRoute />} />
 
-            {/* PUBLIC LISTING ROUTES */}
             <Route path="/browse" element={<Browse />} />
 
             <Route path="/listings/:id" element={<ListingDetail />} />
 
-            {/* AUTH */}
             <Route path="/login" element={<Login />} />
 
             <Route path="/register" element={<Register />} />
 
             <Route path="/forgot-password" element={<ForgetPassword />} />
 
-            {/* STATIC */}
             <Route path="/about" element={<About />} />
 
             <Route path="/how-it-works" element={<HowItWorks />} />
@@ -89,7 +88,6 @@ function App() {
 
             <Route path="/terms" element={<Terms />} />
 
-            {/* OWNER DASHBOARD */}
             <Route
               path="/owner"
               element={
@@ -118,6 +116,15 @@ function App() {
             />
 
             <Route
+              path="/owner/listings/:id/edit"
+              element={
+                <ProtectedRoute allowedRoles={["owner"]}>
+                  <EditListing />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
               path="/owner/settings"
               element={
                 <ProtectedRoute allowedRoles={["owner"]}>
@@ -126,7 +133,6 @@ function App() {
               }
             />
 
-            {/* RENTER DASHBOARD */}
             <Route
               path="/renter"
               element={
