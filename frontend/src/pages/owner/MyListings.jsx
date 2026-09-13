@@ -1,6 +1,9 @@
 import { useState } from "react";
+
 import { useTranslation } from "react-i18next";
+
 import { Link, useNavigate } from "react-router-dom";
+
 import {
   Home,
   PlusCircle,
@@ -13,14 +16,19 @@ import {
   RefreshCw,
   CheckCircle2,
   CircleOff,
+  Pencil,
 } from "lucide-react";
 
 import AppShell from "../../components/layout/AppShell.jsx";
 import Sidebar from "../../components/layout/Sidebar.jsx";
 import ListingCard from "../../features/listings/components/ListingCard.jsx";
+
 import { StaggerGrid, StaggerItem } from "../../components/ui/StaggerGrid.jsx";
+
 import { useMyListings } from "../../features/listings/hooks/useMyListings.js";
+
 import Button from "../../components/ui/Button.jsx";
+
 import { updateListingAvailability } from "../../api/listings.api.js";
 
 const links = [
@@ -52,15 +60,46 @@ const links = [
   },
 ];
 
+function ListingActions({ listing }) {
+  return (
+    <div className="mt-3">
+      <Link
+        to={`/owner/listings/${listing._id}/edit`}
+        className="
+          flex w-full items-center justify-center gap-2
+          rounded-[16px]
+          border border-black/[0.08]
+          bg-white/45
+          px-4 py-3
+          text-[11px] font-semibold
+          text-[#202226]
+          no-underline
+          transition-colors
+          hover:bg-white/70
+          dark:border-white/[0.08]
+          dark:bg-white/[0.025]
+          dark:text-white/75
+          dark:hover:bg-white/[0.055]
+        "
+      >
+        <Pencil size={13} strokeWidth={1.9} />
+        Edit property
+      </Link>
+    </div>
+  );
+}
+
 function AvailabilityControl({ listing, onUpdated }) {
   const [isUpdating, setIsUpdating] = useState(false);
+
   const [error, setError] = useState("");
 
-  // Old listings without the field should still count as available.
   const isAvailable = listing.isAvailable !== false;
 
   async function handleToggle() {
-    if (isUpdating) return;
+    if (isUpdating) {
+      return;
+    }
 
     const nextValue = !isAvailable;
 
@@ -96,7 +135,8 @@ function AvailabilityControl({ listing, onUpdated }) {
         <div className="flex min-w-0 items-center gap-3">
           <span
             className={`
-              flex h-8 w-8 shrink-0 items-center justify-center
+              flex h-8 w-8 shrink-0
+              items-center justify-center
               rounded-xl
               ${
                 isAvailable
@@ -135,8 +175,8 @@ function AvailabilityControl({ listing, onUpdated }) {
           disabled={isUpdating}
           onClick={handleToggle}
           className={`
-            relative h-[26px] w-[46px] shrink-0
-            rounded-full
+            relative h-[26px] w-[46px]
+            shrink-0 rounded-full
             transition-colors duration-200
             disabled:cursor-not-allowed
             disabled:opacity-50
@@ -146,8 +186,8 @@ function AvailabilityControl({ listing, onUpdated }) {
           <span
             className={`
               absolute top-[3px]
-              h-5 w-5 rounded-full bg-white
-              shadow-sm
+              h-5 w-5 rounded-full
+              bg-white shadow-sm
               transition-[left] duration-200
               ${isAvailable ? "left-[23px]" : "left-[3px]"}
             `}
@@ -173,6 +213,7 @@ function AvailabilityControl({ listing, onUpdated }) {
 
 export default function MyListings() {
   const { t } = useTranslation();
+
   const navigate = useNavigate();
 
   const { data, isLoading, isError, refetch, isFetching } = useMyListings();
@@ -182,14 +223,15 @@ export default function MyListings() {
   return (
     <AppShell sidebar={<Sidebar links={links} />} centeredContent>
       <div className="space-y-6">
-        {/* HERO */}
-
         <section
           className="
-            relative overflow-hidden rounded-[30px]
+            relative overflow-hidden
+            rounded-[30px]
             border border-black/[0.06]
             bg-gradient-to-br
-            from-[#f3f2ee] via-[#e9e8e4] to-[#d8d7d3]
+            from-[#f3f2ee]
+            via-[#e9e8e4]
+            to-[#d8d7d3]
             px-6 py-7
             shadow-[0_20px_60px_rgba(20,23,31,0.055)]
             sm:px-8 sm:py-8
@@ -231,7 +273,7 @@ export default function MyListings() {
                 </h1>
 
                 <p className="mt-3 max-w-xl text-[14px] leading-6 text-[#2b2d31]/58 dark:text-white/52">
-                  Manage your properties and keep their availability up to date.
+                  Manage, edit and keep your property information up to date.
                 </p>
               </div>
             </div>
@@ -241,8 +283,7 @@ export default function MyListings() {
                 pill
                 className="
                   flex items-center gap-2
-                  border-0
-                  bg-[#202226]
+                  border-0 bg-[#202226]
                   text-white
                   hover:bg-[#303238]
                   dark:bg-white
@@ -257,8 +298,6 @@ export default function MyListings() {
             </Link>
           </div>
         </section>
-
-        {/* LISTINGS */}
 
         <section
           className="
@@ -311,20 +350,7 @@ export default function MyListings() {
               </div>
 
               {isFetching && !isLoading && (
-                <div
-                  className="
-                    inline-flex w-fit items-center gap-1.5
-                    rounded-full
-                    border border-black/[0.07]
-                    bg-white/45
-                    px-3 py-2
-                    text-[10px] font-semibold
-                    text-[#2b2d31]/48
-                    dark:border-white/[0.08]
-                    dark:bg-white/[0.035]
-                    dark:text-white/45
-                  "
-                >
+                <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-black/[0.07] bg-white/45 px-3 py-2 text-[10px] font-semibold text-[#2b2d31]/48 dark:border-white/[0.08] dark:bg-white/[0.035] dark:text-white/45">
                   <RefreshCw
                     size={11}
                     strokeWidth={1.8}
@@ -337,40 +363,26 @@ export default function MyListings() {
           </div>
 
           <div className="p-4 sm:p-5">
-            {/* LOADING */}
-
             {isLoading && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {[1, 2, 3].map((item) => (
                   <div
                     key={item}
                     className="
-                      h-80 animate-pulse
-                      rounded-[22px]
-                      border border-black/[0.06]
-                      bg-black/[0.025]
-                      dark:border-white/[0.06]
-                      dark:bg-white/[0.035]
-                    "
+                        h-80 animate-pulse
+                        rounded-[22px]
+                        border border-black/[0.06]
+                        bg-black/[0.025]
+                        dark:border-white/[0.06]
+                        dark:bg-white/[0.035]
+                      "
                   />
                 ))}
               </div>
             )}
 
-            {/* ERROR */}
-
             {isError && (
-              <div
-                className="
-                  rounded-[22px]
-                  border border-rose-200/70
-                  bg-rose-50/70
-                  px-6 py-10
-                  text-center
-                  dark:border-rose-400/15
-                  dark:bg-rose-400/10
-                "
-              >
+              <div className="rounded-[22px] border border-rose-200/70 bg-rose-50/70 px-6 py-10 text-center dark:border-rose-400/15 dark:bg-rose-400/10">
                 <p className="text-sm font-semibold text-rose-700 dark:text-rose-300">
                   {t("dashboard.error", "Couldn't load your listings.")}
                 </p>
@@ -380,14 +392,10 @@ export default function MyListings() {
                   onClick={() => refetch()}
                   className="
                     mt-4 inline-flex items-center gap-1.5
-                    rounded-full
-                    border border-rose-200
-                    bg-white/65
-                    px-4 py-2
-                    text-[11px] font-semibold
-                    text-rose-700
-                    transition-colors
-                    hover:bg-white
+                    rounded-full border border-rose-200
+                    bg-white/65 px-4 py-2
+                    text-[11px] font-semibold text-rose-700
+                    transition-colors hover:bg-white
                     dark:border-rose-400/15
                     dark:bg-white/[0.04]
                     dark:text-rose-300
@@ -400,33 +408,9 @@ export default function MyListings() {
               </div>
             )}
 
-            {/* EMPTY */}
-
             {!isLoading && !isError && listings.length === 0 && (
-              <div
-                className="
-                    rounded-[24px]
-                    border border-dashed border-black/10
-                    bg-white/30
-                    px-6 py-14
-                    text-center
-                    dark:border-white/10
-                    dark:bg-white/[0.018]
-                  "
-              >
-                <div
-                  className="
-                      mx-auto flex h-12 w-12
-                      items-center justify-center
-                      rounded-2xl
-                      border border-black/[0.07]
-                      bg-white/55
-                      text-[#202226]
-                      dark:border-white/[0.08]
-                      dark:bg-white/[0.05]
-                      dark:text-white
-                    "
-                >
+              <div className="rounded-[24px] border border-dashed border-black/10 bg-white/30 px-6 py-14 text-center dark:border-white/10 dark:bg-white/[0.018]">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-black/[0.07] bg-white/55 text-[#202226] dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-white">
                   <PlusCircle size={19} />
                 </div>
 
@@ -444,22 +428,13 @@ export default function MyListings() {
                 >
                   <Button
                     pill
-                    className="
-                        border-0
-                        bg-[#202226]
-                        text-white
-                        hover:bg-[#303238]
-                        dark:bg-white
-                        dark:text-[#17191d]
-                      "
+                    className="border-0 bg-[#202226] text-white hover:bg-[#303238] dark:bg-white dark:text-[#17191d]"
                   >
                     Create your first listing
                   </Button>
                 </Link>
               </div>
             )}
-
-            {/* LISTING GRID */}
 
             {!isLoading && !isError && listings.length > 0 && (
               <StaggerGrid className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -470,6 +445,8 @@ export default function MyListings() {
                         listing={listing}
                         onClick={() => navigate(`/listings/${listing._id}`)}
                       />
+
+                      <ListingActions listing={listing} />
 
                       <AvailabilityControl
                         listing={listing}
