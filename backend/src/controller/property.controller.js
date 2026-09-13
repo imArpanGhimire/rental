@@ -1,112 +1,245 @@
 const rentalmodel = require("../model/rental.model")
+const usermodel = require("../model/user.model")
 const cloudinary = require("../config/cloudinary")
 const streamifier = require("streamifier")
 
-
 // ============================================================
-// CLOUDINARY HELPERS
+// HELPERS
 // ============================================================
 
 function uploadBufferToCloudinary(buffer) {
-    return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-            {
-                folder: "rentora/listings"
-            },
-            (error, result) => {
-                if (error) {
-                    return reject(error)
-                }
+    return new Promise(
+        (resolve, reject) => {
+            const stream =
+                cloudinary.uploader.upload_stream(
+                    {
+                        folder:
+                            "rentora/listings"
+                    },
 
-                resolve(result)
-            }
-        )
+                    (
+                        error,
+                        result
+                    ) => {
+                        if (error) {
+                            return reject(
+                                error
+                            )
+                        }
 
-        streamifier
-            .createReadStream(buffer)
-            .pipe(stream)
-    })
+                        resolve(result)
+                    }
+                )
+
+            streamifier
+                .createReadStream(
+                    buffer
+                )
+                .pipe(stream)
+        }
+    )
 }
 
-
-async function uploadMultipleImages(files) {
-    if (!files || files.length === 0) {
+async function uploadMultipleImages(
+    files
+) {
+    if (
+        !files ||
+        files.length === 0
+    ) {
         return []
     }
 
     const uploadedImages = []
 
     for (const file of files) {
-        const result = await uploadBufferToCloudinary(
-            file.buffer
-        )
+        const result =
+            await uploadBufferToCloudinary(
+                file.buffer
+            )
 
         uploadedImages.push({
             url: result.secure_url,
-            publicId: result.public_id
+            publicId:
+                result.public_id
         })
     }
 
     return uploadedImages
 }
 
+function parseArray(value) {
+    if (Array.isArray(value)) {
+        return value
+    }
+
+    if (
+        typeof value === "string"
+    ) {
+        try {
+            const parsed =
+                JSON.parse(value)
+
+            return Array.isArray(
+                parsed
+            )
+                ? parsed
+                : []
+        } catch {
+            return value
+                ? [value]
+                : []
+        }
+    }
+
+    return []
+}
+
+function parseBoolean(value) {
+    return (
+        value === true ||
+        value === "true"
+    )
+}
+
+function validatePhone(phone) {
+    return /^9[678]\d{8}$/.test(
+        String(phone || "").trim()
+    )
+}
+
+function parseLocation(locationInput) {
+    const parsed =
+        typeof locationInput ===
+            "string"
+            ? JSON.parse(
+                locationInput
+            )
+            : locationInput
+
+    if (
+        !parsed ||
+        !Array.isArray(
+            parsed.coordinates
+        ) ||
+        parsed.coordinates.length !==
+        2
+    ) {
+        throw new Error(
+            "Location coordinates must contain [lng, lat]"
+        )
+    }
+
+    const longitude = Number(
+        parsed.coordinates[0]
+    )
+
+    const latitude = Number(
+        parsed.coordinates[1]
+    )
+
+    if (
+        !Number.isFinite(
+            longitude
+        ) ||
+        !Number.isFinite(latitude)
+    ) {
+        throw new Error(
+            "Longitude and latitude must be valid numbers"
+        )
+    }
+
+    if (
+        longitude < -180 ||
+        longitude > 180 ||
+        latitude < -90 ||
+        latitude > 90
+    ) {
+        throw new Error(
+            "Invalid longitude or latitude"
+        )
+    }
+
+    return {
+        type: "Point",
+
+        coordinates: [
+            longitude,
+            latitude
+        ],
+
+        address:
+            parsed.address || ""
+    }
+}
 
 // ============================================================
-// UPLOAD SINGLE IMAGE
+// UPLOAD IMAGE
 // ============================================================
 
 async function uploadimage(req, res) {
     try {
         if (!req.file) {
             return res.status(400).json({
-                message: "No image file provided"
+                message:
+                    "No image file provided"
             })
         }
 
-        const result = await uploadBufferToCloudinary(
-            req.file.buffer
-        )
+        const result =
+            await uploadBufferToCloudinary(
+                req.file.buffer
+            )
 
         return res.status(201).json({
             url: result.secure_url,
-            publicId: result.public_id
+            publicId:
+                result.public_id
         })
-    }
-    catch (e) {
-        console.error("Image upload error:", e)
+    } catch (e) {
+        console.error(
+            "Image upload error:",
+            e
+        )
 
         return res.status(500).json({
-            message: "Image upload failed"
+            message:
+                "Image upload failed"
         })
     }
 }
-
 
 // ============================================================
 // CREATE PROPERTY
 // ============================================================
 
-async function createproperty(req, res) {
+async function createproperty(
+    req,
+    res
+) {
     try {
+        if (
+            !req.user ||
+            !req.user.id
+        ) {
+            return res.status(401).json({
+                message:
+                    "Unauthorized"
+            })
+        }
+
         const {
             title,
             description,
             type,
             price,
+            contactPhone,
             rooms,
             furnished,
             genderPreference,
             waterSupply,
             amenities
         } = req.body
-
-        if (!req.user || !req.user.id) {
-            return res.status(401).json({
-                message: "Unauthorized"
-            })
-        }
-
-        const owner = req.user.id
 
         if (
             !title ||
@@ -118,82 +251,55 @@ async function createproperty(req, res) {
         ) {
             return res.status(400).json({
                 message:
-                    "title, description, price, location, and type are required"
+                    "Title, description, price, location and type are required"
             })
         }
 
-        // --------------------------------------------------------
-        // Parse location
-        // --------------------------------------------------------
+        const owner =
+            await usermodel.findById(
+                req.user.id
+            )
 
-        let parsedLocation
+        if (!owner) {
+            return res.status(404).json({
+                message:
+                    "Owner account not found"
+            })
+        }
+
+        const finalContactPhone =
+            String(
+                contactPhone ||
+                owner.phone ||
+                ""
+            ).trim()
+
+        if (
+            !validatePhone(
+                finalContactPhone
+            )
+        ) {
+            return res.status(400).json({
+                message:
+                    "Enter a valid 10-digit Nepali contact number"
+            })
+        }
+
+        let location
 
         try {
-            parsedLocation =
-                typeof req.body.location === "string"
-                    ? JSON.parse(req.body.location)
-                    : req.body.location
+            location =
+                parseLocation(
+                    req.body.location
+                )
+        } catch (e) {
+            return res
+                .status(400)
+                .json({
+                    message:
+                        e.message
+                })
         }
-        catch (e) {
-            return res.status(400).json({
-                message:
-                    'location must be valid JSON, e.g. {"type":"Point","coordinates":[lng,lat],"address":"..."}'
-            })
-        }
-
-        if (
-            !parsedLocation ||
-            !Array.isArray(parsedLocation.coordinates) ||
-            parsedLocation.coordinates.length !== 2
-        ) {
-            return res.status(400).json({
-                message:
-                    "location coordinates must contain [lng, lat]"
-            })
-        }
-
-        const longitude = Number(
-            parsedLocation.coordinates[0]
-        )
-
-        const latitude = Number(
-            parsedLocation.coordinates[1]
-        )
-
-        if (
-            !Number.isFinite(longitude) ||
-            !Number.isFinite(latitude)
-        ) {
-            return res.status(400).json({
-                message:
-                    "longitude and latitude must be valid numbers"
-            })
-        }
-
-        if (
-            longitude < -180 ||
-            longitude > 180 ||
-            latitude < -90 ||
-            latitude > 90
-        ) {
-            return res.status(400).json({
-                message:
-                    "Invalid longitude or latitude"
-            })
-        }
-
-        const location = {
-            type: "Point",
-            coordinates: [
-                longitude,
-                latitude
-            ],
-            address: parsedLocation.address
-        }
-
-        // --------------------------------------------------------
-        // Upload images
-        // --------------------------------------------------------
 
         let finalImages = []
 
@@ -202,81 +308,111 @@ async function createproperty(req, res) {
             req.files.length > 0
         ) {
             finalImages =
-                await uploadMultipleImages(req.files)
+                await uploadMultipleImages(
+                    req.files
+                )
         }
-
-        // --------------------------------------------------------
-        // Handle images already supplied as URLs
-        // --------------------------------------------------------
 
         if (
-            finalImages.length === 0 &&
+            finalImages.length ===
+            0 &&
             req.body.images
         ) {
-            if (typeof req.body.images === "string") {
-                try {
-                    finalImages =
-                        JSON.parse(req.body.images)
-                }
-                catch {
-                    finalImages = []
-                }
-            }
-            else if (Array.isArray(req.body.images)) {
-                finalImages = req.body.images
-            }
+            finalImages =
+                parseArray(
+                    req.body.images
+                )
         }
 
-        // --------------------------------------------------------
-        // Handle amenities
-        // --------------------------------------------------------
+        const finalAmenities =
+            parseArray(amenities)
 
-        let finalAmenities = amenities
+        const parsedPrice =
+            Number(price)
 
-        if (typeof amenities === "string") {
-            try {
-                finalAmenities =
-                    JSON.parse(amenities)
-            }
-            catch {
-                finalAmenities = [amenities]
-            }
+        if (
+            !Number.isFinite(
+                parsedPrice
+            ) ||
+            parsedPrice <= 0
+        ) {
+            return res.status(400).json({
+                message:
+                    "Price must be a valid number greater than 0"
+            })
         }
-
-        if (!Array.isArray(finalAmenities)) {
-            finalAmenities = []
-        }
-
-        // --------------------------------------------------------
-        // Create property
-        // --------------------------------------------------------
 
         const property =
             await rentalmodel.create({
-                title,
-                description,
-                type,
-                price,
-                owner,
-                location,
-                images: finalImages,
-                amenities: finalAmenities,
-                rooms,
-                furnished,
-                genderPreference,
-                waterSupply,
+                title:
+                    String(
+                        title
+                    ).trim(),
 
-                // New properties start as available.
+                description:
+                    String(
+                        description
+                    ).trim(),
+
+                type,
+
+                price:
+                    parsedPrice,
+
+                contactPhone:
+                    finalContactPhone,
+
+                owner:
+                    req.user.id,
+
+                location,
+
+                images:
+                    finalImages,
+
+                amenities:
+                    finalAmenities,
+
+                rooms:
+                    rooms === "" ||
+                        rooms ===
+                        undefined
+                        ? undefined
+                        : Number(
+                            rooms
+                        ),
+
+                furnished:
+                    parseBoolean(
+                        furnished
+                    ),
+
+                genderPreference:
+                    genderPreference ||
+                    "any",
+
+                waterSupply:
+                    waterSupply || "",
+
                 isAvailable: true
             })
 
+        await property.populate(
+            "owner",
+            "name phone profilePicture"
+        )
+
         return res.status(201).json({
-            message: "Property has been added",
+            message:
+                "Property has been added",
+
             property
         })
-    }
-    catch (e) {
-        console.error("Create property error:", e)
+    } catch (e) {
+        console.error(
+            "Create property error:",
+            e
+        )
 
         return res.status(500).json({
             message:
@@ -286,12 +422,14 @@ async function createproperty(req, res) {
     }
 }
 
-
 // ============================================================
 // GET ALL PROPERTIES
 // ============================================================
 
-async function getallproperties(req, res) {
+async function getallproperties(
+    req,
+    res
+) {
     try {
         const {
             minPrice,
@@ -304,46 +442,64 @@ async function getallproperties(req, res) {
 
         const filter = {}
 
-        // --------------------------------------------------------
-        // Price filter
-        // --------------------------------------------------------
-
         if (
             minPrice !== undefined ||
             maxPrice !== undefined
         ) {
             filter.price = {}
 
-            if (minPrice !== undefined) {
-                const min = Number(minPrice)
+            if (
+                minPrice !==
+                undefined
+            ) {
+                const min =
+                    Number(
+                        minPrice
+                    )
 
-                if (!Number.isFinite(min)) {
-                    return res.status(400).json({
-                        message:
-                            "minPrice must be a valid number"
-                    })
+                if (
+                    !Number.isFinite(
+                        min
+                    )
+                ) {
+                    return res
+                        .status(400)
+                        .json({
+                            message:
+                                "minPrice must be a valid number"
+                        })
                 }
 
-                filter.price.$gte = min
+                filter.price.$gte =
+                    min
             }
 
-            if (maxPrice !== undefined) {
-                const max = Number(maxPrice)
+            if (
+                maxPrice !==
+                undefined
+            ) {
+                const max =
+                    Number(
+                        maxPrice
+                    )
 
-                if (!Number.isFinite(max)) {
-                    return res.status(400).json({
-                        message:
-                            "maxPrice must be a valid number"
-                    })
+                if (
+                    !Number.isFinite(
+                        max
+                    )
+                ) {
+                    return res
+                        .status(400)
+                        .json({
+                            message:
+                                "maxPrice must be a valid number"
+                        })
                 }
 
-                filter.price.$lte = max
+                filter.price.$lte =
+                    max
             }
         }
-
-        // --------------------------------------------------------
-        // Search
-        // --------------------------------------------------------
 
         if (search) {
             filter.title = {
@@ -352,28 +508,26 @@ async function getallproperties(req, res) {
             }
         }
 
-        // --------------------------------------------------------
-        // Sorting
-        // --------------------------------------------------------
-
         let sortOption = {}
 
-        if (sort === "price_asc") {
+        if (
+            sort === "price_asc"
+        ) {
             sortOption.price = 1
-        }
-        else if (sort === "price_desc") {
+        } else if (
+            sort === "price_desc"
+        ) {
             sortOption.price = -1
-        }
-        else if (sort === "newest") {
-            sortOption.createdAt = -1
-        }
-        else if (sort === "oldest") {
+        } else if (
+            sort === "newest"
+        ) {
+            sortOption.createdAt =
+                -1
+        } else if (
+            sort === "oldest"
+        ) {
             sortOption.createdAt = 1
         }
-
-        // --------------------------------------------------------
-        // Pagination
-        // --------------------------------------------------------
 
         const currentPage =
             Math.max(
@@ -388,18 +542,17 @@ async function getallproperties(req, res) {
             )
 
         const skip =
-            (currentPage - 1) * currentLimit
+            (currentPage - 1) *
+            currentLimit
 
-        // --------------------------------------------------------
-        // Query
-        // --------------------------------------------------------
-
-        const allproperties =
+        const properties =
             await rentalmodel
                 .find(filter)
                 .sort(sortOption)
                 .skip(skip)
-                .limit(currentLimit)
+                .limit(
+                    currentLimit
+                )
                 .populate(
                     "owner",
                     "name phone profilePicture"
@@ -410,24 +563,25 @@ async function getallproperties(req, res) {
                 filter
             )
 
-        const totalPages =
-            Math.ceil(
-                totalCount / currentLimit
-            )
-
         return res.status(200).json({
-            properties: allproperties,
+            properties,
 
             pagination: {
                 currentPage,
-                totalPages,
+
+                totalPages:
+                    Math.ceil(
+                        totalCount /
+                        currentLimit
+                    ),
+
                 totalCount,
-                limit: currentLimit
+                limit:
+                    currentLimit
             }
         })
-    }
-    catch (e) {
-        console.error("Get all properties error:", e)
+    } catch (e) {
+        console.error(e)
 
         return res.status(500).json({
             message:
@@ -436,24 +590,20 @@ async function getallproperties(req, res) {
     }
 }
 
-
 // ============================================================
 // GET ONE PROPERTY
 // ============================================================
 
-async function getoneproperty(req, res) {
-    const { id } = req.params
-
+async function getoneproperty(
+    req,
+    res
+) {
     try {
-        if (!id) {
-            return res.status(400).json({
-                message: "Property ID is required"
-            })
-        }
-
         const property =
             await rentalmodel
-                .findById(id)
+                .findById(
+                    req.params.id
+                )
                 .populate(
                     "owner",
                     "name phone profilePicture"
@@ -466,38 +616,35 @@ async function getoneproperty(req, res) {
             })
         }
 
-        return res.status(200).json(property)
-    }
-    catch (e) {
-        console.error("Get property error:", e)
+        return res.status(200).json(
+            property
+        )
+    } catch (e) {
+        console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
-
 
 // ============================================================
 // UPDATE PROPERTY
 // ============================================================
 
-async function updateproperty(req, res) {
-    const { id } = req.params
-
+async function updateproperty(
+    req,
+    res
+) {
     try {
-        if (!id) {
-            return res.status(400).json({
-                message: "Property ID is required"
-            })
-        }
-
-        const propertyToEdit =
+        const property =
             req.property
 
-        if (!propertyToEdit) {
+        if (!property) {
             return res.status(404).json({
-                message: "Property not found"
+                message:
+                    "Property not found"
             })
         }
 
@@ -506,261 +653,310 @@ async function updateproperty(req, res) {
             description,
             type,
             price,
+            contactPhone,
             location,
             rooms,
             furnished,
             genderPreference,
             waterSupply,
             amenities,
-            isAvailable
+            isAvailable,
+            images
         } = req.body
 
-        // --------------------------------------------------------
-        // Basic fields
-        // --------------------------------------------------------
+        if (
+            title !== undefined
+        ) {
+            const value =
+                String(title).trim()
 
-        if (title !== undefined) {
-            propertyToEdit.title = title
+            if (!value) {
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            "Title cannot be empty"
+                    })
+            }
+
+            property.title =
+                value
         }
 
-        if (description !== undefined) {
-            propertyToEdit.description =
-                description
+        if (
+            description !==
+            undefined
+        ) {
+            const value =
+                String(
+                    description
+                ).trim()
+
+            if (!value) {
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            "Description cannot be empty"
+                    })
+            }
+
+            property.description =
+                value
         }
 
         if (type !== undefined) {
-            propertyToEdit.type = type
+            property.type = type
         }
 
-        if (price !== undefined) {
-            const parsedPrice = Number(price)
+        if (
+            price !== undefined
+        ) {
+            const value =
+                Number(price)
 
-            if (!Number.isFinite(parsedPrice)) {
-                return res.status(400).json({
-                    message:
-                        "price must be a valid number"
-                })
-            }
-
-            propertyToEdit.price =
-                parsedPrice
-        }
-
-        // --------------------------------------------------------
-        // Rooms
-        // --------------------------------------------------------
-
-        if (rooms !== undefined) {
-            propertyToEdit.rooms = rooms
-        }
-
-        // --------------------------------------------------------
-        // Furnished
-        // --------------------------------------------------------
-
-        if (furnished !== undefined) {
-            propertyToEdit.furnished =
-                furnished
-        }
-
-        // --------------------------------------------------------
-        // Availability
-        // --------------------------------------------------------
-
-        if (isAvailable !== undefined) {
             if (
-                isAvailable !== true &&
-                isAvailable !== false &&
-                isAvailable !== "true" &&
-                isAvailable !== "false"
+                !Number.isFinite(
+                    value
+                ) ||
+                value <= 0
             ) {
-                return res.status(400).json({
-                    message:
-                        "isAvailable must be true or false"
-                })
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            "Price must be greater than 0"
+                    })
             }
 
-            propertyToEdit.isAvailable =
-                isAvailable === true ||
-                isAvailable === "true"
+            property.price =
+                value
         }
 
-        // --------------------------------------------------------
-        // Gender preference
-        // --------------------------------------------------------
+        if (
+            contactPhone !==
+            undefined
+        ) {
+            const value =
+                String(
+                    contactPhone
+                ).trim()
 
-        if (genderPreference !== undefined) {
-            propertyToEdit.genderPreference =
+            if (
+                !validatePhone(
+                    value
+                )
+            ) {
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            "Enter a valid 10-digit Nepali contact number"
+                    })
+            }
+
+            property.contactPhone =
+                value
+        }
+
+        if (
+            rooms !== undefined
+        ) {
+            if (
+                rooms === "" ||
+                rooms === null
+            ) {
+                property.rooms =
+                    undefined
+            } else {
+                const value =
+                    Number(rooms)
+
+                if (
+                    !Number.isFinite(
+                        value
+                    ) ||
+                    value < 0
+                ) {
+                    return res
+                        .status(400)
+                        .json({
+                            message:
+                                "Rooms must be a valid number"
+                        })
+                }
+
+                property.rooms =
+                    value
+            }
+        }
+
+        if (
+            furnished !==
+            undefined
+        ) {
+            property.furnished =
+                parseBoolean(
+                    furnished
+                )
+        }
+
+        if (
+            genderPreference !==
+            undefined
+        ) {
+            property.genderPreference =
                 genderPreference
         }
 
-        // --------------------------------------------------------
-        // Water supply
-        // --------------------------------------------------------
-
-        if (waterSupply !== undefined) {
-            propertyToEdit.waterSupply =
+        if (
+            waterSupply !==
+            undefined
+        ) {
+            property.waterSupply =
                 waterSupply
         }
 
-        // --------------------------------------------------------
-        // Amenities
-        // --------------------------------------------------------
-
-        if (amenities !== undefined) {
-            let finalAmenities = amenities
-
-            if (typeof amenities === "string") {
-                try {
-                    finalAmenities =
-                        JSON.parse(amenities)
-                }
-                catch {
-                    finalAmenities =
-                        [amenities]
-                }
+        if (
+            isAvailable !==
+            undefined
+        ) {
+            if (
+                ![
+                    true,
+                    false,
+                    "true",
+                    "false"
+                ].includes(
+                    isAvailable
+                )
+            ) {
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            "isAvailable must be true or false"
+                    })
             }
 
-            if (!Array.isArray(finalAmenities)) {
-                return res.status(400).json({
-                    message:
-                        "amenities must be an array"
-                })
-            }
-
-            propertyToEdit.amenities =
-                finalAmenities
+            property.isAvailable =
+                parseBoolean(
+                    isAvailable
+                )
         }
 
-        // --------------------------------------------------------
-        // Location
-        // --------------------------------------------------------
+        if (
+            amenities !== undefined
+        ) {
+            property.amenities =
+                parseArray(
+                    amenities
+                )
+        }
 
-        if (location !== undefined) {
-            let parsedLocation
-
+        if (
+            location !== undefined
+        ) {
             try {
-                parsedLocation =
-                    typeof location === "string"
-                        ? JSON.parse(location)
-                        : location
-            }
-            catch {
-                return res.status(400).json({
-                    message:
-                        "location must be valid JSON"
-                })
-            }
-
-            if (
-                !parsedLocation ||
-                !Array.isArray(
-                    parsedLocation.coordinates
-                ) ||
-                parsedLocation.coordinates.length !== 2
-            ) {
-                return res.status(400).json({
-                    message:
-                        "location coordinates must contain [lng, lat]"
-                })
-            }
-
-            const longitude =
-                Number(
-                    parsedLocation.coordinates[0]
-                )
-
-            const latitude =
-                Number(
-                    parsedLocation.coordinates[1]
-                )
-
-            if (
-                !Number.isFinite(longitude) ||
-                !Number.isFinite(latitude)
-            ) {
-                return res.status(400).json({
-                    message:
-                        "longitude and latitude must be valid numbers"
-                })
-            }
-
-            if (
-                longitude < -180 ||
-                longitude > 180 ||
-                latitude < -90 ||
-                latitude > 90
-            ) {
-                return res.status(400).json({
-                    message:
-                        "Invalid longitude or latitude"
-                })
-            }
-
-            propertyToEdit.location = {
-                type: "Point",
-                coordinates: [
-                    longitude,
-                    latitude
-                ],
-                address:
-                    parsedLocation.address
+                property.location =
+                    parseLocation(
+                        location
+                    )
+            } catch (e) {
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            e.message
+                    })
             }
         }
 
-        // --------------------------------------------------------
-        // Replace images
-        // --------------------------------------------------------
+        /*
+         * PhotoUploader uploads images before the main form
+         * is saved, so the frontend sends image objects:
+         *
+         * [
+         *   { url, publicId }
+         * ]
+         *
+         * During editing:
+         * - retained old photos remain in the submitted array
+         * - newly uploaded photos are also in that array
+         * - removed old photos are absent
+         *
+         * We delete only the old Cloudinary images that have
+         * disappeared from the submitted list.
+         */
+        if (images !== undefined) {
+            const nextImages =
+                parseArray(images)
 
+            const nextIds =
+                new Set(
+                    nextImages
+                        .map(
+                            (img) =>
+                                img?.publicId
+                        )
+                        .filter(
+                            Boolean
+                        )
+                )
+
+            const removedImages =
+                (
+                    property.images ||
+                    []
+                ).filter(
+                    (img) =>
+                        img.publicId &&
+                        !nextIds.has(
+                            img.publicId
+                        )
+                )
+
+            for (
+                const image of
+                removedImages
+            ) {
+                try {
+                    await cloudinary.uploader.destroy(
+                        image.publicId
+                    )
+                } catch (e) {
+                    console.error(
+                        `Failed to delete Cloudinary image ${image.publicId}:`,
+                        e
+                    )
+                }
+            }
+
+            property.images =
+                nextImages
+        }
+
+        /*
+         * Multipart uploads remain supported as well.
+         */
         if (
             req.files &&
             req.files.length > 0
         ) {
-            const newImages =
+            const uploaded =
                 await uploadMultipleImages(
                     req.files
                 )
 
-            // Delete old Cloudinary images
-            if (
-                propertyToEdit.images &&
-                propertyToEdit.images.length > 0
-            ) {
-                await Promise.all(
-                    propertyToEdit.images.map(
-                        async (img) => {
-                            if (!img.publicId) {
-                                return
-                            }
-
-                            try {
-                                await cloudinary
-                                    .uploader
-                                    .destroy(
-                                        img.publicId
-                                    )
-                            }
-                            catch (e) {
-                                console.error(
-                                    `Failed to delete Cloudinary image ${img.publicId}:`,
-                                    e
-                                )
-                            }
-                        }
-                    )
-                )
-            }
-
-            propertyToEdit.images =
-                newImages
+            property.images = [
+                ...(property.images ||
+                    []),
+                ...uploaded
+            ]
         }
 
-        // --------------------------------------------------------
-        // Save
-        // --------------------------------------------------------
-
         const updatedProperty =
-            await propertyToEdit.save()
+            await property.save()
 
         await updatedProperty.populate(
             "owner",
@@ -770,11 +966,14 @@ async function updateproperty(req, res) {
         return res.status(200).json({
             message:
                 "Property updated successfully",
+
             updatedProperty
         })
-    }
-    catch (e) {
-        console.error("Update property error:", e)
+    } catch (e) {
+        console.error(
+            "Update property error:",
+            e
+        )
 
         return res.status(500).json({
             message:
@@ -784,93 +983,91 @@ async function updateproperty(req, res) {
     }
 }
 
-
 // ============================================================
 // DELETE PROPERTY
 // ============================================================
 
-async function deleteproperty(req, res) {
+async function deleteproperty(
+    req,
+    res
+) {
     try {
-        const propToDelete =
+        const property =
             req.property
 
-        if (!propToDelete) {
+        if (!property) {
             return res.status(404).json({
                 message:
                     "Property couldn't be found to delete"
             })
         }
 
-        // --------------------------------------------------------
-        // Delete images from Cloudinary
-        // --------------------------------------------------------
-
-        if (
-            propToDelete.images &&
-            propToDelete.images.length > 0
+        for (
+            const image of
+            property.images || []
         ) {
-            await Promise.all(
-                propToDelete.images.map(
-                    async (img) => {
-                        if (!img.publicId) {
-                            return
-                        }
+            if (!image.publicId) {
+                continue
+            }
 
-                        try {
-                            await cloudinary
-                                .uploader
-                                .destroy(
-                                    img.publicId
-                                )
-                        }
-                        catch (e) {
-                            console.error(
-                                `Failed to delete Cloudinary image ${img.publicId}:`,
-                                e
-                            )
-                        }
-                    }
+            try {
+                await cloudinary.uploader.destroy(
+                    image.publicId
                 )
-            )
+            } catch (e) {
+                console.error(
+                    `Failed to delete Cloudinary image ${image.publicId}:`,
+                    e
+                )
+            }
         }
 
-        // --------------------------------------------------------
-        // Delete property
-        // --------------------------------------------------------
-
-        await propToDelete.deleteOne()
+        await property.deleteOne()
 
         return res.status(200).json({
-            message: "Deleted property",
-            propToDelete
+            message:
+                "Deleted property",
+
+            propToDelete:
+                property
         })
-    }
-    catch (e) {
-        console.error("Delete property error:", e)
+    } catch (e) {
+        console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
-
 
 // ============================================================
 // GET MY PROPERTIES
 // ============================================================
 
-async function getmyproperties(req, res) {
+async function getmyproperties(
+    req,
+    res
+) {
     try {
-        if (!req.user || !req.user.id) {
+        if (
+            !req.user ||
+            !req.user.id
+        ) {
             return res.status(401).json({
-                message: "Unauthorized"
+                message:
+                    "Unauthorized"
             })
         }
 
         const myproperties =
             await rentalmodel
                 .find({
-                    owner: req.user.id
+                    owner:
+                        req.user.id
+                })
+                .sort({
+                    createdAt: -1
                 })
                 .populate(
                     "owner",
@@ -880,27 +1077,27 @@ async function getmyproperties(req, res) {
         return res.status(200).json({
             message:
                 "Here are the listings of your properties",
+
             myproperties
         })
-    }
-    catch (e) {
-        console.error(
-            "Get my properties error:",
-            e
-        )
+    } catch (e) {
+        console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
 
-
 // ============================================================
-// GET NEARBY PROPERTIES
+// NEARBY
 // ============================================================
 
-async function getnearbyproperties(req, res) {
+async function getnearbyproperties(
+    req,
+    res
+) {
     const {
         lng,
         lat,
@@ -912,10 +1109,6 @@ async function getnearbyproperties(req, res) {
         page,
         limit
     } = req.query
-
-    // --------------------------------------------------------
-    // Validate coordinates
-    // --------------------------------------------------------
 
     if (
         lng === undefined ||
@@ -931,7 +1124,9 @@ async function getnearbyproperties(req, res) {
     const latitude = Number(lat)
 
     if (
-        !Number.isFinite(longitude) ||
+        !Number.isFinite(
+            longitude
+        ) ||
         !Number.isFinite(latitude)
     ) {
         return res.status(400).json({
@@ -940,31 +1135,16 @@ async function getnearbyproperties(req, res) {
         })
     }
 
-    if (
-        longitude < -180 ||
-        longitude > 180 ||
-        latitude < -90 ||
-        latitude > 90
-    ) {
-        return res.status(400).json({
-            message:
-                "Invalid longitude or latitude"
-        })
-    }
-
-    // --------------------------------------------------------
-    // Radius
-    // MongoDB uses meters.
-    // API receives kilometers.
-    // --------------------------------------------------------
-
     let maxDistance = 5000
 
     if (radius !== undefined) {
-        const radiusInKm = Number(radius)
+        const radiusInKm =
+            Number(radius)
 
         if (
-            !Number.isFinite(radiusInKm) ||
+            !Number.isFinite(
+                radiusInKm
+            ) ||
             radiusInKm <= 0
         ) {
             return res.status(400).json({
@@ -976,10 +1156,6 @@ async function getnearbyproperties(req, res) {
         maxDistance =
             radiusInKm * 1000
     }
-
-    // --------------------------------------------------------
-    // Pagination
-    // --------------------------------------------------------
 
     const currentPage =
         Math.max(
@@ -993,13 +1169,6 @@ async function getnearbyproperties(req, res) {
             1
         )
 
-    const skip =
-        (currentPage - 1) * currentLimit
-
-    // --------------------------------------------------------
-    // Build filters
-    // --------------------------------------------------------
-
     const query = {}
 
     if (
@@ -1008,30 +1177,18 @@ async function getnearbyproperties(req, res) {
     ) {
         query.price = {}
 
-        if (minPrice !== undefined) {
-            const min = Number(minPrice)
-
-            if (!Number.isFinite(min)) {
-                return res.status(400).json({
-                    message:
-                        "minPrice must be a valid number"
-                })
-            }
-
-            query.price.$gte = min
+        if (
+            minPrice !== undefined
+        ) {
+            query.price.$gte =
+                Number(minPrice)
         }
 
-        if (maxPrice !== undefined) {
-            const max = Number(maxPrice)
-
-            if (!Number.isFinite(max)) {
-                return res.status(400).json({
-                    message:
-                        "maxPrice must be a valid number"
-                })
-            }
-
-            query.price.$lte = max
+        if (
+            maxPrice !== undefined
+        ) {
+            query.price.$lte =
+                Number(maxPrice)
         }
     }
 
@@ -1043,21 +1200,19 @@ async function getnearbyproperties(req, res) {
     }
 
     try {
-        // --------------------------------------------------------
-        // $geoNear MUST be the first stage
-        // --------------------------------------------------------
-
         const geoNearStage = {
             $geoNear: {
                 near: {
                     type: "Point",
+
                     coordinates: [
                         longitude,
                         latitude
                     ]
                 },
 
-                distanceField: "distance",
+                distanceField:
+                    "distance",
 
                 maxDistance,
 
@@ -1067,121 +1222,102 @@ async function getnearbyproperties(req, res) {
             }
         }
 
-        // --------------------------------------------------------
-        // Count matching properties
-        // --------------------------------------------------------
-
         const countResult =
-            await rentalmodel.aggregate([
-                geoNearStage,
-                {
-                    $count: "total"
-                }
-            ])
+            await rentalmodel.aggregate(
+                [
+                    geoNearStage,
 
-        const totalCount =
-            countResult.length > 0
-                ? countResult[0].total
-                : 0
-
-        const totalPages =
-            Math.ceil(
-                totalCount / currentLimit
+                    {
+                        $count:
+                            "total"
+                    }
+                ]
             )
 
-        // --------------------------------------------------------
-        // Actual property pipeline
-        // --------------------------------------------------------
+        const totalCount =
+            countResult.length
+                ? countResult[0]
+                    .total
+                : 0
 
         const pipeline = [
             geoNearStage
         ]
 
-        // --------------------------------------------------------
-        // Sorting
-        // --------------------------------------------------------
-
-        if (sort === "price_asc") {
+        if (
+            sort === "price_asc"
+        ) {
             pipeline.push({
                 $sort: {
                     price: 1
                 }
             })
-        }
-        else if (sort === "price_desc") {
+        } else if (
+            sort === "price_desc"
+        ) {
             pipeline.push({
                 $sort: {
                     price: -1
                 }
             })
-        }
-        else if (sort === "newest") {
+        } else if (
+            sort === "newest"
+        ) {
             pipeline.push({
                 $sort: {
                     createdAt: -1
                 }
             })
         }
-        else if (sort === "oldest") {
-            pipeline.push({
-                $sort: {
-                    createdAt: 1
-                }
-            })
-        }
-
-        // --------------------------------------------------------
-        // Pagination
-        // --------------------------------------------------------
 
         pipeline.push(
             {
-                $skip: skip
+                $skip:
+                    (currentPage -
+                        1) *
+                    currentLimit
             },
+
             {
-                $limit: currentLimit
+                $limit:
+                    currentLimit
             }
         )
 
-        // --------------------------------------------------------
-        // Execute aggregation
-        // --------------------------------------------------------
-
-        const nearbyproperties =
+        const properties =
             await rentalmodel.aggregate(
                 pipeline
             )
 
-        // --------------------------------------------------------
-        // Populate owner manually
-        // because aggregate() doesn't automatically populate
-        // --------------------------------------------------------
-
         await rentalmodel.populate(
-            nearbyproperties,
+            properties,
             {
                 path: "owner",
-                select: "name phone profilePicture"
+                select:
+                    "name phone profilePicture"
             }
         )
 
         return res.status(200).json({
-            properties:
-                nearbyproperties,
+            properties,
 
             pagination: {
                 currentPage,
-                totalPages,
+
+                totalPages:
+                    Math.ceil(
+                        totalCount /
+                        currentLimit
+                    ),
+
                 totalCount,
-                limit: currentLimit
+
+                limit:
+                    currentLimit
             }
         })
-    }
-    catch (e) {
-        console.error(
-            "Nearby properties error:",
-            e
-        )
+    } catch (e) {
+        console.error(e)
 
         return res.status(500).json({
             message:
@@ -1190,12 +1326,14 @@ async function getnearbyproperties(req, res) {
     }
 }
 
-
 // ============================================================
-// GET PROPERTIES INSIDE POLYGON
+// POLYGON
 // ============================================================
 
-async function getpropertiesinpolygon(req, res) {
+async function getpropertiesinpolygon(
+    req,
+    res
+) {
     try {
         const {
             polygon,
@@ -1207,12 +1345,10 @@ async function getpropertiesinpolygon(req, res) {
             limit
         } = req.body
 
-        // --------------------------------------------------------
-        // Validate polygon
-        // --------------------------------------------------------
-
         if (
-            !Array.isArray(polygon) ||
+            !Array.isArray(
+                polygon
+            ) ||
             polygon.length < 4
         ) {
             return res.status(400).json({
@@ -1221,87 +1357,20 @@ async function getpropertiesinpolygon(req, res) {
             })
         }
 
-        // --------------------------------------------------------
-        // Validate every coordinate
-        // --------------------------------------------------------
-
-        for (const point of polygon) {
-            if (
-                !Array.isArray(point) ||
-                point.length !== 2
-            ) {
-                return res.status(400).json({
-                    message:
-                        "Each polygon point must be [lng, lat]"
-                })
-            }
-
-            const longitude = Number(point[0])
-            const latitude = Number(point[1])
-
-            if (
-                !Number.isFinite(longitude) ||
-                !Number.isFinite(latitude)
-            ) {
-                return res.status(400).json({
-                    message:
-                        "Polygon coordinates must be valid numbers"
-                })
-            }
-
-            if (
-                longitude < -180 ||
-                longitude > 180 ||
-                latitude < -90 ||
-                latitude > 90
-            ) {
-                return res.status(400).json({
-                    message:
-                        "Invalid polygon longitude or latitude"
-                })
-            }
-        }
-
-        // --------------------------------------------------------
-        // Check polygon is closed
-        // First point must equal last point
-        // --------------------------------------------------------
-
-        const firstPoint = polygon[0]
-
-        const lastPoint =
-            polygon[polygon.length - 1]
-
-        if (
-            Number(firstPoint[0]) !==
-            Number(lastPoint[0]) ||
-            Number(firstPoint[1]) !==
-            Number(lastPoint[1])
-        ) {
-            return res.status(400).json({
-                message:
-                    "Polygon must be closed. First and last points must be the same."
-            })
-        }
-
-        // --------------------------------------------------------
-        // Base geo filter
-        // --------------------------------------------------------
-
         const filter = {
             location: {
                 $geoWithin: {
                     $geometry: {
-                        type: "Polygon",
-                        coordinates: [polygon]
+                        type:
+                            "Polygon",
+
+                        coordinates: [
+                            polygon
+                        ]
                     }
                 }
             }
         }
-
-        // --------------------------------------------------------
-        // Price filter
-        // --------------------------------------------------------
 
         if (
             minPrice !== undefined ||
@@ -1309,36 +1378,26 @@ async function getpropertiesinpolygon(req, res) {
         ) {
             filter.price = {}
 
-            if (minPrice !== undefined) {
-                const min = Number(minPrice)
-
-                if (!Number.isFinite(min)) {
-                    return res.status(400).json({
-                        message:
-                            "minPrice must be a valid number"
-                    })
-                }
-
-                filter.price.$gte = min
+            if (
+                minPrice !==
+                undefined
+            ) {
+                filter.price.$gte =
+                    Number(
+                        minPrice
+                    )
             }
 
-            if (maxPrice !== undefined) {
-                const max = Number(maxPrice)
-
-                if (!Number.isFinite(max)) {
-                    return res.status(400).json({
-                        message:
-                            "maxPrice must be a valid number"
-                    })
-                }
-
-                filter.price.$lte = max
+            if (
+                maxPrice !==
+                undefined
+            ) {
+                filter.price.$lte =
+                    Number(
+                        maxPrice
+                    )
             }
         }
-
-        // --------------------------------------------------------
-        // Search
-        // --------------------------------------------------------
 
         if (search) {
             filter.title = {
@@ -1347,28 +1406,22 @@ async function getpropertiesinpolygon(req, res) {
             }
         }
 
-        // --------------------------------------------------------
-        // Sorting
-        // --------------------------------------------------------
+        const sortOption = {}
 
-        let sortOption = {}
-
-        if (sort === "price_asc") {
+        if (
+            sort === "price_asc"
+        ) {
             sortOption.price = 1
-        }
-        else if (sort === "price_desc") {
+        } else if (
+            sort === "price_desc"
+        ) {
             sortOption.price = -1
+        } else if (
+            sort === "newest"
+        ) {
+            sortOption.createdAt =
+                -1
         }
-        else if (sort === "newest") {
-            sortOption.createdAt = -1
-        }
-        else if (sort === "oldest") {
-            sortOption.createdAt = 1
-        }
-
-        // --------------------------------------------------------
-        // Pagination
-        // --------------------------------------------------------
 
         const currentPage =
             Math.max(
@@ -1382,55 +1435,48 @@ async function getpropertiesinpolygon(req, res) {
                 1
             )
 
-        const skip =
-            (currentPage - 1) * currentLimit
-
-        // --------------------------------------------------------
-        // Query
-        // --------------------------------------------------------
-
-        const propertiesinpolygon =
+        const properties =
             await rentalmodel
                 .find(filter)
                 .sort(sortOption)
-                .skip(skip)
-                .limit(currentLimit)
+                .skip(
+                    (currentPage -
+                        1) *
+                    currentLimit
+                )
+                .limit(
+                    currentLimit
+                )
                 .populate(
                     "owner",
                     "name phone profilePicture"
                 )
-
-        // --------------------------------------------------------
-        // Count
-        // --------------------------------------------------------
 
         const totalCount =
             await rentalmodel.countDocuments(
                 filter
             )
 
-        const totalPages =
-            Math.ceil(
-                totalCount / currentLimit
-            )
-
         return res.status(200).json({
-            properties:
-                propertiesinpolygon,
+            properties,
 
             pagination: {
                 currentPage,
-                totalPages,
+
+                totalPages:
+                    Math.ceil(
+                        totalCount /
+                        currentLimit
+                    ),
+
                 totalCount,
-                limit: currentLimit
+
+                limit:
+                    currentLimit
             }
         })
-    }
-    catch (e) {
-        console.error(
-            "Polygon properties error:",
-            e
-        )
+    } catch (e) {
+        console.error(e)
 
         return res.status(500).json({
             message:
@@ -1438,11 +1484,6 @@ async function getpropertiesinpolygon(req, res) {
         })
     }
 }
-
-
-// ============================================================
-// EXPORTS
-// ============================================================
 
 module.exports = {
     uploadimage,
