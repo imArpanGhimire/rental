@@ -41,25 +41,18 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
   return createPortal(
     <div
       className="
-        fixed
-        inset-0
-        z-[100000]
-        flex
-        items-center
-        justify-center
-        bg-black/40
-        px-4
+        fixed inset-0 z-[100000]
+        flex items-center justify-center
+        bg-black/40 px-4
         backdrop-blur-[5px]
       "
     >
       <div
         className="
-          w-full
-          max-w-[390px]
+          w-full max-w-[390px]
           overflow-hidden
           rounded-[26px]
-          border
-          border-black/[0.08]
+          border border-black/[0.08]
           bg-[#f8f7f3]
           shadow-[0_28px_80px_rgba(20,23,31,0.24)]
 
@@ -70,14 +63,10 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
         <div className="p-6 sm:p-7">
           <div
             className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
+              flex h-10 w-10
+              items-center justify-center
               rounded-xl
-              border
-              border-[#B5502E]/15
+              border border-[#B5502E]/15
               bg-[#B5502E]/[0.07]
               text-[#B5502E]
 
@@ -124,11 +113,9 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
               className="
                 min-w-[88px]
                 rounded-full
-                border
-                border-black/[0.10]
+                border border-black/[0.10]
                 bg-transparent
-                px-5
-                py-2.5
+                px-5 py-2.5
                 text-[12px]
                 font-semibold
                 text-[#26282d]
@@ -150,8 +137,7 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
                 min-w-[88px]
                 rounded-full
                 bg-[#B5502E]
-                px-5
-                py-2.5
+                px-5 py-2.5
                 text-[12px]
                 font-semibold
                 text-white
@@ -248,8 +234,7 @@ function LanguageToggle({ className = "" }) {
         shrink-0
         items-center
         rounded-full
-        border
-        border-stone
+        border border-stone
         bg-bg
         p-1
         ${className}
@@ -259,15 +244,14 @@ function LanguageToggle({ className = "" }) {
         type="button"
         onClick={() => changeLanguage("en")}
         className={`
-          flex
-          h-8
-          flex-1
+          flex h-8 flex-1
           items-center
           justify-center
           rounded-full
           text-[11px]
           font-semibold
           transition-colors
+
           ${
             currentLanguage === "en"
               ? "bg-ink text-ivory"
@@ -282,15 +266,14 @@ function LanguageToggle({ className = "" }) {
         type="button"
         onClick={() => changeLanguage("ne")}
         className={`
-          flex
-          h-8
-          flex-1
+          flex h-8 flex-1
           items-center
           justify-center
           rounded-full
           text-[11px]
           font-semibold
           transition-colors
+
           ${
             currentLanguage === "ne"
               ? "bg-ink text-ivory"
@@ -320,14 +303,11 @@ function ThemeToggleButton({ className = "" }) {
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className={`
-        flex
-        h-10
-        w-10
+        flex h-10 w-10
         items-center
         justify-center
         rounded-full
-        border
-        border-stone
+        border border-stone
         bg-bg
         text-ink/55
         transition-colors
@@ -347,6 +327,350 @@ function ThemeToggleButton({ className = "" }) {
 }
 
 /* =========================================================
+   VISIT REQUEST DETAILS
+========================================================= */
+
+function VisitRequestDetailsModal({ request, onClose }) {
+  const property = request?.property;
+
+  const renter = request?.renter;
+
+  /*
+   * ListingDetail currently sends visit data as:
+   *
+   * Preferred date: 2026-09-18 |
+   * Preferred time: 14:30 |
+   * Optional renter message
+   *
+   * Split those pieces so the owner sees a much
+   * cleaner details modal.
+   */
+  const parts = String(request?.message || "")
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const datePart =
+    parts.find((part) => part.toLowerCase().startsWith("preferred date:")) ||
+    "";
+
+  const timePart =
+    parts.find((part) => part.toLowerCase().startsWith("preferred time:")) ||
+    "";
+
+  const renterMessage = parts
+    .filter((part) => {
+      const lower = part.toLowerCase();
+
+      return (
+        !lower.startsWith("preferred date:") &&
+        !lower.startsWith("preferred time:")
+      );
+    })
+    .join(" | ");
+
+  const preferredDate = datePart.replace(/^preferred date:\s*/i, "").trim();
+
+  const preferredTime = timePart.replace(/^preferred time:\s*/i, "").trim();
+
+  function formatPreferredDate(value) {
+    if (!value) {
+      return "Not specified";
+    }
+
+    const date = new Date(`${value}T00:00:00`);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
+
+  function formatPreferredTime(value) {
+    if (!value) {
+      return "Not specified";
+    }
+
+    const match = value.match(/^(\d{1,2}):(\d{2})$/);
+
+    if (!match) {
+      return value;
+    }
+
+    const hours = Number(match[1]);
+
+    const minutes = Number(match[2]);
+
+    if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+      return value;
+    }
+
+    const date = new Date();
+
+    date.setHours(hours, minutes, 0, 0);
+
+    return date.toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+
+  return createPortal(
+    <div
+      className="
+        fixed inset-0
+        z-[100000]
+        flex items-center
+        justify-center
+        bg-black/45
+        px-4
+        backdrop-blur-[5px]
+      "
+      onMouseDown={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="visit-request-title"
+        className="
+          w-full
+          max-w-[440px]
+          overflow-hidden
+          rounded-[26px]
+          border
+          border-black/[0.08]
+          bg-[#f8f7f3]
+          shadow-[0_28px_80px_rgba(20,23,31,0.28)]
+
+          dark:border-white/[0.08]
+          dark:bg-[#1b1d22]
+        "
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        {/* HEADER */}
+
+        <div className="border-b border-black/[0.07] px-6 py-5 dark:border-white/[0.07]">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
+                Visit request
+              </p>
+
+              <h2
+                id="visit-request-title"
+                className="mt-1 font-display text-[21px] font-bold tracking-[-0.035em] text-[#202226] dark:text-white"
+              >
+                Request details
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="
+                flex h-8 w-8
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-black/[0.07]
+                bg-white/55
+                text-[#2b2d31]/55
+                transition-colors
+                hover:bg-white
+                hover:text-[#17191d]
+
+                dark:border-white/[0.08]
+                dark:bg-white/[0.05]
+                dark:text-white/55
+                dark:hover:bg-white/[0.09]
+                dark:hover:text-white
+              "
+              aria-label="Close request details"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+
+        {/* CONTENT */}
+
+        <div className="p-6">
+          {/* PROPERTY */}
+
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2b2d31]/38 dark:text-white/35">
+              Property
+            </p>
+
+            <p className="mt-1 text-[14px] font-semibold text-[#202226] dark:text-white">
+              {property?.title ?? "Listing removed"}
+            </p>
+
+            {property?.location?.address && (
+              <p className="mt-1 text-[11px] leading-5 text-[#2b2d31]/45 dark:text-white/40">
+                {property.location.address}
+              </p>
+            )}
+          </div>
+
+          {/* RENTER */}
+
+          <div className="mt-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2b2d31]/38 dark:text-white/35">
+              Requested by
+            </p>
+
+            <p className="mt-1 text-[13px] font-semibold text-[#202226] dark:text-white">
+              {renter?.name ?? "Renter"}
+            </p>
+
+            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-[#2b2d31]/48 dark:text-white/43">
+              {renter?.phone && <span>{renter.phone}</span>}
+
+              {renter?.phone && renter?.email && (
+                <span className="text-[#2b2d31]/25 dark:text-white/20">·</span>
+              )}
+
+              {renter?.email && <span>{renter.email}</span>}
+            </div>
+          </div>
+
+          {/* DATE / TIME */}
+
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div
+              className="
+                rounded-[16px]
+                border border-black/[0.07]
+                bg-white/45
+                p-3.5
+
+                dark:border-white/[0.07]
+                dark:bg-white/[0.035]
+              "
+            >
+              <div className="flex items-center gap-1.5">
+                <CalendarDays
+                  size={12}
+                  strokeWidth={1.8}
+                  className="text-[#2b2d31]/40 dark:text-white/40"
+                />
+
+                <p className="text-[9px] font-semibold uppercase tracking-[0.11em] text-[#2b2d31]/38 dark:text-white/35">
+                  Preferred date
+                </p>
+              </div>
+
+              <p className="mt-2 text-[12px] font-semibold text-[#202226] dark:text-white">
+                {formatPreferredDate(preferredDate)}
+              </p>
+            </div>
+
+            <div
+              className="
+                rounded-[16px]
+                border border-black/[0.07]
+                bg-white/45
+                p-3.5
+
+                dark:border-white/[0.07]
+                dark:bg-white/[0.035]
+              "
+            >
+              <div className="flex items-center gap-1.5">
+                <Clock
+                  size={12}
+                  strokeWidth={1.8}
+                  className="text-[#2b2d31]/40 dark:text-white/40"
+                />
+
+                <p className="text-[9px] font-semibold uppercase tracking-[0.11em] text-[#2b2d31]/38 dark:text-white/35">
+                  Preferred time
+                </p>
+              </div>
+
+              <p className="mt-2 text-[12px] font-semibold text-[#202226] dark:text-white">
+                {formatPreferredTime(preferredTime)}
+              </p>
+            </div>
+          </div>
+
+          {/* MESSAGE */}
+
+          <div className="mt-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2b2d31]/38 dark:text-white/35">
+              Renter message
+            </p>
+
+            <div
+              className="
+                mt-2
+                rounded-[18px]
+                border border-black/[0.07]
+                bg-white/45
+                px-4 py-4
+
+                dark:border-white/[0.07]
+                dark:bg-white/[0.035]
+              "
+            >
+              {renterMessage ? (
+                <p className="whitespace-pre-line text-[12px] leading-6 text-[#2b2d31]/68 dark:text-white/60">
+                  {renterMessage}
+                </p>
+              ) : (
+                <p className="text-[12px] leading-5 text-[#2b2d31]/38 dark:text-white/35">
+                  No additional message was provided.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* REQUESTED DATE */}
+
+          {request?.createdAt && (
+            <p className="mt-4 text-[10px] text-[#2b2d31]/35 dark:text-white/30">
+              Request sent {new Date(request.createdAt).toLocaleString()}
+            </p>
+          )}
+
+          <div className="mt-6 flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="
+                rounded-full
+                bg-[#202226]
+                px-5 py-2.5
+                text-[11px]
+                font-semibold
+                text-white
+                transition-colors
+                hover:bg-[#303238]
+
+                dark:bg-white
+                dark:text-[#17191d]
+                dark:hover:bg-white/90
+              "
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+/* =========================================================
    NOTIFICATION PANEL
 ========================================================= */
 
@@ -359,6 +683,8 @@ function NotificationPanel({
   const updateStatus = useUpdateVisitRequestStatus();
 
   const [updatingId, setUpdatingId] = useState(null);
+
+  const [detailsRequest, setDetailsRequest] = useState(null);
 
   function handleRespond(event, requestId, status) {
     event.stopPropagation();
@@ -380,295 +706,364 @@ function NotificationPanel({
     );
   }
 
-  return (
-    <div
-      className="
-        absolute
-        right-0
-        top-[calc(100%+10px)]
-        z-[99999]
-        w-[360px]
-        max-w-[calc(100vw-24px)]
-        overflow-hidden
-        rounded-[22px]
-        border
-        border-black/10
-        bg-gradient-to-b
-        from-[#f3f2ee]
-        via-[#ecebe7]
-        to-[#dfded9]
-        shadow-[0_24px_70px_rgba(20,23,31,0.18)]
-        backdrop-blur-xl
+  function openDetails(event, request) {
+    event.stopPropagation();
 
-        dark:border-white/10
-        dark:from-[#1c1f26]
-        dark:via-[#181b20]
-        dark:to-[#121419]
-      "
-    >
+    if (!request) {
+      return;
+    }
+
+    setDetailsRequest(request);
+  }
+
+  return (
+    <>
       <div
         className="
-          pointer-events-none
           absolute
-          -right-16
-          -top-20
-          h-48
-          w-48
-          rounded-full
-          bg-white/55
-          blur-3xl
+          right-0
+          top-[calc(100%+10px)]
+          z-[99999]
+          w-[360px]
+          max-w-[calc(100vw-24px)]
+          overflow-hidden
+          rounded-[22px]
+          border border-black/10
+          bg-gradient-to-b
+          from-[#f3f2ee]
+          via-[#ecebe7]
+          to-[#dfded9]
+          shadow-[0_24px_70px_rgba(20,23,31,0.18)]
+          backdrop-blur-xl
 
-          dark:bg-white/[0.035]
+          dark:border-white/10
+          dark:from-[#1c1f26]
+          dark:via-[#181b20]
+          dark:to-[#121419]
         "
-      />
+      >
+        <div
+          className="
+            pointer-events-none
+            absolute
+            -right-16
+            -top-20
+            h-48 w-48
+            rounded-full
+            bg-white/55
+            blur-3xl
 
-      <div className="relative border-b border-black/10 px-4 pb-3.5 pt-4 dark:border-white/10">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
+            dark:bg-white/[0.035]
+          "
+        />
+
+        {/* HEADER */}
+
+        <div className="relative border-b border-black/10 px-4 pb-3.5 pt-4 dark:border-white/10">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <div
+                className="
+                  flex h-9 w-9
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-xl
+                  border border-black/10
+                  bg-white/55
+                  text-[#26282d]
+                  shadow-[0_8px_24px_rgba(20,23,31,0.07)]
+
+                  dark:border-white/10
+                  dark:bg-white/[0.06]
+                  dark:text-white
+                "
+              >
+                <Bell size={16} strokeWidth={1.8} />
+              </div>
+
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#2b2d31]/45 dark:text-white/40">
+                  Activity
+                </p>
+
+                <h3 className="mt-0.5 font-display text-[17px] font-bold tracking-[-0.035em] text-[#1f2125] dark:text-white">
+                  Notifications
+                </h3>
+
+                <p className="mt-0.5 text-[11px] leading-4 text-[#2b2d31]/55 dark:text-white/50">
+                  {unreadCount > 0
+                    ? `${unreadCount} unread notification${
+                        unreadCount === 1 ? "" : "s"
+                      }`
+                    : "You're all caught up"}
+                </p>
+              </div>
+            </div>
+
+            {unreadCount > 0 && (
+              <button
+                type="button"
+                onClick={onMarkAllRead}
+                className="
+                  shrink-0
+                  rounded-full
+                  border
+                  border-black/10
+                  bg-white/45
+                  px-2.5 py-1.5
+                  text-[10px]
+                  font-semibold
+                  text-[#2b2d31]/70
+                  transition-colors
+                  hover:bg-white/75
+                  hover:text-[#14161a]
+
+                  dark:border-white/10
+                  dark:bg-white/[0.05]
+                  dark:text-white/65
+                  dark:hover:bg-white/10
+                  dark:hover:text-white
+                "
+              >
+                Mark all read
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* LIST */}
+
+        <div className="relative max-h-[390px] overflow-y-auto p-2.5">
+          {notifications.length === 0 ? (
             <div
               className="
-                flex
-                h-9
-                w-9
-                shrink-0
-                items-center
-                justify-center
-                rounded-xl
-                border
-                border-black/10
-                bg-white/55
-                text-[#26282d]
-                shadow-[0_8px_24px_rgba(20,23,31,0.07)]
+                rounded-[18px]
+                border border-black/10
+                bg-white/40
+                px-6 py-9
+                text-center
 
                 dark:border-white/10
-                dark:bg-white/[0.06]
-                dark:text-white
+                dark:bg-white/[0.035]
               "
             >
-              <Bell size={16} strokeWidth={1.8} />
-            </div>
+              <Bell
+                size={18}
+                strokeWidth={1.8}
+                className="mx-auto text-ink/35"
+              />
 
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#2b2d31]/45 dark:text-white/40">
-                Activity
+              <p className="mt-3 text-[13px] font-semibold text-ink">
+                No notifications
               </p>
 
-              <h3 className="mt-0.5 font-display text-[17px] font-bold tracking-[-0.035em] text-[#1f2125] dark:text-white">
-                Notifications
-              </h3>
-
-              <p className="mt-0.5 text-[11px] leading-4 text-[#2b2d31]/55 dark:text-white/50">
-                {unreadCount > 0
-                  ? `${unreadCount} unread notification${
-                      unreadCount === 1 ? "" : "s"
-                    }`
-                  : "You're all caught up"}
+              <p className="mt-1 text-[11px] text-ink/45">
+                New activity will appear here.
               </p>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-2">
+              {notifications.map((notification) => {
+                const isPending = notification.type === "pending";
 
-          {unreadCount > 0 && (
-            <button
-              type="button"
-              onClick={onMarkAllRead}
-              className="
-                shrink-0
-                rounded-full
-                border
-                border-black/10
-                bg-white/45
-                px-2.5
-                py-1.5
-                text-[10px]
-                font-semibold
-                text-[#2b2d31]/70
-                transition-colors
-                hover:bg-white/75
-                hover:text-[#14161a]
+                const request = notification.request;
 
-                dark:border-white/10
-                dark:bg-white/[0.05]
-                dark:text-white/65
-                dark:hover:bg-white/10
-                dark:hover:text-white
-              "
-            >
-              Mark all read
-            </button>
+                const requestId = request?._id;
+
+                const isUpdating = updatingId === requestId;
+
+                /*
+                 * Pending notifications exist only for
+                 * the owner, so only those get a details
+                 * button.
+                 */
+                const canViewDetails = isPending && Boolean(request);
+
+                return (
+                  <div
+                    key={notification.key}
+                    className={`
+                        relative
+                        overflow-hidden
+                        rounded-[17px]
+                        border
+                        px-3.5 py-3
+
+                        ${
+                          notification.unread
+                            ? "border-black/10 bg-white/62 dark:border-white/10 dark:bg-white/[0.07]"
+                            : "border-black/[0.07] bg-white/32 dark:border-white/[0.07] dark:bg-white/[0.025]"
+                        }
+                      `}
+                  >
+                    {notification.unread && (
+                      <span className="absolute right-3.5 top-3.5 h-1.5 w-1.5 rounded-full bg-[#2f3136] dark:bg-white/70" />
+                    )}
+
+                    <div className="flex gap-3 pr-3">
+                      <span
+                        className={`
+                            mt-0.5
+                            flex h-9 w-9
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-xl
+                            border
+
+                            ${
+                              notification.type === "accepted"
+                                ? "border-emerald-700/10 bg-emerald-50/80 text-emerald-700 dark:border-emerald-400/15 dark:bg-emerald-400/10 dark:text-emerald-300"
+                                : notification.type === "declined"
+                                  ? "border-red-700/10 bg-red-50/80 text-red-700 dark:border-red-400/15 dark:bg-red-400/10 dark:text-red-300"
+                                  : "border-black/10 bg-white/60 text-[#2b2d31] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/75"
+                            }
+                          `}
+                      >
+                        {notification.type === "accepted" ? (
+                          <Check size={16} strokeWidth={2} />
+                        ) : notification.type === "declined" ? (
+                          <X size={16} strokeWidth={2} />
+                        ) : (
+                          <CalendarDays size={16} strokeWidth={1.8} />
+                        )}
+                      </span>
+
+                      <div className="min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={() => onOpenNotification(notification)}
+                          className="block w-full text-left"
+                        >
+                          <span className="block pr-3 text-[12.5px] font-semibold leading-[1.35rem] text-[#202226] dark:text-white/90">
+                            {notification.title}
+                          </span>
+
+                          <span className="mt-1 block text-[12px] leading-[1.55] text-[#2b2d31]/58 dark:text-white/50">
+                            {notification.message}
+                          </span>
+
+                          <span className="mt-2.5 flex items-center gap-1.5 text-[10px] font-medium text-[#2b2d31]/38 dark:text-white/35">
+                            <Clock size={10} strokeWidth={1.8} />
+
+                            {notification.date}
+                          </span>
+                        </button>
+
+                        {/* REQUEST DETAILS */}
+
+                        {canViewDetails && (
+                          <button
+                            type="button"
+                            onClick={(event) => openDetails(event, request)}
+                            className="
+                                mt-3
+                                inline-flex
+                                items-center
+                                gap-1.5
+                                rounded-full
+                                border border-black/[0.08]
+                                bg-white/45
+                                px-3 py-1.5
+                                text-[10px]
+                                font-semibold
+                                text-[#2b2d31]/65
+                                transition-colors
+                                hover:bg-white/80
+                                hover:text-[#17191d]
+
+                                dark:border-white/[0.08]
+                                dark:bg-white/[0.04]
+                                dark:text-white/60
+                                dark:hover:bg-white/[0.08]
+                                dark:hover:text-white
+                              "
+                          >
+                            View request details
+                          </button>
+                        )}
+
+                        {/* ACCEPT / DECLINE */}
+
+                        {isPending && (
+                          <div className="mt-3.5 grid grid-cols-2 gap-2.5">
+                            <button
+                              type="button"
+                              disabled={isUpdating}
+                              onClick={(event) =>
+                                handleRespond(event, requestId, "accepted")
+                              }
+                              className="
+                                  rounded-xl
+                                  bg-[#202226]
+                                  px-2.5
+                                  py-1.5
+                                  text-[10px]
+                                  font-semibold
+                                  text-white
+                                  transition-colors
+                                  hover:bg-[#303238]
+                                  disabled:cursor-not-allowed
+                                  disabled:opacity-50
+
+                                  dark:bg-white
+                                  dark:text-[#16181c]
+                                  dark:hover:bg-white/90
+                                "
+                            >
+                              {isUpdating ? "..." : "Accept"}
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={isUpdating}
+                              onClick={(event) =>
+                                handleRespond(event, requestId, "declined")
+                              }
+                              className="
+                                  rounded-xl
+                                  border
+                                  border-black/10
+                                  bg-white/45
+                                  px-3 py-2
+                                  text-[11px]
+                                  font-semibold
+                                  text-[#2b2d31]/70
+                                  transition-colors
+                                  hover:bg-white/75
+                                  hover:text-[#14161a]
+                                  disabled:cursor-not-allowed
+                                  disabled:opacity-50
+
+                                  dark:border-white/10
+                                  dark:bg-white/[0.04]
+                                  dark:text-white/65
+                                  dark:hover:bg-white/[0.08]
+                                  dark:hover:text-white
+                                "
+                            >
+                              {isUpdating ? "..." : "Decline"}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
 
-      <div className="relative max-h-[390px] overflow-y-auto p-2.5">
-        {notifications.length === 0 ? (
-          <div
-            className="
-              rounded-[18px]
-              border
-              border-black/10
-              bg-white/40
-              px-6
-              py-9
-              text-center
-
-              dark:border-white/10
-              dark:bg-white/[0.035]
-            "
-          >
-            <Bell size={18} strokeWidth={1.8} className="mx-auto text-ink/35" />
-
-            <p className="mt-3 text-[13px] font-semibold text-ink">
-              No notifications
-            </p>
-
-            <p className="mt-1 text-[11px] text-ink/45">
-              New activity will appear here.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {notifications.map((notification) => {
-              const isPending = notification.type === "pending";
-
-              const requestId = notification.request?._id;
-
-              const isUpdating = updatingId === requestId;
-
-              return (
-                <div
-                  key={notification.key}
-                  className={`
-                      relative
-                      overflow-hidden
-                      rounded-[17px]
-                      border
-                      px-3.5
-                      py-3
-
-                      ${
-                        notification.unread
-                          ? "border-black/10 bg-white/62 dark:border-white/10 dark:bg-white/[0.07]"
-                          : "border-black/[0.07] bg-white/32 dark:border-white/[0.07] dark:bg-white/[0.025]"
-                      }
-                    `}
-                >
-                  {notification.unread && (
-                    <span className="absolute right-3.5 top-3.5 h-1.5 w-1.5 rounded-full bg-[#2f3136] dark:bg-white/70" />
-                  )}
-
-                  <div className="flex gap-3 pr-3">
-                    <span
-                      className={`
-                          mt-0.5
-                          flex
-                          h-9
-                          w-9
-                          shrink-0
-                          items-center
-                          justify-center
-                          rounded-xl
-                          border
-
-                          ${
-                            notification.type === "accepted"
-                              ? "border-emerald-700/10 bg-emerald-50/80 text-emerald-700 dark:border-emerald-400/15 dark:bg-emerald-400/10 dark:text-emerald-300"
-                              : notification.type === "declined"
-                                ? "border-red-700/10 bg-red-50/80 text-red-700 dark:border-red-400/15 dark:bg-red-400/10 dark:text-red-300"
-                                : "border-black/10 bg-white/60 text-[#2b2d31] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/75"
-                          }
-                        `}
-                    >
-                      {notification.type === "accepted" ? (
-                        <Check size={16} strokeWidth={2} />
-                      ) : notification.type === "declined" ? (
-                        <X size={16} strokeWidth={2} />
-                      ) : (
-                        <CalendarDays size={16} strokeWidth={1.8} />
-                      )}
-                    </span>
-
-                    <div className="min-w-0 flex-1">
-                      <button
-                        type="button"
-                        onClick={() => onOpenNotification(notification)}
-                        className="block w-full text-left"
-                      >
-                        <span className="block pr-3 text-[12.5px] font-semibold leading-[1.35rem] text-[#202226] dark:text-white/90">
-                          {notification.title}
-                        </span>
-
-                        <span className="mt-1 block text-[12px] leading-[1.55] text-[#2b2d31]/58 dark:text-white/50">
-                          {notification.message}
-                        </span>
-
-                        <span className="mt-2.5 flex items-center gap-1.5 text-[10px] font-medium text-[#2b2d31]/38 dark:text-white/35">
-                          <Clock size={10} strokeWidth={1.8} />
-
-                          {notification.date}
-                        </span>
-                      </button>
-
-                      {isPending && (
-                        <div className="mt-3.5 grid grid-cols-2 gap-2.5">
-                          <button
-                            type="button"
-                            disabled={isUpdating}
-                            onClick={(event) =>
-                              handleRespond(event, requestId, "accepted")
-                            }
-                            className="
-                                rounded-xl
-                                bg-[#202226]
-                                px-2.5
-                                py-1.5
-                                text-[10px]
-                                font-semibold
-                                text-white
-                                disabled:opacity-50
-
-                                dark:bg-white
-                                dark:text-[#16181c]
-                              "
-                          >
-                            {isUpdating ? "..." : "Accept"}
-                          </button>
-
-                          <button
-                            type="button"
-                            disabled={isUpdating}
-                            onClick={(event) =>
-                              handleRespond(event, requestId, "declined")
-                            }
-                            className="
-                                rounded-xl
-                                border
-                                border-black/10
-                                bg-white/45
-                                px-3
-                                py-2
-                                text-[11px]
-                                font-semibold
-                                text-[#2b2d31]/70
-                                disabled:opacity-50
-
-                                dark:border-white/10
-                                dark:bg-white/[0.04]
-                                dark:text-white/65
-                              "
-                          >
-                            {isUpdating ? "..." : "Decline"}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
+      {detailsRequest && (
+        <VisitRequestDetailsModal
+          request={detailsRequest}
+          onClose={() => setDetailsRequest(null)}
+        />
+      )}
+    </>
   );
 }
 
@@ -703,6 +1098,10 @@ export default function TopBar() {
 
   const userId = user?.id || user?._id;
 
+  /* =======================================================
+     VISIT REQUEST QUERIES
+  ======================================================= */
+
   const ownerRequestsQuery = useOwnerVisitRequests({
     enabled: isAuthenticated && role === "owner",
   });
@@ -715,9 +1114,17 @@ export default function TopBar() {
 
   const renterRequests = role === "renter" ? renterRequestsQuery.requests : [];
 
+  /* =======================================================
+     SEEN NOTIFICATIONS
+  ======================================================= */
+
   useEffect(() => {
     setSeenKeys(getSeenNotificationKeys(userId));
   }, [userId]);
+
+  /* =======================================================
+     OUTSIDE CLICK
+  ======================================================= */
 
   useEffect(() => {
     function handleOutsideClick(event) {
@@ -740,9 +1147,17 @@ export default function TopBar() {
     };
   }, []);
 
+  /* =======================================================
+     CLOSE MOBILE MENU AFTER ROUTE CHANGE
+  ======================================================= */
+
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
+
+  /* =======================================================
+     MOBILE BODY LOCK
+  ======================================================= */
 
   useEffect(() => {
     if (!mobileMenuOpen) {
@@ -757,6 +1172,10 @@ export default function TopBar() {
       document.body.style.overflow = "";
     };
   }, [mobileMenuOpen]);
+
+  /* =======================================================
+     NOTIFICATIONS
+  ======================================================= */
 
   const notifications = useMemo(() => {
     if (!isAuthenticated) {
@@ -890,11 +1309,16 @@ export default function TopBar() {
     }
   }
 
+  /* =======================================================
+     LOGOUT
+  ======================================================= */
+
   const handleLogout = async () => {
     try {
       await logout();
     } finally {
       setConfirmOpen(false);
+
       setMenuOpen(false);
 
       setNotificationsOpen(false);
@@ -907,9 +1331,11 @@ export default function TopBar() {
     }
   };
 
+  /* =======================================================
+     NAV ITEMS
+  ======================================================= */
+
   /*
-   * IMPORTANT:
-   *
    * "/" is the role-aware landing page.
    * "/browse" is the listing browser.
    */
@@ -925,7 +1351,6 @@ export default function TopBar() {
             to: "/owner/listings",
             label: t("nav.myListings", "My Listings"),
           },
-
           {
             to: "/owner/listings/new",
             label: t("nav.addListing", "Add Listing"),
@@ -964,8 +1389,7 @@ export default function TopBar() {
     <>
       <header
         className="
-          sticky
-          top-0
+          sticky top-0
           z-[9999]
           border-b
           border-stone/80
@@ -1072,9 +1496,7 @@ export default function TopBar() {
                     }}
                     className={`
                       relative
-                      flex
-                      h-10
-                      w-10
+                      flex h-10 w-10
                       items-center
                       justify-center
                       rounded-full
@@ -1143,8 +1565,7 @@ export default function TopBar() {
                         src={user.profilePicture}
                         alt={user?.name || "Profile"}
                         className="
-                          h-8
-                          w-8
+                          h-8 w-8
                           rounded-full
                           border
                           border-brass/30
@@ -1154,9 +1575,7 @@ export default function TopBar() {
                     ) : (
                       <span
                         className="
-                          flex
-                          h-8
-                          w-8
+                          flex h-8 w-8
                           items-center
                           justify-center
                           rounded-full
@@ -1318,9 +1737,7 @@ export default function TopBar() {
                         >
                           <span
                             className="
-                              flex
-                              h-8
-                              w-8
+                              flex h-8 w-8
                               shrink-0
                               items-center
                               justify-center
@@ -1376,9 +1793,7 @@ export default function TopBar() {
                         >
                           <span
                             className="
-                              flex
-                              h-8
-                              w-8
+                              flex h-8 w-8
                               shrink-0
                               items-center
                               justify-center
@@ -1438,9 +1853,7 @@ export default function TopBar() {
                         >
                           <span
                             className="
-                              flex
-                              h-8
-                              w-8
+                              flex h-8 w-8
                               shrink-0
                               items-center
                               justify-center
@@ -1469,15 +1882,13 @@ export default function TopBar() {
                   )}
                 </div>
 
-                {/* MOBILE MENU */}
+                {/* MOBILE MENU BUTTON */}
 
                 <button
                   type="button"
                   onClick={toggleMobileMenu}
                   className="
-                    flex
-                    h-10
-                    w-10
+                    flex h-10 w-10
                     items-center
                     justify-center
                     rounded-full
@@ -1498,12 +1909,13 @@ export default function TopBar() {
               </>
             ) : (
               <>
+                {/* GUEST */}
+
                 <NavLink
                   to="/login"
                   className="
                     rounded-full
-                    px-3
-                    py-2
+                    px-3 py-2
                     text-[13px]
                     font-medium
                     text-ink/55
@@ -1543,9 +1955,7 @@ export default function TopBar() {
                   type="button"
                   onClick={toggleMobileMenu}
                   className="
-                    flex
-                    h-10
-                    w-10
+                    flex h-10 w-10
                     items-center
                     justify-center
                     rounded-full
@@ -1569,7 +1979,9 @@ export default function TopBar() {
         </div>
       </header>
 
-      {/* MOBILE NAVIGATION */}
+      {/* =====================================================
+          MOBILE NAVIGATION
+      ===================================================== */}
 
       {mobileMenuOpen && (
         <>
@@ -1640,8 +2052,7 @@ export default function TopBar() {
                         src={user.profilePicture}
                         alt={user?.name || "Profile"}
                         className="
-                          h-9
-                          w-9
+                          h-9 w-9
                           rounded-xl
                           border
                           border-brass/30
@@ -1651,9 +2062,7 @@ export default function TopBar() {
                     ) : (
                       <span
                         className="
-                          flex
-                          h-9
-                          w-9
+                          flex h-9 w-9
                           items-center
                           justify-center
                           rounded-xl
