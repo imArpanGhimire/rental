@@ -30,12 +30,24 @@ const userschema = new mongoose.Schema(
 
         phone: {
             type: String,
-            required: true,
             trim: true,
-            match: [
-                /^9[678]\d{8}$/,
-                "Enter a valid 10-digit Nepali mobile number"
-            ]
+
+            required: function () {
+                return this.role === "owner"
+            },
+
+            validate: {
+                validator: function (value) {
+                    if (!value) {
+                        return this.role !== "owner"
+                    }
+
+                    return /^9[678]\d{8}$/.test(value)
+                },
+
+                message:
+                    "Enter a valid 10-digit Nepali mobile number"
+            }
         },
 
         profilePicture: {
@@ -55,19 +67,25 @@ const userschema = new mongoose.Schema(
                         type: String,
                         required: true
                     },
+
                     answerHash: {
                         type: String,
                         required: true
                     },
+
                     _id: false
                 }
             ],
+
             validate: {
                 validator: function (arr) {
                     return arr.length === 2
                 },
-                message: "Exactly two security questions are required"
+
+                message:
+                    "Exactly two security questions are required"
             },
+
             required: true
         }
     },
