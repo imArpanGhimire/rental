@@ -7,17 +7,29 @@ const SECURITY_QUESTIONS = require("../config/securityQuestions")
 
 const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    secure:
+        process.env.NODE_ENV ===
+        "production",
+
+    sameSite:
+        process.env.NODE_ENV ===
+            "production"
+            ? "none"
+            : "lax",
+
+    maxAge:
+        7 * 24 * 60 * 60 * 1000
 }
 
 function normalizeAnswer(answer) {
-    return (answer || "").trim().toLowerCase()
+    return (answer || "")
+        .trim()
+        .toLowerCase()
 }
 
 async function registeruser(req, res) {
-    const errors = validationResult(req)
+    const errors =
+        validationResult(req)
 
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -26,135 +38,236 @@ async function registeruser(req, res) {
     }
 
     try {
-        const name = req.body.name?.trim()
-        const email = req.body.email?.trim().toLowerCase()
-        const phone = req.body.phone?.trim()
-        const { password, role, securityAnswers } = req.body
+        const name =
+            req.body.name?.trim()
 
-        if (!name || !email || !password || !role || !phone) {
+        const email =
+            req.body.email
+                ?.trim()
+                .toLowerCase()
+
+        const phone =
+            req.body.phone?.trim() || ""
+
+        const {
+            password,
+            role,
+            securityAnswers
+        } = req.body
+
+        if (
+            !name ||
+            !email ||
+            !password ||
+            !role
+        ) {
             return res.status(400).json({
-                message: "All the fields should be filled"
+                message:
+                    "All required fields should be filled"
             })
         }
 
-        if (!/^9[678]\d{8}$/.test(phone)) {
+        if (
+            role === "owner" &&
+            !phone
+        ) {
             return res.status(400).json({
-                message: "Enter a valid 10-digit Nepali mobile number"
+                message:
+                    "Phone number is required for property owners"
             })
         }
 
-        if (name.length < 2 || name.length > 20) {
+        if (
+            phone &&
+            !/^9[678]\d{8}$/.test(phone)
+        ) {
             return res.status(400).json({
-                message: "name must be 2–20 characters"
+                message:
+                    "Enter a valid 10-digit Nepali mobile number"
+            })
+        }
+
+        if (
+            name.length < 2 ||
+            name.length > 20
+        ) {
+            return res.status(400).json({
+                message:
+                    "Name must be 2-20 characters"
             })
         }
 
         if (password.length < 6) {
             return res.status(400).json({
-                message: "Password must be at least 6 characters"
+                message:
+                    "Password must be at least 6 characters"
             })
         }
-
-        if (!["owner", "renter"].includes(role)) {
-            return res.status(400).json({
-                message: "Select either owner or renter"
-            })
-        }
-
-        if (!Array.isArray(securityAnswers) || securityAnswers.length !== 2) {
-            return res.status(400).json({
-                message: "Please answer exactly two security questions"
-            })
-        }
-
-        const [first, second] = securityAnswers
 
         if (
-            !SECURITY_QUESTIONS.includes(first?.question) ||
-            !SECURITY_QUESTIONS.includes(second?.question)
+            ![
+                "owner",
+                "renter"
+            ].includes(role)
         ) {
             return res.status(400).json({
-                message: "Invalid security question"
+                message:
+                    "Select either owner or renter"
             })
         }
 
-        if (first.question === second.question) {
+        if (
+            !Array.isArray(
+                securityAnswers
+            ) ||
+            securityAnswers.length !== 2
+        ) {
             return res.status(400).json({
-                message: "Please choose two different security questions"
+                message:
+                    "Please answer exactly two security questions"
             })
         }
 
-        if (!normalizeAnswer(first.answer) || !normalizeAnswer(second.answer)) {
+        const [first, second] =
+            securityAnswers
+
+        if (
+            !SECURITY_QUESTIONS.includes(
+                first?.question
+            ) ||
+            !SECURITY_QUESTIONS.includes(
+                second?.question
+            )
+        ) {
             return res.status(400).json({
-                message: "Security answers cannot be empty"
+                message:
+                    "Invalid security question"
             })
         }
 
-        const alreadyExists = await usermodel.findOne({ email })
+        if (
+            first.question ===
+            second.question
+        ) {
+            return res.status(400).json({
+                message:
+                    "Please choose two different security questions"
+            })
+        }
+
+        if (
+            !normalizeAnswer(
+                first.answer
+            ) ||
+            !normalizeAnswer(
+                second.answer
+            )
+        ) {
+            return res.status(400).json({
+                message:
+                    "Security answers cannot be empty"
+            })
+        }
+
+        const alreadyExists =
+            await usermodel.findOne({
+                email
+            })
 
         if (alreadyExists) {
             return res.status(400).json({
-                message: "user with this email already exists"
+                message:
+                    "User with this email already exists"
             })
         }
 
-        const hash = await bcrypt.hash(password, 10)
+        const hash =
+            await bcrypt.hash(
+                password,
+                10
+            )
 
-        const hashedSecurityQuestions = await Promise.all(
-            securityAnswers.map(async (item) => ({
-                question: item.question,
-                answerHash: await bcrypt.hash(
-                    normalizeAnswer(item.answer),
-                    10
+        const hashedSecurityQuestions =
+            await Promise.all(
+                securityAnswers.map(
+                    async (item) => ({
+                        question:
+                            item.question,
+
+                        answerHash:
+                            await bcrypt.hash(
+                                normalizeAnswer(
+                                    item.answer
+                                ),
+                                10
+                            )
+                    })
                 )
-            }))
-        )
+            )
 
-        const user = await usermodel.create({
-            name,
-            password: hash,
-            email,
-            role,
-            phone,
-            securityQuestions: hashedSecurityQuestions
-        })
+        const user =
+            await usermodel.create({
+                name,
+                password: hash,
+                email,
+                role,
+
+                phone:
+                    role === "owner"
+                        ? phone
+                        : phone || undefined,
+
+                securityQuestions:
+                    hashedSecurityQuestions
+            })
 
         const token = jwt.sign(
             {
                 id: user._id,
                 role: user.role
             },
+
             process.env.JWT_SECRET,
+
             {
                 expiresIn: "7d"
             }
         )
 
-        res.cookie("token", token, cookieOptions)
+        res.cookie(
+            "token",
+            token,
+            cookieOptions
+        )
 
         return res.status(201).json({
-            message: "user created succesfully",
+            message:
+                "User created successfully",
+
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                phone: user.phone,
-                profilePicture: user.profilePicture
+                phone: user.phone || "",
+                profilePicture:
+                    user.profilePicture
             }
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                e.message ||
+                "Internal server error"
         })
     }
 }
 
 async function loginuser(req, res) {
-    const errors = validationResult(req)
+    const errors =
+        validationResult(req)
 
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -163,31 +276,43 @@ async function loginuser(req, res) {
     }
 
     try {
-        const email = req.body.email?.trim().toLowerCase()
-        const { password } = req.body
+        const email =
+            req.body.email
+                ?.trim()
+                .toLowerCase()
+
+        const { password } =
+            req.body
 
         if (!email || !password) {
             return res.status(400).json({
-                message: "Email and password are required"
+                message:
+                    "Email and password are required"
             })
         }
 
-        const user = await usermodel.findOne({ email })
+        const user =
+            await usermodel.findOne({
+                email
+            })
 
         if (!user) {
             return res.status(401).json({
-                message: "Invalid credentials"
+                message:
+                    "Invalid credentials"
             })
         }
 
-        const pswcheck = await bcrypt.compare(
-            password,
-            user.password
-        )
+        const pswcheck =
+            await bcrypt.compare(
+                password,
+                user.password
+            )
 
         if (!pswcheck) {
             return res.status(401).json({
-                message: "Invalid credentials"
+                message:
+                    "Invalid credentials"
             })
         }
 
@@ -196,52 +321,67 @@ async function loginuser(req, res) {
                 id: user._id,
                 role: user.role
             },
+
             process.env.JWT_SECRET,
+
             {
                 expiresIn: "7d"
             }
         )
 
-        res.cookie("token", token, cookieOptions)
+        res.cookie(
+            "token",
+            token,
+            cookieOptions
+        )
 
         return res.status(200).json({
-            message: "Logged in successfully",
+            message:
+                "Logged in successfully",
+
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                phone: user.phone,
-                profilePicture: user.profilePicture
+                phone: user.phone || "",
+                profilePicture:
+                    user.profilePicture
             }
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
 
 async function logoutuser(req, res) {
-    res.clearCookie("token", cookieOptions)
+    res.clearCookie(
+        "token",
+        cookieOptions
+    )
 
     return res.status(200).json({
-        message: "Logged out successfully"
+        message:
+            "Logged out successfully"
     })
 }
 
 async function getme(req, res) {
     try {
-        const user = await usermodel
-            .findById(req.user.id)
-            .select("-password")
+        const user =
+            await usermodel
+                .findById(req.user.id)
+                .select("-password")
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found"
+                message:
+                    "User not found"
             })
         }
 
@@ -251,22 +391,24 @@ async function getme(req, res) {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                phone: user.phone,
-                profilePicture: user.profilePicture
+                phone: user.phone || "",
+                profilePicture:
+                    user.profilePicture
             }
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
 
 async function updateprofile(req, res) {
-    const errors = validationResult(req)
+    const errors =
+        validationResult(req)
 
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -275,25 +417,35 @@ async function updateprofile(req, res) {
     }
 
     try {
-        const name = req.body.name?.trim()
+        const name =
+            req.body.name?.trim()
 
         if (!name) {
             return res.status(400).json({
-                message: "Name is required"
+                message:
+                    "Name is required"
             })
         }
 
-        if (name.length < 2 || name.length > 20) {
+        if (
+            name.length < 2 ||
+            name.length > 20
+        ) {
             return res.status(400).json({
-                message: "name must be 2–20 characters"
+                message:
+                    "Name must be 2-20 characters"
             })
         }
 
-        const user = await usermodel.findById(req.user.id)
+        const user =
+            await usermodel.findById(
+                req.user.id
+            )
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found"
+                message:
+                    "User not found"
             })
         }
 
@@ -304,28 +456,35 @@ async function updateprofile(req, res) {
         })
 
         return res.status(200).json({
-            message: "Profile updated",
+            message:
+                "Profile updated",
+
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                phone: user.phone,
-                profilePicture: user.profilePicture
+                phone: user.phone || "",
+                profilePicture:
+                    user.profilePicture
             }
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
 
-async function updatepassword(req, res) {
-    const errors = validationResult(req)
+async function updatepassword(
+    req,
+    res
+) {
+    const errors =
+        validationResult(req)
 
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -334,92 +493,124 @@ async function updatepassword(req, res) {
     }
 
     try {
-        const { currentPassword, newPassword } = req.body
+        const {
+            currentPassword,
+            newPassword
+        } = req.body
 
-        if (!currentPassword || !newPassword) {
+        if (
+            !currentPassword ||
+            !newPassword
+        ) {
             return res.status(400).json({
-                message: "Current and new password are required"
+                message:
+                    "Current and new password are required"
             })
         }
 
-        if (newPassword.length < 6) {
+        if (
+            newPassword.length < 6
+        ) {
             return res.status(400).json({
-                message: "New password must be at least 6 characters"
+                message:
+                    "New password must be at least 6 characters"
             })
         }
 
-        const user = await usermodel.findById(req.user.id)
+        const user =
+            await usermodel.findById(
+                req.user.id
+            )
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found"
+                message:
+                    "User not found"
             })
         }
 
-        const pswcheck = await bcrypt.compare(
-            currentPassword,
-            user.password
-        )
+        const pswcheck =
+            await bcrypt.compare(
+                currentPassword,
+                user.password
+            )
 
         if (!pswcheck) {
             return res.status(400).json({
-                message: "Current password is incorrect"
+                message:
+                    "Current password is incorrect"
             })
         }
 
-        const samePassword = await bcrypt.compare(
-            newPassword,
-            user.password
-        )
+        const samePassword =
+            await bcrypt.compare(
+                newPassword,
+                user.password
+            )
 
         if (samePassword) {
             return res.status(400).json({
-                message: "New password must be different from current password"
+                message:
+                    "New password must be different from current password"
             })
         }
 
-        user.password = await bcrypt.hash(
-            newPassword,
-            10
-        )
+        user.password =
+            await bcrypt.hash(
+                newPassword,
+                10
+            )
 
         await user.save({
             validateModifiedOnly: true
         })
 
         return res.status(200).json({
-            message: "Password updated successfully"
+            message:
+                "Password updated successfully"
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
 
-async function updateprofilepicture(req, res) {
+async function updateprofilepicture(
+    req,
+    res
+) {
     if (!req.file) {
         return res.status(400).json({
-            message: "No image uploaded"
+            message:
+                "No image uploaded"
         })
     }
 
     try {
-        const user = await usermodel.findById(req.user.id)
+        const user =
+            await usermodel.findById(
+                req.user.id
+            )
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found"
+                message:
+                    "User not found"
             })
         }
 
-        const oldPublicId = user.profilePicturePublicId
+        const oldPublicId =
+            user.profilePicturePublicId
 
-        user.profilePicture = req.file.path
-        user.profilePicturePublicId = req.file.filename
+        user.profilePicture =
+            req.file.path
+
+        user.profilePicturePublicId =
+            req.file.filename
 
         await user.save({
             validateModifiedOnly: true
@@ -440,37 +631,48 @@ async function updateprofilepicture(req, res) {
         }
 
         return res.status(200).json({
-            message: "Profile picture updated",
+            message:
+                "Profile picture updated",
+
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                phone: user.phone,
-                profilePicture: user.profilePicture
+                phone: user.phone || "",
+                profilePicture:
+                    user.profilePicture
             }
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
 
-async function removeprofilepicture(req, res) {
+async function removeprofilepicture(
+    req,
+    res
+) {
     try {
-        const user = await usermodel.findById(req.user.id)
+        const user =
+            await usermodel.findById(
+                req.user.id
+            )
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found"
+                message:
+                    "User not found"
             })
         }
 
-        const publicId = user.profilePicturePublicId
+        const publicId =
+            user.profilePicturePublicId
 
         user.profilePicture = ""
         user.profilePicturePublicId = ""
@@ -494,34 +696,45 @@ async function removeprofilepicture(req, res) {
         }
 
         return res.status(200).json({
-            message: "Profile picture removed",
+            message:
+                "Profile picture removed",
+
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                phone: user.phone,
-                profilePicture: user.profilePicture
+                phone: user.phone || "",
+                profilePicture:
+                    user.profilePicture
             }
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
 
-function getsecurityquestionslist(req, res) {
+function getsecurityquestionslist(
+    req,
+    res
+) {
     return res.status(200).json({
-        questions: SECURITY_QUESTIONS
+        questions:
+            SECURITY_QUESTIONS
     })
 }
 
-async function getaccountsecurityquestions(req, res) {
-    const errors = validationResult(req)
+async function getaccountsecurityquestions(
+    req,
+    res
+) {
+    const errors =
+        validationResult(req)
 
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -530,46 +743,48 @@ async function getaccountsecurityquestions(req, res) {
     }
 
     try {
-        const email = req.body.email
-            ?.trim()
-            .toLowerCase()
+        const email =
+            req.body.email
+                ?.trim()
+                .toLowerCase()
 
-        const user = await usermodel.findOne({
-            email
-        })
+        const user =
+            await usermodel.findOne({
+                email
+            })
 
         if (
             !user ||
             !user.securityQuestions ||
-            user.securityQuestions.length !== 2
+            user.securityQuestions.length !==
+            2
         ) {
             return res.status(404).json({
-                message: "No account found with that email"
+                message:
+                    "No account found with that email"
             })
         }
 
-        /*
-         * IMPORTANT:
-         * We return ALL available security questions here.
-         *
-         * We do NOT return the user's two saved questions.
-         * The user must choose the questions themselves.
-         */
         return res.status(200).json({
-            questions: SECURITY_QUESTIONS
+            questions:
+                SECURITY_QUESTIONS
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
 
-async function verifysecurityanswers(req, res) {
-    const errors = validationResult(req)
+async function verifysecurityanswers(
+    req,
+    res
+) {
+    const errors =
+        validationResult(req)
 
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -578,90 +793,105 @@ async function verifysecurityanswers(req, res) {
     }
 
     try {
-        const email = req.body.email
-            ?.trim()
-            .toLowerCase()
+        const email =
+            req.body.email
+                ?.trim()
+                .toLowerCase()
 
-        const { answers } = req.body
+        const { answers } =
+            req.body
 
-        const user = await usermodel.findOne({
-            email
-        })
+        const user =
+            await usermodel.findOne({
+                email
+            })
 
         if (
             !user ||
             !user.securityQuestions ||
-            user.securityQuestions.length !== 2
+            user.securityQuestions.length !==
+            2
         ) {
             return res.status(404).json({
-                message: "No account found with that email"
+                message:
+                    "No account found with that email"
             })
         }
 
-        /*
-         * User selected two questions.
-         *
-         * For each question originally stored on the account:
-         * 1. Find the matching submitted question.
-         * 2. Compare the submitted answer with its stored hash.
-         *
-         * If the user chooses the wrong question, no submitted
-         * item will match the stored question, so verification fails.
-         */
-        for (const stored of user.securityQuestions) {
-            const submitted = answers.find(
-                (item) =>
-                    item.question === stored.question
-            )
+        for (
+            const stored of
+            user.securityQuestions
+        ) {
+            const submitted =
+                answers.find(
+                    (item) =>
+                        item.question ===
+                        stored.question
+                )
 
             if (!submitted) {
-                return res.status(400).json({
-                    message: "One or more answers are incorrect"
-                })
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            "One or more answers are incorrect"
+                    })
             }
 
-            const match = await bcrypt.compare(
-                normalizeAnswer(submitted.answer),
-                stored.answerHash
-            )
+            const match =
+                await bcrypt.compare(
+                    normalizeAnswer(
+                        submitted.answer
+                    ),
+                    stored.answerHash
+                )
 
             if (!match) {
-                return res.status(400).json({
-                    message: "One or more answers are incorrect"
-                })
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                            "One or more answers are incorrect"
+                    })
             }
         }
 
-        /*
-         * Only after BOTH question + answer pairs are correct
-         * do we issue a password-reset token.
-         */
-        const resetToken = jwt.sign(
-            {
-                id: user._id,
-                purpose: "password_reset"
-            },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: "10m"
-            }
-        )
+        const resetToken =
+            jwt.sign(
+                {
+                    id: user._id,
+                    purpose:
+                        "password_reset"
+                },
+
+                process.env
+                    .JWT_SECRET,
+
+                {
+                    expiresIn:
+                        "10m"
+                }
+            )
 
         return res.status(200).json({
             resetToken
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
 
-async function resetpasswordwithtoken(req, res) {
-    const errors = validationResult(req)
+async function resetpasswordwithtoken(
+    req,
+    res
+) {
+    const errors =
+        validationResult(req)
 
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -682,49 +912,55 @@ async function resetpasswordwithtoken(req, res) {
                 resetToken,
                 process.env.JWT_SECRET
             )
-        }
-        catch (e) {
+        } catch {
             return res.status(400).json({
-                message: "Reset session expired, please start again"
+                message:
+                    "Reset session expired, please start again"
             })
         }
 
         if (
-            payload.purpose !== "password_reset"
+            payload.purpose !==
+            "password_reset"
         ) {
             return res.status(400).json({
-                message: "Invalid reset request"
+                message:
+                    "Invalid reset request"
             })
         }
 
-        const user = await usermodel.findById(
-            payload.id
-        )
+        const user =
+            await usermodel.findById(
+                payload.id
+            )
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found"
+                message:
+                    "User not found"
             })
         }
 
-        user.password = await bcrypt.hash(
-            newPassword,
-            10
-        )
+        user.password =
+            await bcrypt.hash(
+                newPassword,
+                10
+            )
 
         await user.save({
             validateModifiedOnly: true
         })
 
         return res.status(200).json({
-            message: "Password reset successfully"
+            message:
+                "Password reset successfully"
         })
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e)
 
         return res.status(500).json({
-            message: "Internal server error"
+            message:
+                "Internal server error"
         })
     }
 }
