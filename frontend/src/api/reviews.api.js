@@ -1,27 +1,61 @@
 import client from "./client";
 
-/**
- * Renter only. @param {{ rating: number, comment: string }} payload
+/*
+ * Renter only.
+ *
+ * payload:
+ * {
+ *   rating: number,
+ *   comment: string
+ * }
  */
 export function createReview(propertyId, payload) {
-  return client.post(`/reviews/create-review/${propertyId}`, payload).then((res) => res.data);
+  return client
+    .post(`/reviews/create-review/${propertyId}`, payload)
+    .then((res) => res.data);
 }
 
 export function getPropertyReviews(propertyId) {
-  return client.get(`/reviews/get-property-review/${propertyId}`).then((res) => res.data);
+  return client
+    .get(`/reviews/get-property-review/${propertyId}`)
+    .then((res) => res.data);
 }
 
-// Renter only, and only their own review (backend enforces ownership)
+/*
+ * Renter can delete only their own review.
+ */
 export function deleteReview(reviewId) {
-  return client.delete(`/reviews/delete-review/${reviewId}`).then((res) => res.data);
+  return client
+    .delete(`/reviews/delete-review/${reviewId}`)
+    .then((res) => res.data);
 }
 
-// Owner only. comment is a plain string here — wrapped into the body shape the backend expects.
+/*
+ * Owner only.
+ *
+ * IMPORTANT:
+ * Backend expects:
+ *
+ * {
+ *   comment: "..."
+ * }
+ */
 export function replyToReview(reviewId, comment) {
-  return client.post(`/reviews/reply-review/${reviewId}`, { reply: comment }).then((res) => res.data);
+  return client
+    .post(`/reviews/reply-review/${reviewId}`, {
+      comment,
+    })
+    .then((res) => res.data);
 }
 
-// Owner only.
+/*
+ * Kept for compatibility with existing code.
+ * Editing does NOT create another reply.
+ */
 export function editReply(reviewId, comment) {
-  return client.patch(`/reviews/edit-reply/${reviewId}`, { reply: comment }).then((res) => res.data);
+  return client
+    .patch(`/reviews/edit-reply/${reviewId}`, {
+      comment,
+    })
+    .then((res) => res.data);
 }
