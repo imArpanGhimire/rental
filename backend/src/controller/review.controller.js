@@ -4,156 +4,371 @@ const reviewmodel = require("../model/review.model");
 async function createreview(req, res) {
     try {
         const { rating, comment } = req.body;
+
         const propertyid = req.params.propertyid;
         const reviewerid = req.user.id;
 
-        const property = await rentalmodel.findById(propertyid);
-
-        if (!property) {
-            return res.status(404).json({ message: "Property not found" });
-        }
-        if (property.owner.toString() === reviewerid.toString()) {
-            return res
-                .status(403)
-                .json({ message: "You cannot review your own property" });
-        }
-
         if (req.user.role !== "renter") {
             return res.status(403).json({
-                message: "only renters can write reviews",
+                message: "Only renters can write reviews",
             });
         }
 
-        const review = await reviewmodel.create({
-            property: propertyid,
-            reviewer: reviewerid,
-            rating,
-            comment,
+        const property =
+            await rentalmodel.findById(propertyid);
+
+        if (!property) {
+            return res.status(404).json({
+                message: "Property not found",
+            });
+        }
+
+        if (
+            property.owner.toString() ===
+            reviewerid.toString()
+        ) {
+            return res.status(403).json({
+                message:
+                    "You cannot review your own property",
+            });
+        }
+
+        const numericRating =
+            Number(rating);
+
+        if (
+            !Number.isFinite(numericRating) ||
+            numericRating < 1 ||
+            numericRating > 5
+        ) {
+            return res.status(400).json({
+                message:
+                    "Rating must be between 1 and 5",
+            });
+        }
+
+        const cleanComment =
+            String(comment || "").trim();
+
+        if (!cleanComment) {
+            return res.status(400).json({
+                message:
+                    "Review comment is required",
+            });
+        }
+
+        const existingReview =
+            await reviewmodel.findOne({
+                property: propertyid,
+                reviewer: reviewerid,
+            });
+
+        if (existingReview) {
+            return res.status(400).json({
+                message:
+                    "You have already reviewed this property",
+            });
+        }
+
+        const review =
+            await reviewmodel.create({
+                property: propertyid,
+                reviewer: reviewerid,
+                rating: numericRating,
+                comment: cleanComment,
+            });
+
+        await review.populate(
+            "reviewer",
+            "name email",
+        );
+
+        return res.status(201).json({
+            message: "Review created",
+            review,
         });
-        res.status(201).json({ message: "Review created", review });
     } catch (e) {
         console.error(e);
+
         if (e.code === 11000) {
-            return res
-                .status(400)
-                .json({ message: "You have already reviewed this property" });
-        }
-        // fixed: catch variable is named e, not error
-        return res.status(500).json({ message: "Server error", error: e.message });
-    }
-}
-
-async function getpropertyreviews(req, res) {
-    try {
-        const propertyid = req.params.propertyid;
-        const reviews = await reviewmodel
-            .find({ property: propertyid })
-            .populate("reviewer", "name email");
-        res.status(200).json({ reviews });
-    } catch (e) {
-        res.status(500).json({ message: "Server error", error: e.message });
-    }
-}
-
-async function deletereview(req, res) {
-    try {
-        // fixed: route param is :reviewid, not :id
-        const reviewid = req.params.reviewid;
-        // fixed: use findById to get a single document; cmt was undefined and find() returns an array
-        const deletedreview = await reviewmodel.findById(reviewid);
-
-        if (!deletedreview) {
-            return res.status(404).json({
-                message: "cant find that review",
+            return res.status(400).json({
+                message:
+                    "You have already reviewed this property",
             });
         }
 
-        if (deletedreview.reviewer.toString() !== req.user.id) {
-            return res.status(403).json({
-                message: "you can delete only your own reviews",
-            });
-        }
+        return res.status(500).json({
+            message: "Server error",
+            error: e.message,
+        });
+    }
+}
 
-        const reviewtodel = await reviewmodel.findByIdAndDelete(reviewid);
+async function getpropertyreviews(
+    req,
+    res,
+) {
+    try {
+        const propertyid =
+            req.params.propertyid;
+
+        const reviews =
+            await reviewmodel
+                .find({
+                    property: propertyid,
+                })
+                .populate(
+                    "reviewer",
+                    "name email",
+                )
+                .sort({
+                    createdAt: -1,
+                });
 
         return res.status(200).json({
-            message: "review deleted",
-            reviewtodel,
+            reviews,
         });
     } catch (e) {
         console.error(e);
-        res.status(500).json({ message: "Server error", error: e.message });
+
+        return res.status(500).json({
+            message: "Server error",
+            error: e.message,
+        });
     }
 }
 
-async function replytoreview(req, res) {
+async function deletereview(
+    req,
+    res,
+) {
     try {
-        const reviewid = req.params.reviewid;
-        const { comment } = req.body;
+        const reviewid =
+            req.params.reviewid;
 
-        const review = await reviewmodel.findById(reviewid);
+        const review =
+            await reviewmodel.findById(
+                reviewid,
+            );
+
         if (!review) {
-            return res.status(404).json({ message: "Review not found" });
+            return res.status(404).json({
+                message:
+                    "Can't find that review",
+            });
         }
 
-        const property = await rentalmodel.findById(review.property);
+        if (
+            review.reviewer.toString() !==
+            req.user.id.toString()
+        ) {
+            return res.status(403).json({
+                message:
+                    "You can delete only your own reviews",
+            });
+        }
+
+        await review.deleteOne();
+
+        return res.status(200).json({
+            message: "Review deleted",
+            reviewtodel: review,
+        });
+    } catch (e) {
+        console.error(e);
+
+        return res.status(500).json({
+            message: "Server error",
+            error: e.message,
+        });
+    }
+}
+
+/*
+ * EXACTLY ONE OWNER REPLY.
+ *
+ * Renter:
+ *   review
+ *
+ * Owner:
+ *   reply
+ *
+ * End.
+ */
+async function replytoreview(
+    req,
+    res,
+) {
+    try {
+        const reviewid =
+            req.params.reviewid;
+
+        const cleanComment =
+            String(
+                req.body.comment || "",
+            ).trim();
+
+        if (!cleanComment) {
+            return res.status(400).json({
+                message:
+                    "Reply cannot be empty",
+            });
+        }
+
+        const review =
+            await reviewmodel.findById(
+                reviewid,
+            );
+
+        if (!review) {
+            return res.status(404).json({
+                message:
+                    "Review not found",
+            });
+        }
+
+        const property =
+            await rentalmodel.findById(
+                review.property,
+            );
+
         if (!property) {
-            return res.status(404).json({ message: "Property not found" });
+            return res.status(404).json({
+                message:
+                    "Property not found",
+            });
         }
 
-        if (property.owner.toString() !== req.user.id.toString()) {
-            return res
-                .status(403)
-                .json({ message: "Only the property owner can reply to this review" });
+        if (
+            property.owner.toString() !==
+            req.user.id.toString()
+        ) {
+            return res.status(403).json({
+                message:
+                    "Only the property owner can reply to this review",
+            });
+        }
+
+        /*
+         * Prevent multiple owner replies.
+         */
+        if (
+            review.ownerReply?.comment
+        ) {
+            return res.status(400).json({
+                message:
+                    "This review already has an owner reply",
+            });
         }
 
         review.ownerReply = {
-            comment: comment,
+            comment: cleanComment,
             repliedAt: new Date(),
         };
 
         await review.save();
-        res.status(200).json({ message: "Reply added", review });
+
+        await review.populate(
+            "reviewer",
+            "name email",
+        );
+
+        return res.status(200).json({
+            message: "Reply added",
+            review,
+        });
     } catch (e) {
-        res.status(500).json({ message: "Server error", error: e.message });
+        console.error(e);
+
+        return res.status(500).json({
+            message: "Server error",
+            error: e.message,
+        });
     }
 }
 
+/*
+ * This edits the SAME owner reply.
+ * It does not create another conversation level.
+ */
 async function editreply(req, res) {
     try {
-        const reviewid = req.params.reviewid;
-        const review = await reviewmodel.findById(reviewid);
+        const reviewid =
+            req.params.reviewid;
 
-        const { comment } = req.body;
+        const cleanComment =
+            String(
+                req.body.comment || "",
+            ).trim();
+
+        if (!cleanComment) {
+            return res.status(400).json({
+                message:
+                    "Reply cannot be empty",
+            });
+        }
+
+        const review =
+            await reviewmodel.findById(
+                reviewid,
+            );
 
         if (!review) {
             return res.status(404).json({
-                message: "couldn't found the reply",
+                message:
+                    "Review not found",
             });
         }
 
-        // fixed: use findById; find() returns an array so property.owner would be undefined
-        const property = await rentalmodel.findById(review.property);
+        const property =
+            await rentalmodel.findById(
+                review.property,
+            );
 
-        // ownership check garya
-        if (property.owner.toString() !== req.user.id.toString()) {
+        if (!property) {
+            return res.status(404).json({
+                message:
+                    "Property not found",
+            });
+        }
+
+        if (
+            property.owner.toString() !==
+            req.user.id.toString()
+        ) {
             return res.status(403).json({
-                message: "not authorised to edit",
+                message:
+                    "Not authorised to edit this reply",
             });
         }
 
-        if (!review.ownerReply || !review.ownerReply.comment) {
-            return res.status(400).json({ message: "No existing reply to edit" });
+        if (
+            !review.ownerReply?.comment
+        ) {
+            return res.status(400).json({
+                message:
+                    "No existing reply to edit",
+            });
         }
 
-        review.ownerReply.comment = comment;
-        review.ownerReply.repliedAt = new Date();
+        review.ownerReply.comment =
+            cleanComment;
+
+        review.ownerReply.repliedAt =
+            new Date();
 
         await review.save();
-        res.status(200).json({ message: "Reply updated", review });
+
+        return res.status(200).json({
+            message: "Reply updated",
+            review,
+        });
     } catch (e) {
+        console.error(e);
+
         return res.status(500).json({
-            message: "internal server error",
+            message:
+                "Internal server error",
             error: e.message,
         });
     }
