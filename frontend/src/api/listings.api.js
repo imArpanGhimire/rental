@@ -1,83 +1,151 @@
-// frontend/src/api/listings.api.js
-import client from "./client";
+import client from "./client"
 
-export function getListings(params = {}) {
+export function getListings(
+  params = {}
+) {
   return client
-    .get("/properties/get-all-properties", { params })
-    .then((res) => res.data);
+    .get(
+      "/properties/get-all-properties",
+      {
+        params
+      }
+    )
+    .then(
+      (res) => res.data
+    )
 }
 
-export function getNearbyProperties(params) {
+export function getNearbyProperties(
+  params
+) {
   return client
-    .get("/properties/nearby", { params })
-    .then((res) => res.data);
+    .get(
+      "/properties/nearby",
+      {
+        params
+      }
+    )
+    .then(
+      (res) => res.data
+    )
 }
 
-export function polygonSearch(polygon, filters = {}) {
+export function polygonSearch(
+  polygon,
+  filters = {}
+) {
   return client
-    .post("/properties/polygon-search", {
-      polygon,
-      ...filters,
-    })
-    .then((res) => res.data);
+    .post(
+      "/properties/polygon-search",
+      {
+        polygon,
+        ...filters
+      }
+    )
+    .then(
+      (res) => res.data
+    )
 }
 
 export function getListing(id) {
   return client
-    .get(`/properties/get-property/${id}`)
-    .then((res) => res.data);
+    .get(
+      `/properties/get-property/${id}`
+    )
+    .then(
+      (res) => res.data
+    )
 }
 
-export function createListing(payload) {
+export function createListing(
+  payload
+) {
   return client
-    .post("/properties/add-property", payload)
-    .then((res) => res.data);
+    .post(
+      "/properties/add-property",
+      payload
+    )
+    .then(
+      (res) => res.data
+    )
 }
 
-export function updateListing(id, payload) {
+export function updateListing(
+  id,
+  payload
+) {
   return client
-    .put(`/properties/update-property/${id}`, payload)
-    .then((res) => res.data);
+    .put(
+      `/properties/update-property/${id}`,
+      payload
+    )
+    .then(
+      (res) => res.data
+    )
 }
 
-/*
- * Update only the availability of a property.
- *
- * The backend update route is already protected by:
- * - authentication
- * - owner role middleware
- * - property ownership verification
- */
-export function updateListingAvailability(id, isAvailable) {
+export function updateListingAvailability(
+  id,
+  isAvailable
+) {
   return client
-    .put(`/properties/update-property/${id}`, {
-      isAvailable,
-    })
-    .then((res) => res.data);
+    .put(
+      `/properties/update-property/${id}`,
+      {
+        isAvailable
+      }
+    )
+    .then(
+      (res) => res.data
+    )
 }
 
 export function deleteListing(id) {
   return client
-    .delete(`/properties/delete-property/${id}`)
-    .then((res) => res.data);
+    .delete(
+      `/properties/delete-property/${id}`
+    )
+    .then(
+      (res) => res.data
+    )
 }
 
-export function getMyListings(params = {}) {
+export function getMyListings(
+  params = {}
+) {
   return client
-    .get("/properties/view-my-listings", { params })
-    .then((res) => res.data);
+    .get(
+      "/properties/view-my-listings",
+      {
+        params
+      }
+    )
+    .then(
+      (res) => res.data
+    )
 }
 
 export function uploadImage(file) {
-  const formData = new FormData();
+  const formData =
+    new FormData()
 
-  formData.append("image", file);
+  formData.append(
+    "image",
+    file
+  )
 
   return client
-    .post("/properties/upload-image", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    .then((res) => res.data);
+    .post(
+      "/properties/upload-image",
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data"
+        }
+      }
+    )
+    .then(
+      (res) => res.data
+    )
 }
