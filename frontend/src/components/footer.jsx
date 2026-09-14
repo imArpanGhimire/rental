@@ -1,26 +1,60 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+
 import { ArrowUpRight, MapPin } from "lucide-react";
 
 import { useAuth } from "../features/auth/AuthContext.jsx";
 
+/* =========================================================
+   DATA
+========================================================= */
+
 const neighborhoods = ["Baneshwor", "Patan", "Boudha", "Jhamsikhel", "Kalanki"];
 
 const support = [
-  { label: "Help center", to: "/help" },
-  { label: "Privacy policy", to: "/privacy" },
-  { label: "Terms of service", to: "/terms" },
+  {
+    label: "Support & feedback",
+    to: "/support",
+    reportLink: true,
+  },
+  {
+    label: "Help center",
+    to: "/help",
+  },
+  {
+    label: "Privacy policy",
+    to: "/privacy",
+  },
+  {
+    label: "Terms of service",
+    to: "/terms",
+  },
 ];
+
+/* =========================================================
+   FOOTER
+========================================================= */
 
 export default function Footer() {
   const { isAuthenticated, role } = useAuth();
+
+  const location = useLocation();
 
   const listPropertyTo =
     isAuthenticated && role === "owner" ? "/owner/listings/new" : "/register";
 
   const company = [
-    { label: "About", to: "/about" },
-    { label: "How it works", to: "/how-it-works" },
-    { label: "List your property", to: listPropertyTo },
+    {
+      label: "About",
+      to: "/about",
+    },
+    {
+      label: "How it works",
+      to: "/how-it-works",
+    },
+    {
+      label: "List your property",
+      to: listPropertyTo,
+    },
   ];
 
   return (
@@ -38,6 +72,7 @@ export default function Footer() {
           from-[#f3f2ee]
           via-[#e8e7e3]
           to-[#c8c8c6]
+
           dark:from-[#1c1f26]
           dark:via-[#181b20]
           dark:to-[#121419]
@@ -55,16 +90,21 @@ export default function Footer() {
               py-7
               shadow-[0_20px_60px_rgba(20,23,31,0.07)]
               backdrop-blur-xl
+
               sm:px-8
+
               md:flex
               md:items-center
               md:justify-between
               md:gap-10
+
               dark:border-white/5
               dark:bg-white/[0.035]
               dark:shadow-none
             "
           >
+            {/* atmosphere */}
+
             <div
               className="
                 pointer-events-none
@@ -76,9 +116,12 @@ export default function Footer() {
                 rounded-full
                 bg-white/40
                 blur-3xl
+
                 dark:bg-white/[0.03]
               "
             />
+
+            {/* text */}
 
             <div className="relative max-w-2xl">
               <p
@@ -101,6 +144,7 @@ export default function Footer() {
                   font-bold
                   tracking-[-0.04em]
                   text-text
+
                   sm:text-3xl
                 "
               >
@@ -114,6 +158,7 @@ export default function Footer() {
                   text-sm
                   leading-6
                   text-text/55
+
                   sm:text-[15px]
                 "
               >
@@ -121,6 +166,8 @@ export default function Footer() {
                 property details in one place.
               </p>
             </div>
+
+            {/* CTA */}
 
             <Link
               to="/"
@@ -140,6 +187,9 @@ export default function Footer() {
                 text-ivory
                 no-underline
                 transition-colors
+
+                hover:opacity-90
+
                 md:mt-0
               "
             >
@@ -159,15 +209,18 @@ export default function Footer() {
           relative
           overflow-hidden
           bg-gradient-to-b
-          from-[#c8c8c6]
-          via-[#55575c]
+          from-[#77797d]
+          via-[#414348]
           to-[#14161a]
+
           dark:from-[#121419]
           dark:via-[#0f1115]
           dark:to-[#090a0d]
         "
       >
-        {/* ATMOSPHERE */}
+        {/* ===================================================
+            ATMOSPHERE
+        =================================================== */}
 
         <div
           className="
@@ -181,6 +234,7 @@ export default function Footer() {
             rounded-full
             bg-white/10
             blur-[110px]
+
             dark:bg-white/[0.03]
           "
         />
@@ -199,7 +253,9 @@ export default function Footer() {
           "
         />
 
-        {/* LARGE BACKGROUND WORD */}
+        {/* ===================================================
+            LARGE BACKGROUND WORD
+        =================================================== */}
 
         <div
           className="
@@ -218,12 +274,18 @@ export default function Footer() {
             leading-none
             tracking-[-0.085em]
             text-white/[0.035]
+
             sm:bottom-[-32px]
+
             lg:text-[15vw]
           "
         >
           RENTORA
         </div>
+
+        {/* ===================================================
+            FOOTER CONTENT
+        =================================================== */}
 
         <div className="app-shell relative z-10 px-6 pb-48 pt-12 md:pt-14">
           <div
@@ -231,7 +293,9 @@ export default function Footer() {
               grid
               gap-x-10
               gap-y-12
+
               sm:grid-cols-2
+
               lg:grid-cols-4
               lg:gap-x-12
             "
@@ -252,13 +316,10 @@ export default function Footer() {
                       justify-center
                       rounded-xl
                       border
-                      border-black/10
-                      bg-white/30
-                      text-[#1f2125]
+                      border-white/15
+                      bg-white/10
+                      text-white
                       backdrop-blur
-                      dark:border-white/15
-                      dark:bg-white/10
-                      dark:text-white
                     "
                   >
                     <MapPin size={18} strokeWidth={1.8} />
@@ -271,8 +332,7 @@ export default function Footer() {
                         text-xl
                         font-bold
                         tracking-[-0.035em]
-                        text-[#1f2125]
-                        dark:text-white
+                        text-white
                       "
                     >
                       Rentora
@@ -285,8 +345,7 @@ export default function Footer() {
                         font-semibold
                         capitalize
                         tracking-[0.15em]
-                        text-[#2b2d31]/45
-                        dark:text-white/40
+                        text-white/60
                       "
                     >
                       Kathmandu Valley
@@ -300,8 +359,7 @@ export default function Footer() {
                     max-w-sm
                     text-[14px]
                     leading-6
-                    text-[#2b2d31]/65
-                    dark:text-white/55
+                    text-white/70
                   "
                 >
                   Rental search for the Kathmandu valley, built around the map —
@@ -309,7 +367,7 @@ export default function Footer() {
                 </p>
               </div>
 
-              {/* COPYRIGHT DIRECTLY UNDER DESCRIPTION */}
+              {/* COPYRIGHT */}
 
               <div
                 className="
@@ -320,7 +378,7 @@ export default function Footer() {
                   gap-x-3
                   gap-y-1
                   text-xs
-                  text-white/40
+                  text-white/50
                 "
               >
                 <span>© {new Date().getFullYear()} Rentora</span>
@@ -332,6 +390,7 @@ export default function Footer() {
                     w-1
                     rounded-full
                     bg-white/25
+
                     sm:block
                   "
                 />
@@ -352,8 +411,7 @@ export default function Footer() {
                   font-semibold
                   uppercase
                   tracking-[0.15em]
-                  text-[#2b2d31]/55
-                  dark:text-white/45
+                  text-white/55
                 "
               >
                 Popular areas
@@ -364,12 +422,11 @@ export default function Footer() {
                   <span
                     key={area}
                     className="
-                      cursor-default
-                      text-sm
-                      font-medium
-                      text-[#2b2d31]/65
-                      dark:text-white/65
-                    "
+                        cursor-default
+                        text-sm
+                        font-medium
+                        text-white/75
+                      "
                   >
                     {area}
                   </span>
@@ -389,8 +446,7 @@ export default function Footer() {
                   font-semibold
                   uppercase
                   tracking-[0.15em]
-                  text-[#2b2d31]/55
-                  dark:text-white/45
+                  text-white/55
                 "
               >
                 Company
@@ -402,19 +458,18 @@ export default function Footer() {
                     key={item.label}
                     to={item.to}
                     className="
-                      group
-                      inline-flex
-                      items-center
-                      gap-1.5
-                      text-sm
-                      font-medium
-                      text-[#2b2d31]/75
-                      no-underline
-                      transition-colors
-                      hover:text-[#14161a]
-                      dark:text-white/65
-                      dark:hover:text-white
-                    "
+                        group
+                        inline-flex
+                        items-center
+                        gap-1.5
+                        text-sm
+                        font-medium
+                        text-white/75
+                        no-underline
+                        transition-colors
+
+                        hover:text-white
+                      "
                   >
                     {item.label}
 
@@ -422,11 +477,12 @@ export default function Footer() {
                       size={12}
                       strokeWidth={1.8}
                       className="
-                        opacity-0
-                        transition-opacity
-                        duration-200
-                        group-hover:opacity-100
-                      "
+                          opacity-0
+                          transition-opacity
+                          duration-200
+
+                          group-hover:opacity-100
+                        "
                     />
                   </Link>
                 ))}
@@ -446,8 +502,7 @@ export default function Footer() {
                     font-semibold
                     uppercase
                     tracking-[0.15em]
-                    text-[#2b2d31]/55
-                    dark:text-white/45
+                    text-white/55
                   "
                 >
                   Support
@@ -458,20 +513,26 @@ export default function Footer() {
                     <Link
                       key={item.label}
                       to={item.to}
+                      state={
+                        item.reportLink
+                          ? {
+                              from: location.pathname,
+                            }
+                          : undefined
+                      }
                       className="
-                        group
-                        inline-flex
-                        items-center
-                        gap-1.5
-                        text-sm
-                        font-medium
-                        text-[#2b2d31]/75
-                        no-underline
-                        transition-colors
-                        hover:text-[#14161a]
-                        dark:text-white/65
-                        dark:hover:text-white
-                      "
+                          group
+                          inline-flex
+                          items-center
+                          gap-1.5
+                          text-sm
+                          font-medium
+                          text-white/75
+                          no-underline
+                          transition-colors
+
+                          hover:text-white
+                        "
                     >
                       {item.label}
 
@@ -479,18 +540,21 @@ export default function Footer() {
                         size={12}
                         strokeWidth={1.8}
                         className="
-                          opacity-0
-                          transition-opacity
-                          duration-200
-                          group-hover:opacity-100
-                        "
+                            opacity-0
+                            transition-opacity
+                            duration-200
+
+                            group-hover:opacity-100
+                          "
                       />
                     </Link>
                   ))}
                 </div>
               </div>
 
-              {/* SOURCE DIRECTLY UNDER SUPPORT */}
+              {/* =================================================
+                  SOURCE
+              ================================================= */}
 
               <a
                 href="https://github.com/imArpanGhimire/rental"
@@ -504,17 +568,18 @@ export default function Footer() {
                   gap-2
                   rounded-full
                   border
-                  border-white/10
-                  bg-white/[0.06]
+                  border-white/15
+                  bg-white/[0.07]
                   px-4
                   py-2.5
                   text-xs
                   font-semibold
-                  text-white/65
+                  text-white/70
                   no-underline
                   backdrop-blur
                   transition-colors
-                  hover:border-white/20
+
+                  hover:border-white/25
                   hover:bg-white/10
                   hover:text-white
                 "
