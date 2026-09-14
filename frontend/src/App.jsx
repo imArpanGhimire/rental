@@ -31,6 +31,7 @@ import HowItWorks from "./pages/static/HowItWorks.jsx";
 import Help from "./pages/static/Help.jsx";
 import Privacy from "./pages/static/Privacy.jsx";
 import Terms from "./pages/static/Terms.jsx";
+import Support from "./pages/static/Support.jsx";
 
 import { useAuth } from "./features/auth/AuthContext.jsx";
 
@@ -88,6 +89,19 @@ function App() {
 
             <Route path="/terms" element={<Terms />} />
 
+            {/* SUPPORT — OWNER + RENTER */}
+
+            <Route
+              path="/support"
+              element={
+                <ProtectedRoute allowedRoles={["owner", "renter"]}>
+                  <Support />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* OWNER */}
+
             <Route
               path="/owner"
               element={
@@ -132,6 +146,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* RENTER */}
 
             <Route
               path="/renter"
