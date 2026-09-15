@@ -108,9 +108,11 @@ function StatTile({ icon: Icon, value, label, helper }) {
           <p className="font-display text-[28px] font-bold tracking-[-0.045em] text-[#202226] dark:text-white">
             {value}
           </p>
+
           <p className="mt-1 text-[13px] font-semibold text-[#2b2d31]/70 dark:text-white/65">
             {label}
           </p>
+
           {helper && (
             <p className="mt-1 text-[11px] leading-4 text-[#2b2d31]/42 dark:text-white/38">
               {helper}
@@ -157,16 +159,18 @@ function StatusSummary({ pending, accepted, declined }) {
         <div
           key={label}
           className="
-            rounded-2xl border border-black/[0.06] bg-white/45 px-3 py-3
-            dark:border-white/[0.07] dark:bg-white/[0.035]
-          "
+              rounded-2xl border border-black/[0.06] bg-white/45 px-3 py-3
+              dark:border-white/[0.07] dark:bg-white/[0.035]
+            "
         >
           <div className="flex items-center gap-2 text-[#2b2d31]/45 dark:text-white/40">
             <Icon size={13} strokeWidth={1.8} />
+
             <span className="text-[10px] font-semibold uppercase tracking-[0.11em]">
               {label}
             </span>
           </div>
+
           <p className="mt-2 font-display text-xl font-bold tracking-[-0.035em] text-[#202226] dark:text-white">
             {value}
           </p>
@@ -224,6 +228,7 @@ function OwnerRequestRow({ request, onUpdateStatus, isUpdating }) {
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 text-[10px] text-[#2b2d31]/38 dark:text-white/35">
           <CalendarDays size={11} strokeWidth={1.8} />
+
           <span>
             Requested{" "}
             {request.createdAt
@@ -272,9 +277,11 @@ function OwnerRequestRow({ request, onUpdateStatus, isUpdating }) {
 
 export default function OwnerDashboard() {
   const { t } = useTranslation();
+
   const { user } = useAuth();
 
   const { data, isLoading, isError, refetch } = useMyListings();
+
   const listings = data?.myproperties ?? data?.listings ?? [];
 
   const {
@@ -306,6 +313,7 @@ export default function OwnerDashboard() {
 
         if (Number.isFinite(rating)) {
           totalRating += rating;
+
           totalReviews += 1;
         }
       });
@@ -338,8 +346,10 @@ export default function OwnerDashboard() {
     () => ({
       pending: requests.filter((request) => request.status === "pending")
         .length,
+
       accepted: requests.filter((request) => request.status === "accepted")
         .length,
+
       declined: requests.filter((request) => request.status === "declined")
         .length,
     }),
@@ -347,7 +357,9 @@ export default function OwnerDashboard() {
   );
 
   const latestRequest = useMemo(() => {
-    if (!requests.length) return null;
+    if (!requests.length) {
+      return null;
+    }
 
     return [...requests].sort(
       (a, b) =>
@@ -376,9 +388,10 @@ export default function OwnerDashboard() {
   }, [listings]);
 
   return (
-    <AppShell sidebar={<Sidebar links={links} />}>
+    <AppShell sidebar={<Sidebar links={links} />} centeredContent>
       <div className="space-y-6">
         {/* HERO */}
+
         <section
           className="
             relative overflow-hidden rounded-[30px] border border-black/[0.06]
@@ -394,7 +407,7 @@ export default function OwnerDashboard() {
 
           <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-[#2b2d31]/42 dark:text-white/40">
+              <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
                 Owner workspace
               </p>
 
@@ -417,6 +430,7 @@ export default function OwnerDashboard() {
                 className="flex items-center gap-2 border-0 bg-[#202226] text-white hover:bg-[#303238] dark:bg-white dark:text-[#17191d]"
               >
                 <PlusCircle size={15} strokeWidth={1.9} />
+
                 <span>{t("dashboard.owner.newListing", "New listing")}</span>
               </Button>
             </Link>
@@ -424,6 +438,7 @@ export default function OwnerDashboard() {
         </section>
 
         {/* STATS */}
+
         <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatTile
             icon={Compass}
@@ -461,8 +476,10 @@ export default function OwnerDashboard() {
         </section>
 
         {/* MAIN GRID */}
+
         <section className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(310px,0.75fr)]">
           {/* LISTINGS + REQUESTS */}
+
           <div
             className="
               overflow-hidden rounded-[26px] border border-black/[0.07]
@@ -474,12 +491,14 @@ export default function OwnerDashboard() {
             <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6 dark:border-white/[0.07]">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
+                  <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
                     Property management
                   </p>
+
                   <h2 className="mt-1 font-display text-xl font-bold tracking-[-0.035em] text-[#202226] dark:text-white">
                     Listings & requests
                   </h2>
+
                   <p className="mt-1 text-[12px] text-[#2b2d31]/48 dark:text-white/43">
                     Review your properties and respond to renter visits.
                   </p>
@@ -528,6 +547,7 @@ export default function OwnerDashboard() {
                             <p className="text-sm font-semibold text-[#202226] dark:text-white">
                               No listings yet
                             </p>
+
                             <p className="mx-auto mt-1 max-w-sm text-[12px] leading-5 text-[#2b2d31]/48 dark:text-white/43">
                               Create your first property listing to start
                               receiving renter interest and visit requests.
@@ -560,7 +580,9 @@ export default function OwnerDashboard() {
                   },
                   {
                     id: "requests",
-                    label: `Requests${requests.length ? ` (${requests.length})` : ""}`,
+                    label: `Requests${
+                      requests.length ? ` (${requests.length})` : ""
+                    }`,
                     content: (
                       <>
                         {requestsError && (
@@ -587,6 +609,7 @@ export default function OwnerDashboard() {
                               <p className="text-sm font-semibold text-[#202226] dark:text-white">
                                 No visit requests yet
                               </p>
+
                               <p className="mt-1 text-[12px] text-[#2b2d31]/48 dark:text-white/43">
                                 New renter requests will appear here.
                               </p>
@@ -616,6 +639,7 @@ export default function OwnerDashboard() {
           </div>
 
           {/* RIGHT COLUMN */}
+
           <div className="space-y-5">
             <div
               className="
@@ -624,9 +648,10 @@ export default function OwnerDashboard() {
                 dark:border-white/[0.07] dark:bg-white/[0.025] dark:shadow-none
               "
             >
-              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
+              <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
                 Visit activity
               </p>
+
               <h2 className="mt-1 font-display text-xl font-bold tracking-[-0.035em] text-[#202226] dark:text-white">
                 Request overview
               </h2>
@@ -640,7 +665,7 @@ export default function OwnerDashboard() {
               </div>
 
               <div className="mt-4 rounded-[18px] border border-black/[0.06] bg-white/40 p-4 dark:border-white/[0.07] dark:bg-white/[0.025]">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2b2d31]/38 dark:text-white/35">
+                <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/42 dark:text-white/38">
                   Latest request
                 </p>
 
@@ -651,6 +676,7 @@ export default function OwnerDashboard() {
                     <p className="mt-2 text-[13px] font-semibold text-[#202226] dark:text-white">
                       {latestRequest.property?.title ?? "Listing removed"}
                     </p>
+
                     <p className="mt-1 text-[11px] leading-4 text-[#2b2d31]/48 dark:text-white/43">
                       From {latestRequest.renter?.name ?? "a renter"}
                       {latestRequest.createdAt
@@ -678,7 +704,7 @@ export default function OwnerDashboard() {
             >
               <div className="flex items-start justify-between gap-4 border-b border-black/[0.06] px-5 pb-4 pt-5 dark:border-white/[0.07]">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
+                  <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
                     Portfolio snapshot
                   </p>
 
@@ -733,12 +759,12 @@ export default function OwnerDashboard() {
                           key={listing._id}
                           to={`/listings/${listing._id}`}
                           className="
-                            flex items-center gap-3 rounded-[17px]
-                            border border-black/[0.06] bg-white/38 p-2.5
-                            no-underline transition-colors hover:bg-white/70
-                            dark:border-white/[0.07] dark:bg-white/[0.02]
-                            dark:hover:bg-white/[0.045]
-                          "
+                              flex items-center gap-3 rounded-[17px]
+                              border border-black/[0.06] bg-white/38 p-2.5
+                              no-underline transition-colors hover:bg-white/70
+                              dark:border-white/[0.07] dark:bg-white/[0.02]
+                              dark:hover:bg-white/[0.045]
+                            "
                         >
                           <div className="h-14 w-16 shrink-0 overflow-hidden rounded-[13px] bg-black/[0.04] dark:bg-white/[0.04]">
                             {image ? (
@@ -765,7 +791,9 @@ export default function OwnerDashboard() {
 
                             <p className="mt-1 text-[11px] font-semibold text-[#2b2d31]/68 dark:text-white/62">
                               {Number.isFinite(Number(listing.price))
-                                ? `NPR ${Number(listing.price).toLocaleString()} / month`
+                                ? `NPR ${Number(
+                                    listing.price,
+                                  ).toLocaleString()} / month`
                                 : "Price not set"}
                             </p>
                           </div>
