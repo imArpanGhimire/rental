@@ -275,7 +275,6 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
           shadow-[0_1px_2px_rgba(20,23,31,0.04),0_20px_55px_rgba(20,23,31,0.08)]
           transition-all
           duration-300
-           
           hover:shadow-[0_8px_24px_rgba(20,23,31,0.08),0_28px_70px_rgba(20,23,31,0.10)]
         "
       >
@@ -298,10 +297,10 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                 src={imageUrl}
                 alt={selected.title}
                 className="
-  h-full
-  w-full
-  object-cover
-"
+                  h-full
+                  w-full
+                  object-cover
+                "
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-sm text-text/40">
@@ -522,15 +521,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
           <div className="relative">
             {/* EYEBROW */}
 
-            <p
-              className="
-                text-[10px]
-                font-semibold
-                uppercase
-                tracking-[0.14em]
-                text-text/35
-              "
-            >
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-text/45">
               Selected rental
             </p>
 
@@ -581,13 +572,10 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                   items={[
                     {
                       label: copied ? "Link copied" : "Copy link",
-
                       onSelect: handleCopyLink,
                     },
-
                     {
                       label: "Open property",
-
                       onSelect: () => navigate(`/listings/${selected._id}`),
                     },
                   ]}
@@ -696,7 +684,6 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                 shadow-[0_8px_20px_rgba(17,19,24,0.18)]
                 transition-all
                 duration-200
-                 
                 hover:shadow-[0_12px_28px_rgba(17,19,24,0.22)]
                 dark:from-[#f1f0ec]
                 dark:via-[#e3e2de]
@@ -744,15 +731,7 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
             "
           >
             <div>
-              <p
-                className="
-                  text-[10px]
-                  font-semibold
-                  uppercase
-                  tracking-[0.14em]
-                  text-text/35
-                "
-              >
+              <p className="text-[11px] font-medium tracking-[-0.01em] text-text/45">
                 Explore
               </p>
 
@@ -790,7 +769,6 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                     shadow-[0_6px_18px_rgba(20,23,31,0.04)]
                     transition-all
                     duration-200
-                     
                     hover:shadow-[0_12px_28px_rgba(20,23,31,0.08)]
                   "
                 >
@@ -807,10 +785,10 @@ export default function FeaturedListingPanel({ listings = [], isLoading }) {
                         src={listing.images[0].url}
                         alt={listing.title}
                         className="
-  h-full
-  w-full
-  object-cover
-"
+                          h-full
+                          w-full
+                          object-cover
+                        "
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs text-text/35">
