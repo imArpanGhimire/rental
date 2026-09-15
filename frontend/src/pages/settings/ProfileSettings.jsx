@@ -827,11 +827,10 @@ function SettingsSection({
         <div>
           <p
             className="
-              text-[10px]
-              font-semibold
-              uppercase
-              tracking-[0.15em]
-              text-text/35
+              text-[11px]
+              font-medium
+              tracking-[-0.01em]
+              text-text/40
             "
           >
             {eyebrow}
@@ -968,11 +967,10 @@ export default function ProfileSettings() {
             <div>
               <p
                 className="
-                  text-[10px]
-                  font-semibold
-                  uppercase
-                  tracking-[0.16em]
-                  text-text/40
+                  text-[11px]
+                  font-medium
+                  tracking-[-0.01em]
+                  text-text/45
                 "
               >
                 Account settings
