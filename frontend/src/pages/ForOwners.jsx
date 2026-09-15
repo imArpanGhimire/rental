@@ -67,7 +67,7 @@ function BenefitCard({ icon: Icon, eyebrow, title, description }) {
         <Icon size={17} strokeWidth={1.8} />
       </div>
 
-      <p className="mt-5 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/38 dark:text-white/35">
+      <p className="mt-5 text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
         {eyebrow}
       </p>
 
@@ -730,7 +730,7 @@ export default function ForOwners() {
                   className="text-[#426c64] dark:text-[#8db4aa]"
                 />
 
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#2b2d31]/52 dark:text-white/48">
+                <span className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/55 dark:text-white/50">
                   Rentora for property owners
                 </span>
               </div>
@@ -879,7 +879,7 @@ export default function ForOwners() {
 
         <section>
           <div className="mb-5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#426c64] dark:text-[#8db4aa]">
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-[#426c64] dark:text-[#8db4aa]">
               Built for owners
             </p>
 
@@ -941,7 +941,7 @@ export default function ForOwners() {
           "
         >
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#426c64] dark:text-[#8db4aa]">
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-[#426c64] dark:text-[#8db4aa]">
               How it works
             </p>
 
@@ -1047,7 +1047,7 @@ export default function ForOwners() {
             <div className="flex items-center gap-2 text-[#8db4aa]">
               <CheckCircle2 size={14} strokeWidth={1.9} />
 
-              <span className="text-[10px] font-semibold uppercase tracking-[0.15em]">
+              <span className="text-[11px] font-medium tracking-[-0.01em]">
                 Your owner workspace
               </span>
             </div>
