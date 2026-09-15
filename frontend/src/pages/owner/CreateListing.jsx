@@ -71,7 +71,7 @@ export default function CreateListing() {
             </div>
 
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-[#2b2d31]/42 dark:text-white/40">
+              <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
                 Property management
               </p>
 
