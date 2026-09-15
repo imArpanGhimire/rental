@@ -1,7 +1,5 @@
 import { useState } from "react";
-
 import { useTranslation } from "react-i18next";
-
 import { Link, useNavigate } from "react-router-dom";
 
 import {
@@ -22,13 +20,9 @@ import {
 import AppShell from "../../components/layout/AppShell.jsx";
 import Sidebar from "../../components/layout/Sidebar.jsx";
 import ListingCard from "../../features/listings/components/ListingCard.jsx";
-
 import { StaggerGrid, StaggerItem } from "../../components/ui/StaggerGrid.jsx";
-
 import { useMyListings } from "../../features/listings/hooks/useMyListings.js";
-
 import Button from "../../components/ui/Button.jsx";
-
 import { updateListingAvailability } from "../../api/listings.api.js";
 
 const links = [
@@ -91,15 +85,12 @@ function ListingActions({ listing }) {
 
 function AvailabilityControl({ listing, onUpdated }) {
   const [isUpdating, setIsUpdating] = useState(false);
-
   const [error, setError] = useState("");
 
   const isAvailable = listing.isAvailable !== false;
 
   async function handleToggle() {
-    if (isUpdating) {
-      return;
-    }
+    if (isUpdating) return;
 
     const nextValue = !isAvailable;
 
@@ -108,7 +99,6 @@ function AvailabilityControl({ listing, onUpdated }) {
 
     try {
       await updateListingAvailability(listing._id, nextValue);
-
       await onUpdated();
     } catch (err) {
       setError(
@@ -213,7 +203,6 @@ function AvailabilityControl({ listing, onUpdated }) {
 
 export default function MyListings() {
   const { t } = useTranslation();
-
   const navigate = useNavigate();
 
   const { data, isLoading, isError, refetch, isFetching } = useMyListings();
@@ -264,7 +253,7 @@ export default function MyListings() {
               </div>
 
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-[#2b2d31]/42 dark:text-white/40">
+                <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
                   Property management
                 </p>
 
@@ -292,7 +281,6 @@ export default function MyListings() {
                 "
               >
                 <PlusCircle size={15} strokeWidth={1.9} />
-
                 <span>Add listing</span>
               </Button>
             </Link>
@@ -331,7 +319,7 @@ export default function MyListings() {
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
+                  <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
                     Portfolio
                   </p>
 
@@ -369,13 +357,13 @@ export default function MyListings() {
                   <div
                     key={item}
                     className="
-                        h-80 animate-pulse
-                        rounded-[22px]
-                        border border-black/[0.06]
-                        bg-black/[0.025]
-                        dark:border-white/[0.06]
-                        dark:bg-white/[0.035]
-                      "
+                      h-80 animate-pulse
+                      rounded-[22px]
+                      border border-black/[0.06]
+                      bg-black/[0.025]
+                      dark:border-white/[0.06]
+                      dark:bg-white/[0.035]
+                    "
                   />
                 ))}
               </div>
@@ -402,7 +390,6 @@ export default function MyListings() {
                   "
                 >
                   <RefreshCw size={12} />
-
                   {t("dashboard.retry", "Retry")}
                 </button>
               </div>
