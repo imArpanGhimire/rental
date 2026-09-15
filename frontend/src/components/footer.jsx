@@ -127,10 +127,9 @@ export default function Footer() {
               <p
                 className="
                   text-[11px]
-                  font-semibold
-                  uppercase
-                  tracking-[0.16em]
-                  text-text/40
+                  font-medium
+                  tracking-[-0.01em]
+                  text-text/45
                 "
               >
                 Find your next place
@@ -344,7 +343,7 @@ export default function Footer() {
                         text-[10px]
                         font-semibold
                         capitalize
-                        tracking-[0.15em]
+                        tracking-[0.08em]
                         text-white/60
                       "
                     >
@@ -407,10 +406,9 @@ export default function Footer() {
               <p
                 className="
                   mb-5
-                  text-[10px]
-                  font-semibold
-                  uppercase
-                  tracking-[0.15em]
+                  text-[11px]
+                  font-medium
+                  tracking-[-0.01em]
                   text-white/55
                 "
               >
@@ -442,10 +440,9 @@ export default function Footer() {
               <p
                 className="
                   mb-5
-                  text-[10px]
-                  font-semibold
-                  uppercase
-                  tracking-[0.15em]
+                  text-[11px]
+                  font-medium
+                  tracking-[-0.01em]
                   text-white/55
                 "
               >
@@ -498,10 +495,9 @@ export default function Footer() {
                 <p
                   className="
                     mb-5
-                    text-[10px]
-                    font-semibold
-                    uppercase
-                    tracking-[0.15em]
+                    text-[11px]
+                    font-medium
+                    tracking-[-0.01em]
                     text-white/55
                   "
                 >
