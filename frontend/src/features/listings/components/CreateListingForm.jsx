@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-
 import { useForm } from "react-hook-form";
-
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -58,7 +56,7 @@ function SectionCard({ icon: Icon, eyebrow, title, description, children }) {
           </div>
 
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
               {eyebrow}
             </p>
 
@@ -82,7 +80,7 @@ function SectionCard({ icon: Icon, eyebrow, title, description, children }) {
 
 function FieldLabel({ children }) {
   return (
-    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.11em] text-[#2b2d31]/52 dark:text-white/48">
+    <label className="mb-2 block text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/58 dark:text-white/52">
       {children}
     </label>
   );
@@ -90,7 +88,6 @@ function FieldLabel({ children }) {
 
 export default function CreateListingForm({ listing = null, mode = "create" }) {
   const navigate = useNavigate();
-
   const { user } = useAuth();
 
   const isEdit = mode === "edit" && Boolean(listing?._id);
@@ -118,15 +115,11 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
   });
 
   const [amenities, setAmenities] = useState([]);
-
   const [images, setImages] = useState([]);
-
   const [position, setPosition] = useState(null);
-
   const [locationError, setLocationError] = useState(null);
 
   const createMutation = useCreateListing();
-
   const updateMutation = useUpdateListing(listing?._id);
 
   const activeMutation = isEdit ? updateMutation : createMutation;
@@ -141,38 +134,25 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
     }
 
     const coordinates = listing.location?.coordinates || [];
-
     const lng = coordinates[0];
-
     const lat = coordinates[1];
 
     reset({
       title: listing.title || "",
-
       description: listing.description || "",
-
       type: listing.type || "rental",
-
       price: listing.price ?? "",
-
       contactPhone:
         listing.contactPhone || listing.owner?.phone || user?.phone || "",
-
       address: listing.location?.address || "",
-
       rooms: listing.rooms ?? "",
-
       furnished: listing.furnished ? "true" : "false",
-
       genderPreference: listing.genderPreference || "any",
-
       waterSupply: listing.waterSupply || "",
-
       isAvailable: listing.isAvailable === false ? "false" : "true",
     });
 
     setAmenities(listing.amenities || []);
-
     setImages(listing.images || []);
 
     if (Number.isFinite(lat) && Number.isFinite(lng)) {
@@ -191,7 +171,6 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
   function onSubmit(data) {
     if (!position) {
       setLocationError("Please drop a pin on the map to set the location");
-
       return;
     }
 
@@ -205,18 +184,13 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
 
     const payload = {
       title: data.title.trim(),
-
       description: data.description.trim(),
-
       type: data.type,
-
       price: Number(data.price),
-
       contactPhone: data.contactPhone.trim(),
 
       location: {
         coordinates: [lng, lat],
-
         address: data.address.trim(),
       },
 
@@ -224,11 +198,8 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
       images,
 
       rooms: data.rooms === "" ? "" : Number(data.rooms),
-
       furnished: data.furnished === "true",
-
       genderPreference: data.genderPreference,
-
       waterSupply: data.waterSupply,
 
       ...(isEdit
@@ -262,7 +233,6 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
   }
 
   const mutationError = activeMutation.error;
-
   const isPending = activeMutation.isPending;
 
   return (
@@ -375,7 +345,6 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
                   placeholder="e.g. 25000"
                   {...register("price", {
                     required: "Price is required",
-
                     min: {
                       value: 1,
                       message: "Price must be greater than 0",
@@ -415,7 +384,6 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
                     "
                   >
                     <option value="false">Unfurnished</option>
-
                     <option value="true">Furnished</option>
                   </select>
                 </div>
@@ -437,9 +405,7 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
                     "
                   >
                     <option value="any">Any</option>
-
                     <option value="male">Male</option>
-
                     <option value="female">Female</option>
                   </select>
                 </div>
@@ -459,13 +425,9 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
                     "
                   >
                     <option value="">Not specified</option>
-
                     <option value="municipal">Municipal</option>
-
                     <option value="tanker">Tanker</option>
-
                     <option value="jar">Jar</option>
-
                     <option value="borewell">Borewell</option>
                   </select>
                 </div>
@@ -487,10 +449,8 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
               placeholder="98XXXXXXXX"
               {...register("contactPhone", {
                 required: "Contact phone is required",
-
                 pattern: {
                   value: /^9[678]\d{8}$/,
-
                   message: "Enter a valid 10-digit Nepali mobile number",
                 },
               })}
@@ -572,19 +532,18 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
                     type="button"
                     onClick={() => toggleAmenity(amenity)}
                     className={`
-                        inline-flex items-center gap-1.5
-                        rounded-full border px-3.5 py-2
-                        text-[11px] font-semibold
-                        transition-colors
-                        ${
-                          active
-                            ? "border-[#202226] bg-[#202226] text-white dark:border-white dark:bg-white dark:text-[#17191d]"
-                            : "border-black/[0.09] bg-white/40 text-[#2b2d31]/62 hover:bg-white/75 hover:text-[#17191d] dark:border-white/[0.09] dark:bg-white/[0.025] dark:text-white/58 dark:hover:bg-white/[0.06] dark:hover:text-white"
-                        }
-                      `}
+                      inline-flex items-center gap-1.5
+                      rounded-full border px-3.5 py-2
+                      text-[11px] font-semibold
+                      transition-colors
+                      ${
+                        active
+                          ? "border-[#202226] bg-[#202226] text-white dark:border-white dark:bg-white dark:text-[#17191d]"
+                          : "border-black/[0.09] bg-white/40 text-[#2b2d31]/62 hover:bg-white/75 hover:text-[#17191d] dark:border-white/[0.09] dark:bg-white/[0.025] dark:text-white/58 dark:hover:bg-white/[0.06] dark:hover:text-white"
+                      }
+                    `}
                   >
                     {active && <Check size={12} strokeWidth={2.2} />}
-
                     {amenity}
                   </button>
                 );
@@ -614,7 +573,6 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
                   "
                 >
                   <option value="true">Available</option>
-
                   <option value="false">Rented / filled</option>
                 </select>
               </div>
@@ -639,7 +597,7 @@ export default function CreateListingForm({ listing = null, mode = "create" }) {
               xl:sticky xl:top-6
             "
           >
-            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/40 dark:text-white/38">
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/45 dark:text-white/40">
               {isEdit ? "Ready to save" : "Ready to publish"}
             </p>
 
