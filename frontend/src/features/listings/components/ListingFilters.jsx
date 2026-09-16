@@ -4,12 +4,10 @@ import { LISTING_TYPES, NEPAL_AREAS } from "../constants";
 
 export default function ListingFilters({ filters, onChange }) {
   const [openMenu, setOpenMenu] = useState(null);
-
   const [priceDraft, setPriceDraft] = useState({
     min: filters.minPrice ?? "",
     max: filters.maxPrice ?? "",
   });
-
   const wrapRef = useRef(null);
 
   useEffect(() => {
@@ -20,16 +18,9 @@ export default function ListingFilters({ filters, onChange }) {
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /*
-   * Keep the price inputs synchronized with the
-   * currently applied filters.
-   */
   useEffect(() => {
     setPriceDraft({
       min: filters.minPrice ?? "",
@@ -43,7 +34,6 @@ export default function ListingFilters({ filters, onChange }) {
 
   const applyPrice = () => {
     const min = priceDraft.min !== "" ? Number(priceDraft.min) : null;
-
     const max = priceDraft.max !== "" ? Number(priceDraft.max) : null;
 
     onChange({
@@ -64,12 +54,12 @@ export default function ListingFilters({ filters, onChange }) {
   ).slice(0, 6);
 
   return (
-    <div className="filter-bar" ref={wrapRef}>
-      {/* =====================================================
-          TYPE
-      ===================================================== */}
-
-      <div style={{ position: "relative" }}>
+    <div
+      className="filter-bar flex w-full flex-wrap items-center gap-2 max-md:overflow-visible"
+      ref={wrapRef}
+    >
+      {/* TYPE */}
+      <div className="relative min-w-0">
         <Pill
           label={`Type: ${
             filters.type
@@ -79,29 +69,19 @@ export default function ListingFilters({ filters, onChange }) {
           dark
           onClick={() => toggleMenu("type")}
           onClear={
-            filters.type
-              ? () =>
-                  onChange({
-                    ...filters,
-                    type: null,
-                  })
-              : null
+            filters.type ? () => onChange({ ...filters, type: null }) : null
           }
         />
 
         {openMenu === "type" && (
-          <div className="filter-dropdown">
+          <div className="filter-dropdown left-0 max-md:w-[220px] max-md:max-w-[calc(100vw-32px)]">
             <button
               type="button"
               className={`filter-dropdown__option w-full ${
                 !filters.type ? "is-selected" : ""
               }`}
               onClick={() => {
-                onChange({
-                  ...filters,
-                  type: null,
-                });
-
+                onChange({ ...filters, type: null });
                 setOpenMenu(null);
               }}
             >
@@ -116,11 +96,7 @@ export default function ListingFilters({ filters, onChange }) {
                   filters.type === type.value ? "is-selected" : ""
                 }`}
                 onClick={() => {
-                  onChange({
-                    ...filters,
-                    type: type.value,
-                  });
-
+                  onChange({ ...filters, type: type.value });
                   setOpenMenu(null);
                 }}
               >
@@ -131,15 +107,10 @@ export default function ListingFilters({ filters, onChange }) {
         )}
       </div>
 
-      {/* =====================================================
-          PRICE
-      ===================================================== */}
-
-      <div style={{ position: "relative" }}>
+      {/* PRICE */}
+      <div className="relative min-w-0">
         <Pill
-          label={`Price: Rs ${
-            filters.minPrice ?? "—"
-          }–${filters.maxPrice ?? "—"}`}
+          label={`Price: Rs ${filters.minPrice ?? "—"}–${filters.maxPrice ?? "—"}`}
           dark
           onClick={() => toggleMenu("price")}
           onClear={
@@ -155,7 +126,7 @@ export default function ListingFilters({ filters, onChange }) {
         />
 
         {openMenu === "price" && (
-          <div className="filter-dropdown">
+          <div className="filter-dropdown left-0 max-md:w-[280px] max-md:max-w-[calc(100vw-32px)]">
             <div className="filter-dropdown__row">
               <input
                 type="number"
@@ -195,15 +166,12 @@ export default function ListingFilters({ filters, onChange }) {
         )}
       </div>
 
-      {/* =====================================================
-          AREA
-      ===================================================== */}
-
-      <div style={{ position: "relative" }}>
+      {/* AREA */}
+      <div className="relative min-w-0">
         <Pill label="Area" onClick={() => toggleMenu("area")} />
 
         {openMenu === "area" && (
-          <div className="filter-dropdown">
+          <div className="filter-dropdown right-0 max-md:left-auto max-md:w-[220px] max-md:max-w-[calc(100vw-32px)]">
             {NEPAL_AREAS.slice(0, 8).map((area) => (
               <button
                 type="button"
@@ -212,11 +180,7 @@ export default function ListingFilters({ filters, onChange }) {
                   filters.search === area ? "is-selected" : ""
                 }`}
                 onClick={() => {
-                  onChange({
-                    ...filters,
-                    search: area,
-                  });
-
+                  onChange({ ...filters, search: area });
                   setOpenMenu(null);
                 }}
               >
@@ -227,40 +191,20 @@ export default function ListingFilters({ filters, onChange }) {
         )}
       </div>
 
-      {/* =====================================================
-          SEARCH
-
-          Search is intentionally separated from the filters.
-          Desktop: pushed to the right.
-          Mobile: full width underneath the filters.
-      ===================================================== */}
-
-      <div
-        className="ml-auto max-md:ml-0 max-md:w-full"
-        style={{
-          position: "relative",
-        }}
-      >
-        <div
-          className="filter-bar__search filter-bar__search--highlight max-md:w-full"
-          style={{
-            minWidth: 0,
-          }}
-        >
+      {/* SEARCH */}
+      <div className="relative ml-auto min-w-0 max-md:ml-0 max-md:basis-full max-md:w-full">
+        <div className="filter-bar__search filter-bar__search--highlight w-full min-w-0 max-md:w-full">
           <Icon name="search" size={15} className="filter-bar__search-icon" />
 
-          <div className="filter-bar__search-text">
+          <div className="filter-bar__search-text min-w-0 flex-1">
             <span className="filter-bar__search-label">Region</span>
 
             <input
+              className="min-w-0 w-full"
               value={filters.search || ""}
               onFocus={() => setOpenMenu("region")}
               onChange={(e) => {
-                onChange({
-                  ...filters,
-                  search: e.target.value,
-                });
-
+                onChange({ ...filters, search: e.target.value });
                 setOpenMenu("region");
               }}
               placeholder="Search location in Nepal"
@@ -270,13 +214,9 @@ export default function ListingFilters({ filters, onChange }) {
           {filters.search && (
             <button
               type="button"
-              className="filter-bar__search-clear"
+              className="filter-bar__search-clear shrink-0"
               onClick={() => {
-                onChange({
-                  ...filters,
-                  search: "",
-                });
-
+                onChange({ ...filters, search: "" });
                 setOpenMenu(null);
               }}
               aria-label="Clear search"
@@ -286,26 +226,19 @@ export default function ListingFilters({ filters, onChange }) {
           )}
         </div>
 
-        {/* REGION SUGGESTIONS */}
-
         {openMenu === "region" && regionSuggestions.length > 0 && (
-          <div className="filter-dropdown filter-dropdown--wide max-md:w-full">
+          <div className="filter-dropdown filter-dropdown--wide left-0 right-0 w-full max-md:w-full max-md:max-w-full">
             {regionSuggestions.map((area) => (
               <button
                 type="button"
                 key={area}
                 className="filter-dropdown__option w-full"
                 onClick={() => {
-                  onChange({
-                    ...filters,
-                    search: area,
-                  });
-
+                  onChange({ ...filters, search: area });
                   setOpenMenu(null);
                 }}
               >
                 <Icon name="pin" size={13} className="text-neutral-400" />
-
                 <span>{area}</span>
               </button>
             ))}
@@ -316,22 +249,18 @@ export default function ListingFilters({ filters, onChange }) {
   );
 }
 
-/* =========================================================
-   FILTER PILL
-========================================================= */
-
 function Pill({ label, dark, onClick, onClear }) {
   return (
     <button
       type="button"
-      className={`pill ${dark ? "pill--dark" : "pill--light"}`}
+      className={`pill max-w-full ${dark ? "pill--dark" : "pill--light"}`}
       onClick={onClick}
     >
-      <span>{label}</span>
+      <span className="truncate">{label}</span>
 
       {onClear ? (
         <span
-          className="pill__clear"
+          className="pill__clear shrink-0"
           onClick={(e) => {
             e.stopPropagation();
             onClear();
@@ -340,7 +269,7 @@ function Pill({ label, dark, onClick, onClear }) {
           <Icon name="close" size={12} />
         </span>
       ) : (
-        <Icon name="chevronDown" size={14} className="pill__chevron" />
+        <Icon name="chevronDown" size={14} className="pill__chevron shrink-0" />
       )}
     </button>
   );
