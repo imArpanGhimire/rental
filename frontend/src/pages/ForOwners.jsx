@@ -150,7 +150,7 @@ function OwnerJourneyIllustration() {
         max-w-[720px]
       "
     >
-      {/* soft atmosphere */}
+      {/* SOFT ATMOSPHERE */}
 
       <div
         className="
@@ -181,9 +181,7 @@ function OwnerJourneyIllustration() {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* -----------------------------------------------------
-            VERY LIGHT TERRAIN
-        ----------------------------------------------------- */}
+        {/* VERY LIGHT TERRAIN */}
 
         <path
           d="M37 356C128 292 197 301 264 331C334 362 411 367 497 333C576 302 635 277 732 291"
@@ -206,9 +204,7 @@ function OwnerJourneyIllustration() {
           className="text-[#426c64]/[0.10] dark:text-white/[0.07]"
         />
 
-        {/* -----------------------------------------------------
-            ROUTE
-        ----------------------------------------------------- */}
+        {/* ROUTE */}
 
         <path
           d="M341 263C382 250 414 252 444 236C477 218 495 192 523 173C548 157 571 149 607 143"
@@ -219,9 +215,7 @@ function OwnerJourneyIllustration() {
           className="text-[#426c64]/35 dark:text-[#8db4aa]/35"
         />
 
-        {/* -----------------------------------------------------
-            SMALL HOUSE - FAR LEFT
-        ----------------------------------------------------- */}
+        {/* SMALL HOUSE - FAR LEFT */}
 
         <g opacity="0.52">
           <path
@@ -265,9 +259,7 @@ function OwnerJourneyIllustration() {
           />
         </g>
 
-        {/* -----------------------------------------------------
-            TREE 1
-        ----------------------------------------------------- */}
+        {/* TREE 1 */}
 
         <g opacity="0.5">
           <rect
@@ -288,9 +280,7 @@ function OwnerJourneyIllustration() {
           />
         </g>
 
-        {/* -----------------------------------------------------
-            TREE 2
-        ----------------------------------------------------- */}
+        {/* TREE 2 */}
 
         <g opacity="0.45">
           <rect
@@ -311,9 +301,7 @@ function OwnerJourneyIllustration() {
           />
         </g>
 
-        {/* -----------------------------------------------------
-            DESTINATION HOUSE
-        ----------------------------------------------------- */}
+        {/* DESTINATION HOUSE */}
 
         <g>
           <ellipse
@@ -379,9 +367,7 @@ function OwnerJourneyIllustration() {
           />
         </g>
 
-        {/* -----------------------------------------------------
-            DESTINATION TREES
-        ----------------------------------------------------- */}
+        {/* DESTINATION TREES */}
 
         <g opacity="0.62">
           <rect
@@ -419,12 +405,10 @@ function OwnerJourneyIllustration() {
           />
         </g>
 
-        {/* -----------------------------------------------------
-            PERSON WALKING TOWARD HOUSE
-        ----------------------------------------------------- */}
+        {/* PERSON WALKING TOWARD HOUSE */}
 
         <g transform="translate(365 190)">
-          {/* head */}
+          {/* HEAD */}
 
           <circle
             cx="25"
@@ -433,21 +417,21 @@ function OwnerJourneyIllustration() {
             className="fill-[#4a5551] dark:fill-[#b8c3bf]"
           />
 
-          {/* body */}
+          {/* BODY */}
 
           <path
             d="M22 18C32 18 38 26 39 41L39 63H18L15 38C15 25 17 18 22 18Z"
-            className="fill-[#789087] dark:fill-[#789087]"
+            className="fill-[#789087]"
           />
 
-          {/* backpack */}
+          {/* BACKPACK */}
 
           <path
             d="M14 25C8 29 7 39 8 49L11 58H20V26L14 25Z"
             className="fill-[#566961] dark:fill-[#60766d]"
           />
 
-          {/* arm */}
+          {/* ARM */}
 
           <path
             d="M36 30L48 48"
@@ -457,7 +441,7 @@ function OwnerJourneyIllustration() {
             className="text-[#4f5e59] dark:text-[#9daaa5]"
           />
 
-          {/* leg 1 */}
+          {/* LEG 1 */}
 
           <path
             d="M23 62L19 86"
@@ -467,7 +451,7 @@ function OwnerJourneyIllustration() {
             className="text-[#4f5e59] dark:text-[#a7b2ae]"
           />
 
-          {/* leg 2 */}
+          {/* LEG 2 */}
 
           <path
             d="M35 62L43 82"
@@ -477,7 +461,7 @@ function OwnerJourneyIllustration() {
             className="text-[#4f5e59] dark:text-[#a7b2ae]"
           />
 
-          {/* suitcase handle */}
+          {/* SUITCASE HANDLE */}
 
           <path
             d="M5 45L-1 61"
@@ -486,7 +470,7 @@ function OwnerJourneyIllustration() {
             className="text-[#566961] dark:text-[#91a09a]"
           />
 
-          {/* suitcase */}
+          {/* SUITCASE */}
 
           <rect
             x="-13"
@@ -499,10 +483,9 @@ function OwnerJourneyIllustration() {
           />
 
           <circle cx="-9" cy="89" r="2" className="fill-[#4f5e59]" />
-
           <circle cx="3" cy="91" r="2" className="fill-[#4f5e59]" />
 
-          {/* bag */}
+          {/* BAG */}
 
           <path
             d="M47 47H60L63 61H45L47 47Z"
@@ -517,9 +500,7 @@ function OwnerJourneyIllustration() {
           />
         </g>
 
-        {/* -----------------------------------------------------
-            FOOTSTEPS
-        ----------------------------------------------------- */}
+        {/* FOOTSTEPS */}
 
         <path
           d="M386 294C405 294 423 289 440 281"
@@ -530,73 +511,6 @@ function OwnerJourneyIllustration() {
           className="text-[#426c64]/20 dark:text-[#8db4aa]/20"
         />
       </svg>
-
-      {/* -------------------------------------------------------
-          SMALL REAL UI CARD
-      ------------------------------------------------------- */}
-
-      <div
-        className="
-          absolute
-          bottom-[8%]
-          left-[18%]
-          right-[5%]
-          rounded-[22px]
-          border border-black/[0.07]
-          bg-white/72
-          p-4
-          shadow-[0_18px_55px_rgba(20,23,31,0.08)]
-          backdrop-blur-xl
-
-          dark:border-white/[0.08]
-          dark:bg-[#17191d]/72
-          dark:shadow-none
-        "
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="
-              flex h-10 w-10
-              shrink-0
-              items-center justify-center
-              rounded-[13px]
-              bg-[#426c64]/[0.075]
-              text-[#426c64]
-
-              dark:bg-[#8db4aa]/[0.09]
-              dark:text-[#8db4aa]
-            "
-          >
-            <Building2 size={17} strokeWidth={1.8} />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-semibold text-[#202226] dark:text-white">
-              Your property
-            </p>
-
-            <p className="mt-0.5 text-[10px] text-[#2b2d31]/40 dark:text-white/36">
-              Clear details. Real location. Direct renter interest.
-            </p>
-          </div>
-
-          <div
-            className="
-              flex h-9 w-9
-              shrink-0
-              items-center justify-center
-              rounded-full
-              bg-[#426c64]
-              text-white
-
-              dark:bg-[#8db4aa]
-              dark:text-[#151816]
-            "
-          >
-            <ArrowRight size={15} strokeWidth={1.9} />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -645,7 +559,7 @@ export default function ForOwners() {
             "
           />
 
-          {/* subtle renter-style route background */}
+          {/* SUBTLE ROUTE BACKGROUND */}
 
           <svg
             aria-hidden="true"
@@ -693,9 +607,7 @@ export default function ForOwners() {
               lg:grid-cols-[1.02fr_0.98fr]
             "
           >
-            {/* =================================================
-                LEFT
-            ================================================= */}
+            {/* LEFT */}
 
             <div
               className="
@@ -709,35 +621,8 @@ export default function ForOwners() {
                 xl:px-12
               "
             >
-              <div
-                className="
-                  flex w-fit
-                  items-center gap-2
-                  rounded-full
-                  border border-black/[0.075]
-                  bg-white/60
-                  px-3.5 py-2
-                  shadow-sm
-                  backdrop-blur
-
-                  dark:border-white/[0.08]
-                  dark:bg-white/[0.045]
-                "
-              >
-                <Building2
-                  size={12}
-                  strokeWidth={1.9}
-                  className="text-[#426c64] dark:text-[#8db4aa]"
-                />
-
-                <span className="text-[11px] font-medium tracking-[-0.01em] text-[#2b2d31]/55 dark:text-white/50">
-                  Rentora for property owners
-                </span>
-              </div>
-
               <h1
                 className="
-                  mt-7
                   max-w-[650px]
                   font-display
                   text-[44px]
@@ -758,7 +643,6 @@ export default function ForOwners() {
                   className="
                     mt-1 block
                     text-[#2b2d31]/42
-
                     dark:text-white/38
                   "
                 >
@@ -850,9 +734,7 @@ export default function ForOwners() {
               </div>
             </div>
 
-            {/* =================================================
-                RIGHT
-            ================================================= */}
+            {/* RIGHT */}
 
             <div
               className="
