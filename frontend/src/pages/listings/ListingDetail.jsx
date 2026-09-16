@@ -478,11 +478,11 @@ export default function ListingDetail() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-7xl pb-24 lg:pb-8">
+      <div className="-mx-2 w-[calc(100%+1rem)] max-w-7xl pb-24 sm:mx-auto sm:w-full lg:pb-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.15fr] lg:gap-8">
           {/* LEFT SIDE — MAP */}
 
-          <div className="h-[420px] lg:sticky lg:top-6 lg:h-[calc(100vh-96px)] lg:self-start">
+          <div className="h-[300px] sm:h-[420px] lg:sticky lg:top-6 lg:h-[calc(100vh-96px)] lg:self-start">
             {coordinates ? (
               <ListingMap
                 coordinates={coordinates}
@@ -706,7 +706,7 @@ export default function ListingDetail() {
 
             {/* PRICE / ACTIONS */}
 
-            <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center sm:justify-between">
+            <div className="hidden flex-col gap-4 pt-1 lg:flex lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="whitespace-nowrap text-2xl font-semibold text-text">
                   {formatPrice(listing.price)}
@@ -876,19 +876,17 @@ export default function ListingDetail() {
 
       {/* MOBILE BOTTOM BAR */}
 
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-stone bg-bg p-4 lg:hidden">
-        <p className="shrink-0 text-lg font-semibold text-text">
-          {formatPrice(listing.price)}
+      {!isOwnerAccount && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-3 border-t border-stone bg-bg/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl lg:hidden">
+          <p className="min-w-0 shrink text-base font-semibold text-text sm:text-lg">
+            {formatPrice(listing.price)}
 
-          <span className="block text-xs font-normal leading-none text-text/50">
-            /Month
-          </span>
-        </p>
+            <span className="block text-xs font-normal leading-none text-text/50">
+              /Month
+            </span>
+          </p>
 
-        {/* OWNER DOES NOT SEE SAVE OR VISIT */}
-
-        {!isOwnerAccount && (
-          <div className="flex flex-1 items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
             <button
               type="button"
               onClick={handleToggleSave}
@@ -919,9 +917,10 @@ export default function ListingDetail() {
               disabled={!isAvailable}
               onClick={handleOpenVisit}
               className={`
-                flex-1
+                min-w-0 flex-1
                 rounded-full
-                px-6 py-3
+                px-4 py-3
+                sm:px-6
                 text-sm
                 font-medium
                 ${
@@ -934,8 +933,8 @@ export default function ListingDetail() {
               {isAvailable ? t("listing.bookNow", "Request Visit") : "Rented"}
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </AppShell>
   );
 }
