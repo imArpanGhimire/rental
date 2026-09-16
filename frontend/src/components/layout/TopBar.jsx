@@ -720,12 +720,20 @@ function NotificationPanel({
     <>
       <div
         className="
-          absolute
-          right-0
-          top-[calc(100%+10px)]
+          fixed
+          left-4
+          right-4
+          top-[78px]
           z-[99999]
-          w-[360px]
-          max-w-[calc(100vw-24px)]
+          w-auto
+          max-w-none
+
+          sm:absolute
+          sm:left-auto
+          sm:right-0
+          sm:top-[calc(100%+10px)]
+          sm:w-[360px]
+          sm:max-w-[calc(100vw-24px)]
           overflow-hidden
           rounded-[22px]
           border border-black/10
@@ -834,7 +842,7 @@ function NotificationPanel({
 
         {/* LIST */}
 
-        <div className="relative max-h-[390px] overflow-y-auto p-2.5">
+        <div className="relative max-h-[calc(100vh-180px)] overflow-y-auto p-2.5 sm:max-h-[390px]">
           {notifications.length === 0 ? (
             <div
               className="
