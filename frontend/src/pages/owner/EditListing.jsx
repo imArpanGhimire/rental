@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-
 import { Navigate, useParams } from "react-router-dom";
 
 import {
@@ -16,7 +14,7 @@ import Sidebar from "../../components/layout/Sidebar.jsx";
 
 import CreateListingForm from "../../features/listings/components/CreateListingForm.jsx";
 
-import { getListing } from "../../api/listings.api.js";
+import { useListing } from "../../features/listings/hooks/useListing.js";
 
 import { useAuth } from "../../features/auth/AuthContext.jsx";
 
@@ -59,13 +57,7 @@ export default function EditListing() {
     isLoading,
     isError,
     error,
-  } = useQuery({
-    queryKey: ["listing", id],
-
-    queryFn: () => getListing(id),
-
-    enabled: Boolean(id),
-  });
+  } = useListing(id);
 
   if (isLoading) {
     return (
