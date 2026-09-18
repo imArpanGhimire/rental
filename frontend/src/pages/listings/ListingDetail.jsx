@@ -44,7 +44,7 @@ import {
 } from "../../features/favorites/hooks/useFavorites.js";
 
 import { getNearbyProperties } from "../../api/listings.api.js";
-import { createVisitRequest } from "../../api/visitRequests.api.js";
+import { useCreateVisitRequest } from "../../features/requests/hooks/useCreateVisitRequest.js";
 import { useAuth } from "../../features/auth/AuthContext.jsx";
 import { formatPrice } from "../../utils/formatPrice.js";
 
@@ -86,8 +86,9 @@ function VisitRequestModal({ listing, onClose }) {
   const [time, setTime] = useState("");
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const createRequestMutation = useCreateVisitRequest();
+  const isSubmitting = createRequestMutation.isPending;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,7 +101,6 @@ function VisitRequestModal({ listing, onClose }) {
     }
 
     setSubmitError(null);
-    setIsSubmitting(true);
 
     const composedMessage = [
       date ? `Preferred date: ${date}` : null,
@@ -111,7 +111,7 @@ function VisitRequestModal({ listing, onClose }) {
       .join(" | ");
 
     try {
-      await createVisitRequest({
+      await createRequestMutation.mutateAsync({
         propertyId: listing._id,
         message: composedMessage,
       });
@@ -122,8 +122,6 @@ function VisitRequestModal({ listing, onClose }) {
         err?.response?.data?.message ||
           "Couldn't send request. Please try again.",
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
