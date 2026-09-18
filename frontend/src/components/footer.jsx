@@ -103,7 +103,7 @@ export default function Footer() {
               dark:shadow-none
             "
           >
-            {/* atmosphere */}
+            {/* ATMOSPHERE */}
 
             <div
               className="
@@ -121,7 +121,7 @@ export default function Footer() {
               "
             />
 
-            {/* text */}
+            {/* TEXT */}
 
             <div className="relative max-w-2xl">
               <p
@@ -169,7 +169,7 @@ export default function Footer() {
             {/* CTA */}
 
             <Link
-              to="/"
+              to="/browse"
               className="
                 relative
                 mt-6
@@ -420,11 +420,11 @@ export default function Footer() {
                   <span
                     key={area}
                     className="
-                        cursor-default
-                        text-sm
-                        font-medium
-                        text-white/75
-                      "
+                      cursor-default
+                      text-sm
+                      font-medium
+                      text-white/75
+                    "
                   >
                     {area}
                   </span>
@@ -455,18 +455,18 @@ export default function Footer() {
                     key={item.label}
                     to={item.to}
                     className="
-                        group
-                        inline-flex
-                        items-center
-                        gap-1.5
-                        text-sm
-                        font-medium
-                        text-white/75
-                        no-underline
-                        transition-colors
+                      group
+                      inline-flex
+                      items-center
+                      gap-1.5
+                      text-sm
+                      font-medium
+                      text-white/75
+                      no-underline
+                      transition-colors
 
-                        hover:text-white
-                      "
+                      hover:text-white
+                    "
                   >
                     {item.label}
 
@@ -474,12 +474,12 @@ export default function Footer() {
                       size={12}
                       strokeWidth={1.8}
                       className="
-                          opacity-0
-                          transition-opacity
-                          duration-200
+                        opacity-0
+                        transition-opacity
+                        duration-200
 
-                          group-hover:opacity-100
-                        "
+                        group-hover:opacity-100
+                      "
                     />
                   </Link>
                 ))}
@@ -517,18 +517,18 @@ export default function Footer() {
                           : undefined
                       }
                       className="
-                          group
-                          inline-flex
-                          items-center
-                          gap-1.5
-                          text-sm
-                          font-medium
-                          text-white/75
-                          no-underline
-                          transition-colors
+                        group
+                        inline-flex
+                        items-center
+                        gap-1.5
+                        text-sm
+                        font-medium
+                        text-white/75
+                        no-underline
+                        transition-colors
 
-                          hover:text-white
-                        "
+                        hover:text-white
+                      "
                     >
                       {item.label}
 
@@ -536,12 +536,12 @@ export default function Footer() {
                         size={12}
                         strokeWidth={1.8}
                         className="
-                            opacity-0
-                            transition-opacity
-                            duration-200
+                          opacity-0
+                          transition-opacity
+                          duration-200
 
-                            group-hover:opacity-100
-                          "
+                          group-hover:opacity-100
+                        "
                       />
                     </Link>
                   ))}
