@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MapContainer,
   Marker,
@@ -12,6 +12,8 @@ import { Crosshair, Loader2, MapPin, Search } from "lucide-react";
 
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { useDebounce } from "../../../hooks/useDebounce.js";
+import { useLocationSearch } from "../hooks/useLocationSearch.js";
 
 const icon = L.icon({
   iconUrl: markerIcon,
@@ -54,47 +56,18 @@ export default function LocationPicker({
   const position = value || DEFAULT_CENTER;
 
   const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
-  const [searching, setSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState(null);
 
-  const debounceRef = useRef(null);
+  const debouncedQuery = useDebounce(query, 400);
+  const {
+    data: searchResults = [],
+    isFetching: searching,
+  } = useLocationSearch(debouncedQuery);
 
-  useEffect(() => {
-    if (query.trim().length < 3) {
-      setSuggestions([]);
-      return;
-    }
-
-    clearTimeout(debounceRef.current);
-
-    debounceRef.current = setTimeout(async () => {
-      setSearching(true);
-
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=np&q=${encodeURIComponent(
-            query,
-          )}`,
-          {
-            headers: {
-              Accept: "application/json",
-            },
-          },
-        );
-
-        const data = await res.json();
-        setSuggestions(data);
-      } catch {
-        setSuggestions([]);
-      } finally {
-        setSearching(false);
-      }
-    }, 400);
-
-    return () => clearTimeout(debounceRef.current);
-  }, [query]);
+  const suggestions =
+    showSuggestions && query.trim().length >= 3 ? searchResults : [];
 
   function pickSuggestion(suggestion) {
     const lat = parseFloat(suggestion.lat);
@@ -103,7 +76,7 @@ export default function LocationPicker({
     onChange([lat, lng]);
     onAddressSuggestion?.(suggestion.display_name);
     setQuery(suggestion.display_name);
-    setSuggestions([]);
+    setShowSuggestions(false);
   }
 
   function useCurrentLocation() {
@@ -153,7 +126,10 @@ export default function LocationPicker({
 
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+                setQuery(e.target.value);
+                setShowSuggestions(true);
+              }}
             placeholder="Search a place in Nepal..."
             className="
               min-w-0 flex-1 bg-transparent text-sm text-[#202226] outline-none
