@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 
 import { AnimatePresence } from "framer-motion";
@@ -35,6 +36,28 @@ import Support from "./pages/static/Support.jsx";
 
 import { useAuth } from "./features/auth/AuthContext.jsx";
 
+/* =========================================================
+   SCROLL TO TOP
+========================================================= */
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, [pathname]);
+
+  return null;
+}
+
+/* =========================================================
+   HOME ROUTE
+========================================================= */
+
 function HomeRoute() {
   const { role, isAuthenticated, isLoading } = useAuth();
 
@@ -56,6 +79,10 @@ function HomeRoute() {
   return <Home />;
 }
 
+/* =========================================================
+   APP
+========================================================= */
+
 function App() {
   const location = useLocation();
 
@@ -63,21 +90,29 @@ function App() {
     location.pathname === "/login" || location.pathname === "/register";
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg">
+    <div className="flex min-h-screen flex-col bg-bg">
+      <ScrollToTop />
+
       <main className="flex-1">
         <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>
+            {/* PUBLIC */}
+
             <Route path="/" element={<HomeRoute />} />
 
             <Route path="/browse" element={<Browse />} />
 
             <Route path="/listings/:id" element={<ListingDetail />} />
 
+            {/* AUTH */}
+
             <Route path="/login" element={<Login />} />
 
             <Route path="/register" element={<Register />} />
 
             <Route path="/forgot-password" element={<ForgetPassword />} />
+
+            {/* STATIC */}
 
             <Route path="/about" element={<About />} />
 
