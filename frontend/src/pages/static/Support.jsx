@@ -22,7 +22,7 @@ import AppShell from "../../components/layout/AppShell.jsx";
 
 import { useAuth } from "../../features/auth/AuthContext.jsx";
 
-import { sendSupportReport } from "../../api/support.api.js";
+import { useSendSupportReport } from "../../features/support/hooks/useSendSupportReport.js";
 
 /* =========================================================
    ISSUE TYPES
@@ -91,7 +91,8 @@ export default function Support() {
 
   const [affectedPage, setAffectedPage] = useState(originalPage);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const reportMutation = useSendSupportReport();
+  const isSubmitting = reportMutation.isPending;
 
   const [error, setError] = useState("");
 
@@ -125,10 +126,8 @@ export default function Support() {
 
     setError("");
     setSuccess(false);
-    setIsSubmitting(true);
-
     try {
-      await sendSupportReport({
+      await reportMutation.mutateAsync({
         issueType,
 
         subject: subject.trim(),
@@ -148,8 +147,6 @@ export default function Support() {
       setError(
         err?.message || "We couldn't send your report. Please try again.",
       );
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
