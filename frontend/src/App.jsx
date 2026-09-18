@@ -33,6 +33,7 @@ import Help from "./pages/static/Help.jsx";
 import Privacy from "./pages/static/Privacy.jsx";
 import Terms from "./pages/static/Terms.jsx";
 import Support from "./pages/static/Support.jsx";
+import NotFound from "./pages/static/NotFound.jsx";
 
 import { useAuth } from "./features/auth/AuthContext.jsx";
 
@@ -91,12 +92,15 @@ function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-bg">
+      {/* Reset scroll position whenever route changes */}
       <ScrollToTop />
 
       <main className="flex-1">
         <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>
-            {/* PUBLIC */}
+            {/* =================================================
+                PUBLIC
+            ================================================= */}
 
             <Route path="/" element={<HomeRoute />} />
 
@@ -104,7 +108,9 @@ function App() {
 
             <Route path="/listings/:id" element={<ListingDetail />} />
 
-            {/* AUTH */}
+            {/* =================================================
+                AUTH
+            ================================================= */}
 
             <Route path="/login" element={<Login />} />
 
@@ -112,7 +118,9 @@ function App() {
 
             <Route path="/forgot-password" element={<ForgetPassword />} />
 
-            {/* STATIC */}
+            {/* =================================================
+                STATIC
+            ================================================= */}
 
             <Route path="/about" element={<About />} />
 
@@ -124,7 +132,9 @@ function App() {
 
             <Route path="/terms" element={<Terms />} />
 
-            {/* SUPPORT — OWNER + RENTER */}
+            {/* =================================================
+                SUPPORT — OWNER + RENTER
+            ================================================= */}
 
             <Route
               path="/support"
@@ -135,7 +145,9 @@ function App() {
               }
             />
 
-            {/* OWNER */}
+            {/* =================================================
+                OWNER
+            ================================================= */}
 
             <Route
               path="/owner"
@@ -182,7 +194,9 @@ function App() {
               }
             />
 
-            {/* RENTER */}
+            {/* =================================================
+                RENTER
+            ================================================= */}
 
             <Route
               path="/renter"
@@ -210,6 +224,12 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* =================================================
+                404 — MUST STAY LAST
+            ================================================= */}
+
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
       </main>
