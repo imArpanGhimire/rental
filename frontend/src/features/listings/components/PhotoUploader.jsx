@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { ImagePlus, Loader2, Upload, X } from "lucide-react";
 
-import { uploadImage } from "../../../api/listings.api.js";
+import { useUploadImages } from "../hooks/useUploadImages.js";
 
 const MAX_IMAGES = 5;
 
 export default function PhotoUploader({ images = [], onChange }) {
-  const [uploading, setUploading] = useState(false);
-
   const [error, setError] = useState(null);
+  const uploadMutation = useUploadImages();
+  const uploading = uploadMutation.isPending;
 
   async function handleFiles(e) {
     const files = Array.from(e.target.files || []);
@@ -28,13 +28,10 @@ export default function PhotoUploader({ images = [], onChange }) {
 
     const selected = files.slice(0, remaining);
 
-    setUploading(true);
     setError(null);
 
     try {
-      const uploaded = await Promise.all(
-        selected.map((file) => uploadImage(file)),
-      );
+      const uploaded = await uploadMutation.mutateAsync(selected);
 
       onChange([...images, ...uploaded]);
 
@@ -46,7 +43,6 @@ export default function PhotoUploader({ images = [], onChange }) {
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || "Upload failed");
     } finally {
-      setUploading(false);
       e.target.value = "";
     }
   }
