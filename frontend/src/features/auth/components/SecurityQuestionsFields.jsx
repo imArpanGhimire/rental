@@ -1,28 +1,10 @@
-import { useEffect, useState } from "react";
 import { ChevronDown, ShieldCheck } from "lucide-react";
 
 import AuthField from "../../../components/ui/AuthField";
-import { getSecurityQuestionsList } from "../../../api/auth.api";
+import { useSecurityQuestions } from "../hooks/useSecurityQuestions.js";
 
 export default function SecurityQuestionsFields({ value, onChange }) {
-  const [options, setOptions] = useState([]);
-  const [loadError, setLoadError] = useState("");
-
-  useEffect(() => {
-    getSecurityQuestionsList()
-      .then((data) => {
-        const list = Array.isArray(data?.questions) ? data.questions : data;
-
-        const normalized = (list || []).map((item) =>
-          typeof item === "string" ? item : item.question,
-        );
-
-        setOptions(normalized);
-      })
-      .catch(() => {
-        setLoadError("Couldn't load security questions.");
-      });
-  }, []);
+  const { data: options = [], isError } = useSecurityQuestions();
 
   function handleQuestionChange(index, question) {
     const next = [...value];
@@ -55,10 +37,10 @@ export default function SecurityQuestionsFields({ value, onChange }) {
     );
   }
 
-  if (loadError) {
+  if (isError) {
     return (
       <div className="rounded-[14px] border border-rose-200/70 bg-rose-50/70 px-3.5 py-3 text-[11px] text-rose-700 dark:border-rose-400/15 dark:bg-rose-400/10 dark:text-rose-300">
-        {loadError}
+        Couldn't load security questions.
       </div>
     );
   }
