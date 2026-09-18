@@ -23,7 +23,7 @@ import ListingCard from "../../features/listings/components/ListingCard.jsx";
 import { StaggerGrid, StaggerItem } from "../../components/ui/StaggerGrid.jsx";
 import { useMyListings } from "../../features/listings/hooks/useMyListings.js";
 import Button from "../../components/ui/Button.jsx";
-import { updateListingAvailability } from "../../api/listings.api.js";
+import { useListingAvailability } from "../../features/listings/hooks/useListingAvailability.js";
 
 const links = [
   {
@@ -83,30 +83,28 @@ function ListingActions({ listing }) {
   );
 }
 
-function AvailabilityControl({ listing, onUpdated }) {
-  const [isUpdating, setIsUpdating] = useState(false);
+function AvailabilityControl({ listing }) {
   const [error, setError] = useState("");
+  const availabilityMutation = useListingAvailability();
 
   const isAvailable = listing.isAvailable !== false;
+  const isUpdating = availabilityMutation.isPending;
 
   async function handleToggle() {
     if (isUpdating) return;
 
-    const nextValue = !isAvailable;
-
     setError("");
-    setIsUpdating(true);
 
     try {
-      await updateListingAvailability(listing._id, nextValue);
-      await onUpdated();
+      await availabilityMutation.mutateAsync({
+        listingId: listing._id,
+        isAvailable: !isAvailable,
+      });
     } catch (err) {
       setError(
         err?.response?.data?.message ||
           "Couldn't update availability. Please try again.",
       );
-    } finally {
-      setIsUpdating(false);
     }
   }
 
@@ -435,10 +433,7 @@ export default function MyListings() {
 
                       <ListingActions listing={listing} />
 
-                      <AvailabilityControl
-                        listing={listing}
-                        onUpdated={refetch}
-                      />
+                      <AvailabilityControl listing={listing} />
                     </div>
                   </StaggerItem>
                 ))}
