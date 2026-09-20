@@ -140,22 +140,23 @@ export default function PropertyTypeStrip() {
                   rounded-[10px]
 
                   border
-                  border-[#d5ddd9]
-                  bg-[#e9efec]
-                  text-[#35675f]
+                  border-black/[0.08]
+                  bg-black/[0.045]
+                  text-[#202226]
 
                   transition-colors
                   duration-200
 
-                  group-hover:border-[#bdcec8]
-                  group-hover:bg-[#e1eae6]
+                  group-hover:border-black/[0.14]
+                  group-hover:bg-black/[0.075]
 
-                  dark:border-[#3b4a47]
-                  dark:bg-[#293330]
-                  dark:text-[#91b9af]
+                  dark:border-white/[0.10]
+                  dark:bg-white/[0.06]
+                  dark:text-white/80
 
-                  dark:group-hover:border-[#52645f]
-                  dark:group-hover:bg-[#303c38]
+                  dark:group-hover:border-white/[0.16]
+                  dark:group-hover:bg-white/[0.10]
+                  dark:group-hover:text-white
                 "
               >
                 <Icon size={16} strokeWidth={1.9} />
