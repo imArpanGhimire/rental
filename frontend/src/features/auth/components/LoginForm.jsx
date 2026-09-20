@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
 import AuthField from "../../../components/ui/AuthField";
@@ -7,10 +8,17 @@ import { useLogin } from "../hooks/useLogin";
 
 export default function LoginForm() {
   const { submit, isSubmitting, error } = useLogin();
-  const [form, setForm] = useState({ email: "", password: "" });
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
 
   function handleChange(e) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   }
 
   async function handleSubmit(e) {
@@ -25,6 +33,8 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
+      {/* EMAIL */}
+
       <AuthField
         label="Email address"
         type="email"
@@ -36,20 +46,52 @@ export default function LoginForm() {
         required
       />
 
-      <PasswordInput
-        label="Password"
-        name="password"
-        value={form.password}
-        onChange={handleChange}
-        placeholder="••••••••"
-        autoComplete="current-password"
-        required
-      />
+      {/* PASSWORD */}
+
+      <div>
+        <PasswordInput
+          label="Password"
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          placeholder="••••••••"
+          autoComplete="current-password"
+          required
+        />
+
+        {/* FORGOT PASSWORD */}
+
+        <div className="mt-2 flex justify-end">
+          <Link
+            to="/forgot-password"
+            className="
+              text-[11px]
+              font-medium
+              text-white/45
+              no-underline
+              transition-colors
+              hover:text-white/80
+            "
+          >
+            Forgot password?
+          </Link>
+        </div>
+      </div>
+
+      {/* ERROR */}
 
       {error && (
         <div
           role="alert"
-          className="rounded-[14px] border border-rose-400/15 bg-rose-400/[0.08] px-3.5 py-3 text-[11px] leading-5 text-rose-300"
+          className="
+            rounded-[14px]
+            border border-rose-400/15
+            bg-rose-400/[0.08]
+            px-3.5 py-3
+            text-[11px]
+            leading-5
+            text-rose-300
+          "
         >
           {typeof error === "string"
             ? error
@@ -57,19 +99,32 @@ export default function LoginForm() {
         </div>
       )}
 
+      {/* LOGIN */}
+
       <button
         type="submit"
         disabled={isSubmitting}
         className="
-          mt-1 flex h-12 w-full items-center justify-center gap-2
-          rounded-[14px] border border-white bg-white
-          px-4 text-[13px] font-semibold text-[#15171b]
+          mt-1
+          flex h-12 w-full
+          items-center justify-center
+          gap-2
+          rounded-[14px]
+          border border-white
+          bg-white
+          px-4
+          text-[13px]
+          font-semibold
+          text-[#15171b]
           shadow-[0_12px_34px_rgba(0,0,0,0.16)]
-          transition-colors hover:bg-white/90
-          disabled:cursor-not-allowed disabled:opacity-55
+          transition-colors
+          hover:bg-white/90
+          disabled:cursor-not-allowed
+          disabled:opacity-55
         "
       >
         <span>{isSubmitting ? "Logging in..." : "Log in"}</span>
+
         {!isSubmitting && <ArrowRight size={14} strokeWidth={2} />}
       </button>
     </form>
