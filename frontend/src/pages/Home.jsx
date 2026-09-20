@@ -28,8 +28,6 @@ export default function Home() {
         >
           {/* ===================================================
               DECORATION
-
-              Everything decorative stays BEHIND the content.
           =================================================== */}
 
           <div
@@ -67,10 +65,10 @@ export default function Home() {
                 h-[420px]
                 w-[420px]
                 rounded-full
-                bg-[#54736c]/[0.055]
+                bg-black/[0.025]
                 blur-[90px]
 
-                dark:bg-[#78978f]/[0.045]
+                dark:bg-white/[0.025]
               "
             />
 
@@ -135,28 +133,18 @@ export default function Home() {
             "
           >
             <div className="mx-auto max-w-[880px] text-center">
-              {/* EYEBROW */}
+              {/* EDITORIAL LABEL */}
 
-              <div
-                className="
-                  mx-auto
-                  flex
-                  w-fit
-                  items-center
-                  gap-2
-                  rounded-full
-                  border
-                  border-stone
-                  bg-bg
-                  px-3.5
-                  py-2
-                  shadow-sm
-                "
-              >
-                <MapPin
-                  size={12}
-                  strokeWidth={1.9}
-                  className="text-[#3f7068] dark:text-[#8eb8ae]"
+              <div className="flex items-center justify-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="
+                    h-px
+                    w-7
+                    bg-ink/20
+
+                    dark:bg-white/20
+                  "
                 />
 
                 <span
@@ -164,12 +152,25 @@ export default function Home() {
                     text-[10px]
                     font-semibold
                     uppercase
-                    tracking-[0.12em]
-                    text-ink/55
+                    tracking-[0.16em]
+                    text-ink/45
+
+                    dark:text-white/45
                   "
                 >
                   Rental discovery, made simpler
                 </span>
+
+                <span
+                  aria-hidden="true"
+                  className="
+                    h-px
+                    w-7
+                    bg-ink/20
+
+                    dark:bg-white/20
+                  "
+                />
               </div>
 
               {/* TITLE */}
@@ -193,6 +194,8 @@ export default function Home() {
                 Find your next place
                 <span className="block text-ink/45">without the noise.</span>
               </h1>
+
+              {/* DESCRIPTION */}
 
               <p
                 className="
@@ -236,7 +239,10 @@ export default function Home() {
                   <Check
                     size={11}
                     strokeWidth={2}
-                    className="text-[#3f7068] dark:text-[#8eb8ae]"
+                    className="
+                      text-ink/50
+                      dark:text-white/50
+                    "
                   />
                   Real property listings
                 </span>
@@ -245,7 +251,10 @@ export default function Home() {
                   <ShieldCheck
                     size={11}
                     strokeWidth={1.9}
-                    className="text-[#3f7068] dark:text-[#8eb8ae]"
+                    className="
+                      text-ink/50
+                      dark:text-white/50
+                    "
                   />
                   Direct owner contact
                 </span>
@@ -254,7 +263,10 @@ export default function Home() {
                   <MapPin
                     size={11}
                     strokeWidth={1.9}
-                    className="text-[#3f7068] dark:text-[#8eb8ae]"
+                    className="
+                      text-ink/50
+                      dark:text-white/50
+                    "
                   />
                   Map-based discovery
                 </span>
@@ -264,9 +276,6 @@ export default function Home() {
 
           {/* ===================================================
               PROPERTY TYPES
-
-              z-20 is intentional. Nothing from the hero
-              decoration is allowed to cover this section.
           =================================================== */}
 
           <div className="relative z-20">
