@@ -1,4 +1,5 @@
-import { ArrowRight, Map, MousePointer2, Navigation } from "lucide-react";
+import { ArrowRight, MousePointer2, Navigation } from "lucide-react";
+
 import { Link } from "react-router-dom";
 
 export default function MapSearchShowcase() {
@@ -10,23 +11,64 @@ export default function MapSearchShowcase() {
         ===================================================== */}
 
         <div className="flex flex-col justify-center px-6 py-9 sm:px-9 sm:py-12 lg:px-11 lg:py-14">
-          <div className="flex w-fit items-center gap-2 rounded-full border border-stone bg-ivory/55 px-3 py-1.5">
-            <Map size={13} strokeWidth={1.8} className="text-brass" />
+          {/* EDITORIAL LABEL */}
 
-            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/50">
+          <div className="flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="h-px w-7 bg-ink/20 dark:bg-white/20"
+            />
+
+            <span
+              className="
+                text-[10px]
+                font-semibold
+                uppercase
+                tracking-[0.16em]
+                text-ink/45
+                dark:text-white/45
+              "
+            >
               Map search
             </span>
           </div>
 
-          <h2 className="mt-6 max-w-[500px] font-display text-[30px] font-bold leading-[1.08] tracking-[-0.045em] text-ink sm:text-[38px]">
+          {/* HEADING */}
+
+          <h2
+            className="
+              mt-6
+              max-w-[500px]
+              font-display
+              text-[30px]
+              font-bold
+              leading-[1.08]
+              tracking-[-0.045em]
+              text-ink
+
+              sm:text-[38px]
+            "
+          >
             Search the area,
             <span className="block text-ink/45">not just the address.</span>
           </h2>
 
-          <p className="mt-4 max-w-[470px] text-[14px] leading-6 text-ink/50">
+          {/* DESCRIPTION */}
+
+          <p
+            className="
+              mt-4
+              max-w-[470px]
+              text-[14px]
+              leading-6
+              text-ink/50
+            "
+          >
             Draw around the part of the city you want to live in and Rentora
             will show you the rentals inside it.
           </p>
+
+          {/* ACTIONS */}
 
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link
@@ -61,7 +103,19 @@ export default function MapSearchShowcase() {
             MAP PREVIEW
         ===================================================== */}
 
-        <div className="border-t border-stone bg-ivory/55 p-4 sm:p-6 lg:border-l lg:border-t-0">
+        <div
+          className="
+            border-t
+            border-stone
+            bg-ivory/55
+            p-4
+
+            sm:p-6
+
+            lg:border-l
+            lg:border-t-0
+          "
+        >
           <div
             className="
               relative
@@ -71,10 +125,11 @@ export default function MapSearchShowcase() {
               border
               border-stone
               bg-bg
+
               sm:min-h-[380px]
             "
           >
-            {/* subtle map grid */}
+            {/* SUBTLE MAP GRID */}
 
             <div
               className="
@@ -82,24 +137,39 @@ export default function MapSearchShowcase() {
                 absolute
                 inset-0
                 opacity-[0.55]
+
                 dark:opacity-[0.22]
               "
               style={{
                 backgroundImage: `
-                  linear-gradient(to right, rgba(120,120,120,0.08) 1px, transparent 1px),
-                  linear-gradient(to bottom, rgba(120,120,120,0.08) 1px, transparent 1px)
+                  linear-gradient(
+                    to right,
+                    rgba(120,120,120,0.08) 1px,
+                    transparent 1px
+                  ),
+                  linear-gradient(
+                    to bottom,
+                    rgba(120,120,120,0.08) 1px,
+                    transparent 1px
+                  )
                 `,
                 backgroundSize: "42px 42px",
               }}
             />
 
-            {/* roads */}
+            {/* ROADS */}
 
             <svg
               viewBox="0 0 700 400"
               preserveAspectRatio="none"
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 h-full w-full"
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+                h-full
+                w-full
+              "
             >
               <path
                 d="M-40 310 C80 255 115 295 210 225 C300 158 348 186 430 120 C505 61 596 72 745 15"
@@ -126,21 +196,48 @@ export default function MapSearchShowcase() {
               />
             </svg>
 
-            {/* location names */}
+            {/* LOCATION NAMES */}
 
-            <span className="absolute left-[18%] top-[18%] text-[10px] font-medium text-ink/25">
+            <span
+              className="
+                absolute
+                left-[18%]
+                top-[18%]
+                text-[10px]
+                font-medium
+                text-ink/25
+              "
+            >
               Kathmandu
             </span>
 
-            <span className="absolute bottom-[18%] left-[34%] text-[10px] font-medium text-ink/25">
+            <span
+              className="
+                absolute
+                bottom-[18%]
+                left-[34%]
+                text-[10px]
+                font-medium
+                text-ink/25
+              "
+            >
               Lalitpur
             </span>
 
-            <span className="absolute right-[12%] top-[35%] text-[10px] font-medium text-ink/25">
+            <span
+              className="
+                absolute
+                right-[12%]
+                top-[35%]
+                text-[10px]
+                font-medium
+                text-ink/25
+              "
+            >
               Bhaktapur
             </span>
 
-            {/* search area */}
+            {/* SEARCH AREA */}
 
             <div
               className="
@@ -153,36 +250,102 @@ export default function MapSearchShowcase() {
                 rounded-[45%_55%_43%_57%/51%_43%_57%_49%]
                 border-[1.5px]
                 border-dashed
-                border-brass/80
-                bg-brass/[0.055]
+                border-ink/25
+                bg-ink/[0.025]
+
+                dark:border-white/25
+                dark:bg-white/[0.025]
               "
             />
 
-            {/* markers */}
+            {/* PRICE MARKERS */}
 
-            <div className="absolute left-[37%] top-[37%] rounded-full border border-stone bg-bg px-3 py-1.5 shadow-sm">
+            <div
+              className="
+                absolute
+                left-[37%]
+                top-[37%]
+                rounded-full
+                border
+                border-stone
+                bg-bg
+                px-3
+                py-1.5
+                shadow-sm
+              "
+            >
               <span className="text-[10px] font-bold text-ink">Rs. 18k</span>
             </div>
 
-            <div className="absolute right-[27%] top-[48%] rounded-full border border-stone bg-bg px-3 py-1.5 shadow-sm">
+            <div
+              className="
+                absolute
+                right-[27%]
+                top-[48%]
+                rounded-full
+                border
+                border-stone
+                bg-bg
+                px-3
+                py-1.5
+                shadow-sm
+              "
+            >
               <span className="text-[10px] font-bold text-ink">Rs. 25k</span>
             </div>
 
-            <div className="absolute bottom-[24%] left-[47%] rounded-full border border-stone bg-bg px-3 py-1.5 shadow-sm">
+            <div
+              className="
+                absolute
+                bottom-[24%]
+                left-[47%]
+                rounded-full
+                border
+                border-stone
+                bg-bg
+                px-3
+                py-1.5
+                shadow-sm
+              "
+            >
               <span className="text-[10px] font-bold text-ink">Rs. 32k</span>
             </div>
 
-            {/* search indicator */}
+            {/* LOCATION INDICATOR */}
 
-            <div className="absolute right-4 top-4 flex items-center gap-2 rounded-full border border-stone bg-bg/90 px-3 py-2 shadow-sm backdrop-blur-md">
-              <Navigation size={12} strokeWidth={1.8} className="text-brass" />
+            <div
+              className="
+                absolute
+                right-4
+                top-4
+                flex
+                items-center
+                gap-2
+                rounded-full
+                border
+                border-stone
+                bg-bg/90
+                px-3
+                py-2
+                shadow-sm
+                backdrop-blur-md
+              "
+            >
+              <Navigation
+                size={12}
+                strokeWidth={1.8}
+                className="
+                  text-ink/55
+                  dark:text-white/60
+                "
+              />
 
               <span className="text-[10px] font-semibold text-ink/60">
                 Kathmandu Valley
               </span>
             </div>
 
-            {/* draw control */}
+            {/* DRAW CONTROL */}
 
             <div
               className="
@@ -202,16 +365,47 @@ export default function MapSearchShowcase() {
                 backdrop-blur-md
               "
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brass-light text-brass">
+              <span
+                className="
+                  flex
+                  h-8
+                  w-8
+                  items-center
+                  justify-center
+                  rounded-lg
+                  border
+                  border-ink/[0.07]
+                  bg-ink/[0.045]
+                  text-ink/60
+
+                  dark:border-white/[0.09]
+                  dark:bg-white/[0.06]
+                  dark:text-white/65
+                "
+              >
                 <MousePointer2 size={14} strokeWidth={1.8} />
               </span>
 
               <span>
-                <span className="block text-[10px] font-semibold text-ink">
+                <span
+                  className="
+                    block
+                    text-[10px]
+                    font-semibold
+                    text-ink
+                  "
+                >
                   Draw an area
                 </span>
 
-                <span className="mt-0.5 block text-[9px] text-ink/35">
+                <span
+                  className="
+                    mt-0.5
+                    block
+                    text-[9px]
+                    text-ink/35
+                  "
+                >
                   Drag anywhere on the map
                 </span>
               </span>
