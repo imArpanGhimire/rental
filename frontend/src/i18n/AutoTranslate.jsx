@@ -34,6 +34,7 @@ const legacyUiTranslations = {
   "Popular areas": "लोकप्रिय क्षेत्रहरू",
   Company: "कम्पनी",
   Support: "सहायता",
+  "Support & feedback": "सहायता तथा प्रतिक्रिया",
   "View source": "स्रोत हेर्नुहोस्",
   "Help center": "सहायता केन्द्र",
   "Privacy policy": "गोपनीयता नीति",
