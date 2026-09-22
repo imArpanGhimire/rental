@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Home, MapPin, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, Home, Search } from "lucide-react";
 
 import AppShell from "../../components/layout/AppShell.jsx";
 
@@ -9,7 +9,6 @@ export default function NotFound() {
   return (
     <AppShell>
       <section className="relative flex min-h-[68vh] items-center justify-center overflow-hidden py-10 sm:py-14">
-        {/* Background atmosphere */}
         <div
           aria-hidden="true"
           className="
@@ -19,31 +18,17 @@ export default function NotFound() {
             h-[420px] w-[420px]
             -translate-x-1/2 -translate-y-1/2
             rounded-full
-            bg-[#426c64]/[0.045]
+            bg-black/[0.025]
             blur-[100px]
-
-            dark:bg-[#8db4aa]/[0.04]
+            dark:bg-white/[0.025]
           "
         />
 
         <div className="relative z-10 mx-auto w-full max-w-3xl text-center">
-          {/* Error code */}
-          <p
-            className="
-              mt-7
-              text-[11px]
-              font-semibold
-              uppercase
-              tracking-[0.16em]
-              text-[#426c64]
-
-              dark:text-[#8db4aa]
-            "
-          >
+          <p className="mt-7 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#202226]/45 dark:text-white/40">
             Error 404
           </p>
 
-          {/* Heading */}
           <h1
             className="
               mx-auto mt-3
@@ -54,17 +39,14 @@ export default function NotFound() {
               leading-[1]
               tracking-[-0.055em]
               text-[#202226]
-
               sm:text-[54px]
               lg:text-[62px]
-
               dark:text-white
             "
           >
-            This place isn't on the map.
+            We couldn't find that page.
           </h1>
 
-          {/* Description */}
           <p
             className="
               mx-auto mt-5
@@ -72,17 +54,13 @@ export default function NotFound() {
               text-[14px]
               leading-7
               text-[#2b2d31]/50
-
               sm:text-[15px]
-
               dark:text-white/45
             "
           >
-            The page you're looking for may have moved, been removed, or the
-            address might be incorrect.
+            The link might be wrong, or the page may have been moved or removed.
           </p>
 
-          {/* Actions */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               to="/browse"
@@ -98,16 +76,14 @@ export default function NotFound() {
                 no-underline
                 shadow-[0_12px_30px_rgba(20,23,31,0.10)]
                 transition-colors
-
                 hover:bg-[#303238]
-
                 dark:bg-white
                 dark:text-[#17191d]
                 dark:hover:bg-white/90
               "
             >
               <Search size={14} strokeWidth={1.9} />
-              Explore rentals
+              Browse rentals
               <ArrowRight size={13} strokeWidth={1.9} />
             </Link>
 
@@ -125,9 +101,7 @@ export default function NotFound() {
                 text-[#202226]
                 no-underline
                 transition-colors
-
                 hover:bg-white/80
-
                 dark:border-white/[0.09]
                 dark:bg-white/[0.035]
                 dark:text-white/75
@@ -140,7 +114,6 @@ export default function NotFound() {
             </Link>
           </div>
 
-          {/* Back */}
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -155,9 +128,7 @@ export default function NotFound() {
               font-medium
               text-[#2b2d31]/40
               transition-colors
-
               hover:text-[#202226]
-
               dark:text-white/35
               dark:hover:text-white/70
             "
@@ -166,7 +137,6 @@ export default function NotFound() {
             Go back
           </button>
 
-          {/* Decorative map route */}
           <svg
             aria-hidden="true"
             viewBox="0 0 700 110"
@@ -176,9 +146,8 @@ export default function NotFound() {
               h-[90px]
               w-full
               max-w-[620px]
-              text-[#426c64]/15
-
-              dark:text-[#8db4aa]/10
+              text-black/10
+              dark:text-white/10
             "
           >
             <path
