@@ -1,14 +1,24 @@
 import { Link, useLocation } from "react-router-dom";
 
-import { ArrowUpRight, MapPin } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 import { useAuth } from "../features/auth/AuthContext.jsx";
+import Logo from "./ui/Logo.jsx";
 
 /* =========================================================
    DATA
 ========================================================= */
 
-const neighborhoods = ["Baneshwor", "Patan", "Boudha", "Jhamsikhel", "Kalanki"];
+const browse = [
+  {
+    label: "Browse rentals",
+    to: "/browse",
+  },
+  {
+    label: "Saved listings",
+    to: "/renter/saved",
+  },
+];
 
 const support = [
   {
@@ -41,6 +51,18 @@ export default function Footer() {
 
   const listPropertyTo =
     isAuthenticated && role === "owner" ? "/owner/listings/new" : "/register";
+
+  const savedListingsTo =
+    isAuthenticated && role === "renter" ? "/renter/saved" : "/login";
+
+  const browseLinks = browse.map((item) =>
+    item.label === "Saved listings"
+      ? {
+          ...item,
+          to: savedListingsTo,
+        }
+      : item,
+  );
 
   const company = [
     {
@@ -147,7 +169,7 @@ export default function Footer() {
                   sm:text-3xl
                 "
               >
-                A better way to rent in Kathmandu.
+                Find a place that feels right.
               </h2>
 
               <p
@@ -161,8 +183,8 @@ export default function Footer() {
                   sm:text-[15px]
                 "
               >
-                Browse homes around the valley with location, pricing and
-                property details in one place.
+                Browse rentals, check the location and property details, then
+                contact the owner directly.
               </p>
             </div>
 
@@ -217,9 +239,7 @@ export default function Footer() {
           dark:to-[#090a0d]
         "
       >
-        {/* ===================================================
-            ATMOSPHERE
-        =================================================== */}
+        {/* ATMOSPHERE */}
 
         <div
           className="
@@ -279,7 +299,7 @@ export default function Footer() {
             lg:text-[15vw]
           "
         >
-          RENTORA
+          THEGANA
         </div>
 
         {/* ===================================================
@@ -305,51 +325,22 @@ export default function Footer() {
 
             <div className="flex h-full max-w-sm flex-col">
               <div>
-                <div className="flex items-center gap-3">
-                  <div
+                <div>
+                  <Logo variant="light" className="text-white" />
+
+                  <p
                     className="
-                      flex
-                      h-10
-                      w-10
-                      items-center
-                      justify-center
-                      rounded-xl
-                      border
-                      border-white/15
-                      bg-white/10
-                      text-white
-                      backdrop-blur
+                      ml-[37px]
+                      mt-0.5
+                      text-[10px]
+                      font-semibold
+                      capitalize
+                      tracking-[0.08em]
+                      text-white/60
                     "
                   >
-                    <MapPin size={18} strokeWidth={1.8} />
-                  </div>
-
-                  <div>
-                    <p
-                      className="
-                        font-display
-                        text-xl
-                        font-bold
-                        tracking-[-0.035em]
-                        text-white
-                      "
-                    >
-                      Rentora
-                    </p>
-
-                    <p
-                      className="
-                        mt-0.5
-                        text-[10px]
-                        font-semibold
-                        capitalize
-                        tracking-[0.08em]
-                        text-white/60
-                      "
-                    >
-                      Kathmandu Valley
-                    </p>
-                  </div>
+                    Find your place
+                  </p>
                 </div>
 
                 <p
@@ -361,8 +352,8 @@ export default function Footer() {
                     text-white/70
                   "
                 >
-                  Rental search for the Kathmandu valley, built around the map —
-                  find a place, not just a listing.
+                  Find rooms, flats, apartments and homes for rent. Check the
+                  location, see the details and contact the owner directly.
                 </p>
               </div>
 
@@ -380,26 +371,12 @@ export default function Footer() {
                   text-white/50
                 "
               >
-                <span>© {new Date().getFullYear()} Rentora</span>
-
-                <span
-                  className="
-                    hidden
-                    h-1
-                    w-1
-                    rounded-full
-                    bg-white/25
-
-                    sm:block
-                  "
-                />
-
-                <span>Built in Kathmandu.</span>
+                <span>© {new Date().getFullYear()} Thegana</span>
               </div>
             </div>
 
             {/* =================================================
-                POPULAR AREAS
+                BROWSE
             ================================================= */}
 
             <div className="lg:justify-self-center">
@@ -412,23 +389,73 @@ export default function Footer() {
                   text-white/55
                 "
               >
-                Popular areas
+                Browse
               </p>
 
               <div className="flex flex-col items-start gap-3">
-                {neighborhoods.map((area) => (
-                  <span
-                    key={area}
+                {browseLinks.map((item) => (
+                  <Link
+                    key={item.label}
+                    to={item.to}
                     className="
-                      cursor-default
+                      group
+                      inline-flex
+                      items-center
+                      gap-1.5
                       text-sm
                       font-medium
                       text-white/75
+                      no-underline
+                      transition-colors
+
+                      hover:text-white
                     "
                   >
-                    {area}
-                  </span>
+                    {item.label}
+
+                    <ArrowUpRight
+                      size={12}
+                      strokeWidth={1.8}
+                      className="
+                        opacity-0
+                        transition-opacity
+                        duration-200
+
+                        group-hover:opacity-100
+                      "
+                    />
+                  </Link>
                 ))}
+
+                <Link
+                  to={listPropertyTo}
+                  className="
+                    group
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    text-sm
+                    font-medium
+                    text-white/75
+                    no-underline
+                    transition-colors
+
+                    hover:text-white
+                  "
+                >
+                  List your property
+                  <ArrowUpRight
+                    size={12}
+                    strokeWidth={1.8}
+                    className="
+                      opacity-0
+                      transition-opacity
+                      duration-200
+
+                      group-hover:opacity-100
+                    "
+                  />
+                </Link>
               </div>
             </div>
 
@@ -548,41 +575,7 @@ export default function Footer() {
                 </div>
               </div>
 
-              {/* =================================================
-                  SOURCE
-              ================================================= */}
-
-              <a
-                href="https://github.com/imArpanGhimire/rental"
-                target="_blank"
-                rel="noreferrer"
-                className="
-                  mt-8
-                  inline-flex
-                  w-fit
-                  items-center
-                  gap-2
-                  rounded-full
-                  border
-                  border-white/15
-                  bg-white/[0.07]
-                  px-4
-                  py-2.5
-                  text-xs
-                  font-semibold
-                  text-white/70
-                  no-underline
-                  backdrop-blur
-                  transition-colors
-
-                  hover:border-white/25
-                  hover:bg-white/10
-                  hover:text-white
-                "
-              >
-                View source
-                <ArrowUpRight size={13} strokeWidth={1.8} />
-              </a>
+              {/* SOURCE */}
             </div>
           </div>
         </div>
