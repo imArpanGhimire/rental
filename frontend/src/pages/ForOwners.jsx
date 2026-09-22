@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import AppShell from "../components/layout/AppShell.jsx";
+import DemoListingNotice from "../components/ui/DemoListingNotice.jsx";
 
 /* =========================================================
    SMALL FEATURE
@@ -540,6 +541,8 @@ function OwnerJourneyIllustration() {
 export default function ForOwners() {
   return (
     <AppShell>
+      <DemoListingNotice />
+
       <div className="space-y-8 sm:space-y-10">
         {/* =====================================================
             HERO
