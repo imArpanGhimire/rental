@@ -5,7 +5,7 @@ export default function Login() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Log in to continue to your Rentora account."
+      subtitle="Log in to continue to your Thegana account."
       topLinkLabel="Don't have an account?"
       topLinkText="Sign up"
       topLinkTo="/register"
