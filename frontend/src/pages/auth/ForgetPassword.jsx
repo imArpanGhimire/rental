@@ -263,16 +263,30 @@ export default function ForgetPassword() {
 
           <Button
             type="submit"
-            pill
+            variant="dark"
             disabled={isLoading}
-            className="!py-2.5 text-xs"
+            className="
+    !h-11
+    !rounded-[14px]
+    !border
+    !border-white
+    !bg-white
+    !py-0
+    !text-black
+    text-xs
+    font-semibold
+    hover:!bg-white/90
+    hover:!text-black
+    hover:!opacity-100
+    cursor-pointer
+  "
           >
             {isLoading ? "Checking..." : "Continue"}
           </Button>
         </form>
       )}
 
-      {/* STEP 2: TWO QUESTION DROPDOWNS + TWO ANSWER FIELDS */}
+      {/* STEP 2: SECURITY QUESTIONS */}
       {step === STEP_QUESTIONS && (
         <form
           onSubmit={handleSecurityQuestionsSubmit}
@@ -398,9 +412,8 @@ export default function ForgetPassword() {
 
           <Button
             type="submit"
-            pill
             disabled={isLoading}
-            className="!py-2.5 text-xs"
+            className="!h-11 !rounded-[14px] !py-0 text-xs"
           >
             {isLoading ? "Verifying..." : "Verify and continue"}
           </Button>
@@ -422,9 +435,8 @@ export default function ForgetPassword() {
 
           <Button
             type="submit"
-            pill
             disabled={isLoading}
-            className="!py-2.5 text-xs"
+            className="!h-11 !rounded-[14px] !py-0 text-xs"
           >
             {isLoading ? "Resetting..." : "Reset password"}
           </Button>
@@ -456,9 +468,8 @@ export default function ForgetPassword() {
 
           <Button
             type="button"
-            pill
             onClick={() => navigate("/login")}
-            className="!py-2.5 text-xs"
+            className="!h-11 !rounded-[14px] !py-0 text-xs"
           >
             Go to login
           </Button>
