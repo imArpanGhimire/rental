@@ -71,10 +71,10 @@ const legacyUiTranslations = {
   "A calmer way to rent in Kathmandu.": "काठमाडौंमा भाडा खोज्ने सहज तरिका।",
   "Good places start with a good search.":
     "राम्रो ठाउँको सुरुवात राम्रो खोजबाट हुन्छ।",
-  "Welcome back to Rentora.": "Rentora मा फेरि स्वागत छ।",
-  "Rentora account": "Rentora खाता",
-  "By continuing, you agree to use Rentora responsibly and keep your account information secure.":
-    "जारी राखेर, तपाईं Rentora जिम्मेवारीपूर्वक प्रयोग गर्न र आफ्नो खाता जानकारी सुरक्षित राख्न सहमत हुनुहुन्छ।",
+  "Welcome back to Thegana.": "Thegana मा फेरि स्वागत छ।",
+  "Thegana account": "Thegana खाता",
+  "By continuing, you agree to use Thegana responsibly and keep your account information secure.":
+    "जारी राखेर, तपाईं Thegana जिम्मेवारीपूर्वक प्रयोग गर्न र आफ्नो खाता जानकारी सुरक्षित राख्न सहमत हुनुहुन्छ।",
 
   "Something went wrong": "केही समस्या भयो",
   "An unexpected error occurred.": "अप्रत्याशित त्रुटि भयो।",
@@ -115,13 +115,13 @@ const legacyUiTranslations = {
   "Confirm new password": "नयाँ पासवर्ड पुष्टि गर्नुहोस्",
 
   "Welcome back": "फेरि स्वागत छ",
-  "Log in to continue to your Rentora account.":
-    "आफ्नो Rentora खातामा जारी राख्न लगइन गर्नुहोस्।",
+  "Log in to continue to your Thegana account.":
+    "आफ्नो Thegana खातामा जारी राख्न लगइन गर्नुहोस्।",
   "Don't have an account?": "खाता छैन?",
   "Sign up": "खाता बनाउनुहोस्",
   "Create your account": "आफ्नो खाता बनाउनुहोस्",
-  "Choose how you'll use Rentora, then add your account details.":
-    "Rentora कसरी प्रयोग गर्ने छान्नुहोस् र त्यसपछि आफ्नो खाता विवरण थप्नुहोस्।",
+  "Choose how you'll use Thegana, then add your account details.":
+    "Thegana कसरी प्रयोग गर्ने छान्नुहोस् र त्यसपछि आफ्नो खाता विवरण थप्नुहोस्।",
   "Already have an account?": "पहिले नै खाता छ?",
   "Enter the email on your account.": "आफ्नो खाताको इमेल प्रविष्ट गर्नुहोस्।",
   "Answer your security questions.":
@@ -390,8 +390,8 @@ const legacyUiTranslations = {
   "Renter account": "भाडावाला खाता",
   Identity: "पहिचान",
   "Profile picture": "प्रोफाइल तस्वीर",
-  "This photo appears alongside your account across Rentora.":
-    "यो फोटो Rentora मा तपाईंको खातासँगै देखिन्छ।",
+  "This photo appears alongside your account across Thegana.":
+    "यो फोटो Thegana मा तपाईंको खातासँगै देखिन्छ।",
   Account: "खाता",
   "Personal information": "व्यक्तिगत जानकारी",
   "Keep your basic account information accurate and up to date.":
@@ -425,15 +425,15 @@ const legacyUiTranslations = {
   "Image must be under 5MB.": "फोटो 5MB भन्दा कम हुनुपर्छ।",
   "Your profile": "तपाईंको प्रोफाइल",
 
-  "About Rentora": "Rentora को बारेमा",
+  "About Thegana": "Thegana को बारेमा",
   "Finding a rental should start with knowing where it is.":
     "भाडाको घर खोज्दा सबैभन्दा पहिले त्यो कहाँ छ भन्ने थाहा हुनुपर्छ।",
-  "Rentora is built around the Kathmandu Valley rental market, bringing property discovery, location and direct owner contact into one focused experience.":
-    "Rentora काठमाडौं उपत्यकाको भाडा बजारलाई ध्यानमा राखेर बनाइएको हो, जहाँ सम्पत्ति खोज, स्थान र घरधनीसँग प्रत्यक्ष सम्पर्क एउटै अनुभवमा जोडिएको छ।",
-  "Why Rentora": "किन Rentora",
+  "Thegana is built around the Kathmandu Valley rental market, bringing property discovery, location and direct owner contact into one focused experience.":
+    "Thegana काठमाडौं उपत्यकाको भाडा बजारलाई ध्यानमा राखेर बनाइएको हो, जहाँ सम्पत्ति खोज, स्थान र घरधनीसँग प्रत्यक्ष सम्पर्क एउटै अनुभवमा जोडिएको छ।",
+  "Why Thegana": "किन Thegana",
   "A clearer way to search.": "खोज्ने अझ स्पष्ट तरिका।",
-  "Rentora is a rental search platform built around the Kathmandu valley housing market. Instead of scrolling endless listings with no sense of where they actually are, Rentora puts the map first — so you can see price, location, and commute distance together before you ever click into a listing.":
-    "Rentora काठमाडौं उपत्यकाको आवास बजारका लागि बनाइएको भाडा खोज प्लेटफर्म हो। स्थान थाहा नहुने अनगिन्ती लिस्टिङ स्क्रोल गर्नुको सट्टा Rentora ले नक्सालाई प्राथमिकता दिन्छ — जसले लिस्टिङ खोल्नुअघि नै मूल्य, स्थान र आवतजावत दूरी सँगै देखाउँछ।",
+  "Thegana is a rental search platform built around the Kathmandu valley housing market. Instead of scrolling endless listings with no sense of where they actually are, Thegana puts the map first — so you can see price, location, and commute distance together before you ever click into a listing.":
+    "Thegana काठमाडौं उपत्यकाको आवास बजारका लागि बनाइएको भाडा खोज प्लेटफर्म हो। स्थान थाहा नहुने अनगिन्ती लिस्टिङ स्क्रोल गर्नुको सट्टा Thegana ले नक्सालाई प्राथमिकता दिन्छ — जसले लिस्टिङ खोल्नुअघि नै मूल्य, स्थान र आवतजावत दूरी सँगै देखाउँछ।",
   "We're just getting started, and we're building this with renters and property owners in the valley in mind — from students looking for a shared room near Koteshwor to families searching for a flat in Boudha.":
     "हामी भर्खर सुरु गर्दैछौं, र उपत्यकाका भाडावाला तथा घरधनीलाई ध्यानमा राखेर यो बनाइरहेका छौं — कोटेश्वर नजिक साझा कोठा खोज्ने विद्यार्थीदेखि बौद्धमा फ्ल्याट खोज्ने परिवारसम्म।",
   "Built around the essentials": "आवश्यक कुराहरूमा केन्द्रित",
@@ -452,17 +452,17 @@ const legacyUiTranslations = {
     "काठमाडौंमा मानिसहरूले वास्तवमा घर खोज्ने तरिका — क्षेत्रअनुसार — लाई ध्यानमा राखेर डिजाइन गरिएको।",
 
   "Quick answers when you need them.": "चाहिएको बेला छिटो उत्तर।",
-  "Find help with searching for properties, saving listings, contacting owners and managing your Rentora account.":
-    "सम्पत्ति खोज, लिस्टिङ सुरक्षित गर्ने, घरधनीलाई सम्पर्क गर्ने र Rentora खाता व्यवस्थापनबारे सहायता पाउनुहोस्।",
+  "Find help with searching for properties, saving listings, contacting owners and managing your Thegana account.":
+    "सम्पत्ति खोज, लिस्टिङ सुरक्षित गर्ने, घरधनीलाई सम्पर्क गर्ने र Thegana खाता व्यवस्थापनबारे सहायता पाउनुहोस्।",
   "Frequently asked": "बारम्बार सोधिने",
   "Common questions": "सामान्य प्रश्नहरू",
   "Click a question to view its answer.":
     "उत्तर हेर्न प्रश्नमा क्लिक गर्नुहोस्।",
   "Need more help?": "थप सहायता चाहिन्छ?",
   "Check the answers above first.": "पहिले माथिका उत्तरहरू हेर्नुहोस्।",
-  "We're keeping Rentora simple, so most common account and property questions should be covered here.":
-    "Rentora सरल राखिएको छ, त्यसैले अधिकांश सामान्य खाता र सम्पत्ति प्रश्नहरूको उत्तर यहाँ पाउनुहुनेछ।",
-  "Rentora Help": "Rentora सहायता",
+  "We're keeping Thegana simple, so most common account and property questions should be covered here.":
+    "Thegana सरल राखिएको छ, त्यसैले अधिकांश सामान्य खाता र सम्पत्ति प्रश्नहरूको उत्तर यहाँ पाउनुहुनेछ।",
+  "Thegana Help": "Thegana सहायता",
   "How do I contact a property owner?": "घरधनीलाई कसरी सम्पर्क गर्ने?",
   "Open any listing and use the contact details or message option on the listing page.":
     "कुनै पनि लिस्टिङ खोल्नुहोस् र लिस्टिङ पृष्ठमा रहेको सम्पर्क विवरण वा सन्देश विकल्प प्रयोग गर्नुहोस्।",
@@ -473,7 +473,7 @@ const legacyUiTranslations = {
     "पछि हेर्न लिस्टिङ सुरक्षित गर्न सक्छु?",
   "Yes — use the save option on any listing card. You can view your saved listings from your dashboard.":
     "हो — कुनै पनि लिस्टिङ कार्डमा सुरक्षित गर्ने विकल्प प्रयोग गर्नुहोस्। ड्यासबोर्डबाट सुरक्षित लिस्टिङहरू हेर्न सक्नुहुन्छ।",
-  "Is Rentora free to use?": "Rentora प्रयोग गर्न निःशुल्क हो?",
+  "Is Thegana free to use?": "Thegana प्रयोग गर्न निःशुल्क हो?",
   "Yes, browsing and contacting owners is free for renters. There's no fee to list a property either.":
     "हो, भाडावालाका लागि खोज्न र घरधनीलाई सम्पर्क गर्न निःशुल्क छ। सम्पत्ति सूचीबद्ध गर्न पनि शुल्क छैन।",
   "Finding rentals": "भाडाका घर खोज्दै",
@@ -484,7 +484,7 @@ const legacyUiTranslations = {
   "Create and manage your rental properties.":
     "आफ्ना भाडा सम्पत्तिहरू बनाउनुहोस् र व्यवस्थापन गर्नुहोस्।",
 
-  "How Rentora works": "Rentora कसरी काम गर्छ",
+  "How Thegana works": "Thegana कसरी काम गर्छ",
   "From search to visit in three steps.": "खोजदेखि अवलोकनसम्म तीन चरणमा।",
   "Discover the right area, save the places worth considering and contact the property owner directly.":
     "उपयुक्त क्षेत्र खोज्नुहोस्, विचार गर्न लायक ठाउँ सुरक्षित गर्नुहोस् र घरधनीलाई प्रत्यक्ष सम्पर्क गर्नुहोस्।",
@@ -501,11 +501,11 @@ const legacyUiTranslations = {
   "Reach out to the property owner straight from the listing page — no middleman, no waiting on a broker to call back.":
     "लिस्टिङ पृष्ठबाटै घरधनीलाई सम्पर्क गर्नुहोस् — न बिचौलिया, न दलालको फोनको प्रतीक्षा।",
 
-  "Privacy at Rentora": "Rentora मा गोपनीयता",
+  "Privacy at Thegana": "Thegana मा गोपनीयता",
   "Your information should have a clear purpose.":
     "तपाईंको जानकारीको स्पष्ट उद्देश्य हुनुपर्छ।",
-  "This page explains what Rentora collects, why we use it, and how that information supports your experience on the platform.":
-    "यस पृष्ठले Rentora ले के जानकारी संकलन गर्छ, किन प्रयोग गर्छ र त्यसले प्लेटफर्ममा तपाईंको अनुभवलाई कसरी सहयोग गर्छ भन्ने बताउँछ।",
+  "This page explains what Thegana collects, why we use it, and how that information supports your experience on the platform.":
+    "यस पृष्ठले Thegana ले के जानकारी संकलन गर्छ, किन प्रयोग गर्छ र त्यसले प्लेटफर्ममा तपाईंको अनुभवलाई कसरी सहयोग गर्छ भन्ने बताउँछ।",
   "Privacy summary": "गोपनीयता सारांश",
   "Last updated: August 2026": "अन्तिम अद्यावधिक: अगस्ट २०२६",
   "Information we collect": "हामीले संकलन गर्ने जानकारी",
@@ -515,14 +515,14 @@ const legacyUiTranslations = {
   "We use your information to run your account, show your listings or saved properties, and let renters and owners contact each other.":
     "तपाईंको खाता सञ्चालन गर्न, लिस्टिङ वा सुरक्षित सम्पत्ति देखाउन र भाडावाला तथा घरधनीबीच सम्पर्क गराउन हामी तपाईंको जानकारी प्रयोग गर्छौं।",
   "Account and listing data": "खाता र लिस्टिङ डेटा",
-  "Information connected to your account is used to provide Rentora features such as authentication, saved listings, property management and interaction between renters and owners.":
-    "तपाईंको खातासँग सम्बन्धित जानकारी प्रमाणीकरण, सुरक्षित लिस्टिङ, सम्पत्ति व्यवस्थापन र भाडावाला-घरधनीबीच अन्तरक्रिया जस्ता Rentora सुविधाहरू प्रदान गर्न प्रयोग गरिन्छ।",
+  "Information connected to your account is used to provide Thegana features such as authentication, saved listings, property management and interaction between renters and owners.":
+    "तपाईंको खातासँग सम्बन्धित जानकारी प्रमाणीकरण, सुरक्षित लिस्टिङ, सम्पत्ति व्यवस्थापन र भाडावाला-घरधनीबीच अन्तरक्रिया जस्ता Thegana सुविधाहरू प्रदान गर्न प्रयोग गरिन्छ।",
   "We don't sell your personal data.": "हामी तपाईंको व्यक्तिगत डेटा बेच्दैनौं।",
-  "Your data is used to provide Rentora features.":
-    "तपाईंको डेटा Rentora सुविधाहरू प्रदान गर्न प्रयोग हुन्छ।",
+  "Your data is used to provide Thegana features.":
+    "तपाईंको डेटा Thegana सुविधाहरू प्रदान गर्न प्रयोग हुन्छ।",
   "Listing information is shown only where the platform requires it.":
     "लिस्टिङ जानकारी प्लेटफर्मलाई आवश्यक ठाउँमा मात्र देखाइन्छ।",
-  "Your data at Rentora": "Rentora मा तपाईंको डेटा",
+  "Your data at Thegana": "Thegana मा तपाईंको डेटा",
   "What happens to the information you provide?":
     "तपाईंले दिएको जानकारीलाई के हुन्छ?",
   "The basic flow is intentionally simple.":
@@ -530,7 +530,7 @@ const legacyUiTranslations = {
   "You provide it": "तपाईं जानकारी दिनुहुन्छ",
   "Account information, property details and photos.":
     "खाता जानकारी, सम्पत्ति विवरण र फोटोहरू।",
-  "Rentora uses it": "Rentora ले प्रयोग गर्छ",
+  "Thegana uses it": "Thegana ले प्रयोग गर्छ",
   "To provide accounts, listings, saves and platform features.":
     "खाता, लिस्टिङ, सुरक्षित सुविधा र प्लेटफर्मका अन्य सुविधा प्रदान गर्न।",
   "You get the experience": "तपाईंले अनुभव पाउनुहुन्छ",
@@ -542,21 +542,21 @@ const legacyUiTranslations = {
     "यस नीतिबारे प्रश्न सहायता केन्द्रमार्फत पठाउन सकिन्छ।",
 
   Legal: "कानुनी",
-  "The basic rules for using Rentora as a renter or property owner.":
-    "भाडावाला वा घरधनीको रूपमा Rentora प्रयोग गर्ने आधारभूत नियमहरू।",
+  "The basic rules for using Thegana as a renter or property owner.":
+    "भाडावाला वा घरधनीको रूपमा Thegana प्रयोग गर्ने आधारभूत नियमहरू।",
   "On this page": "यस पृष्ठमा",
-  "Using Rentora": "Rentora प्रयोग गर्दा",
-  "Rentora connects renters and property owners in the Kathmandu valley. By using the site, you agree to provide accurate information in your account and listings.":
-    "Rentora ले काठमाडौं उपत्यकाका भाडावाला र घरधनीलाई जोड्छ। साइट प्रयोग गरेर, तपाईं आफ्नो खाता र लिस्टिङमा सही जानकारी दिन सहमत हुनुहुन्छ।",
+  "Using Thegana": "Thegana प्रयोग गर्दा",
+  "Thegana connects renters and property owners in the Kathmandu valley. By using the site, you agree to provide accurate information in your account and listings.":
+    "Thegana ले काठमाडौं उपत्यकाका भाडावाला र घरधनीलाई जोड्छ। साइट प्रयोग गरेर, तपाईं आफ्नो खाता र लिस्टिङमा सही जानकारी दिन सहमत हुनुहुन्छ।",
   Listings: "लिस्टिङहरू",
-  "Property owners are responsible for the accuracy of their listings, including price, photos, and availability. Rentora does not verify listings and is not a party to any rental agreement made between users.":
-    "लिस्टिङको मूल्य, फोटो र उपलब्धतासहितको शुद्धताका लागि घरधनी जिम्मेवार हुन्छन्। Rentora ले लिस्टिङ प्रमाणित गर्दैन र प्रयोगकर्ताबीच हुने कुनै भाडा सम्झौताको पक्ष हुँदैन।",
+  "Property owners are responsible for the accuracy of their listings, including price, photos, and availability. Thegana does not verify listings and is not a party to any rental agreement made between users.":
+    "लिस्टिङको मूल्य, फोटो र उपलब्धतासहितको शुद्धताका लागि घरधनी जिम्मेवार हुन्छन्। Thegana ले लिस्टिङ प्रमाणित गर्दैन र प्रयोगकर्ताबीच हुने कुनै भाडा सम्झौताको पक्ष हुँदैन।",
   "Account responsibility": "खाता जिम्मेवारी",
   "You're responsible for keeping your login credentials secure and for any activity that happens under your account.":
     "आफ्नो लगइन विवरण सुरक्षित राख्न र खाताअन्तर्गत हुने गतिविधिका लागि तपाईं जिम्मेवार हुनुहुन्छ।",
   "Rental agreements": "भाडा सम्झौताहरू",
-  "Any rental agreement, deposit, payment arrangement or other transaction is made directly between the renter and property owner. Rentora provides the platform for discovery and connection but is not a party to the agreement.":
-    "कुनै पनि भाडा सम्झौता, धरौटी, भुक्तानी व्यवस्था वा अन्य कारोबार भाडावाला र घरधनीबीच प्रत्यक्ष हुन्छ। Rentora ले खोज र सम्पर्कका लागि प्लेटफर्म प्रदान गर्छ तर सम्झौताको पक्ष हुँदैन।",
+  "Any rental agreement, deposit, payment arrangement or other transaction is made directly between the renter and property owner. Thegana provides the platform for discovery and connection but is not a party to the agreement.":
+    "कुनै पनि भाडा सम्झौता, धरौटी, भुक्तानी व्यवस्था वा अन्य कारोबार भाडावाला र घरधनीबीच प्रत्यक्ष हुन्छ। Thegana ले खोज र सम्पर्कका लागि प्लेटफर्म प्रदान गर्छ तर सम्झौताको पक्ष हुँदैन।",
 };
 
 const basePairs = flattenPairs(en, ne);
