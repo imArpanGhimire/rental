@@ -104,7 +104,7 @@ app.get(
     res.status(200).json({
       success: true,
       message:
-        "Rentora backend is running",
+        "Thegana backend is running",
     });
   }
 );
