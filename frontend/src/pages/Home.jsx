@@ -2,8 +2,6 @@ import { Check, MapPin, ShieldCheck } from "lucide-react";
 
 import AppShell from "../components/layout/AppShell.jsx";
 
-import HeroSearch from "../features/home/components/HeroSearch.jsx";
-import PropertyTypeStrip from "../features/home/components/PropertyTypeStrip.jsx";
 import FeaturedHomes from "../features/home/components/FeaturedHomes.jsx";
 import MapSearchShowcase from "../features/home/components/MapSearchShowcase.jsx";
 
@@ -55,7 +53,7 @@ export default function Home() {
               "
             />
 
-            {/* VERY SUBTLE ACCENT */}
+            {/* SUBTLE ACCENT */}
 
             <div
               className="
@@ -121,15 +119,13 @@ export default function Home() {
               relative
               z-10
               px-5
-              pb-8
-              pt-12
+              py-14
 
               sm:px-8
-              sm:pb-10
-              sm:pt-16
+              sm:py-16
 
               lg:px-12
-              lg:pt-20
+              lg:py-20
             "
           >
             <div className="mx-auto max-w-[880px] text-center">
@@ -184,33 +180,32 @@ export default function Home() {
                   leading-6
                   text-ink/55
 
+                  dark:text-white/55
+
                   sm:text-[15px]
                 "
               >
-                Browse rentals, compare locations and search directly on the map
-                — all in one place.
+                Browse available rentals, check property details and explore
+                locations directly on the map.
               </p>
-
-              {/* SEARCH */}
-
-              <div className="relative z-20 mt-8 sm:mt-10">
-                <HeroSearch />
-              </div>
 
               {/* TRUST POINTS */}
 
               <div
                 className="
-                  mt-5
+                  mt-8
                   flex
                   flex-wrap
                   items-center
                   justify-center
                   gap-x-5
                   gap-y-2
+
                   text-[10px]
                   font-medium
                   text-ink/45
+
+                  dark:text-white/45
                 "
               >
                 <span className="flex items-center gap-1.5">
@@ -222,7 +217,7 @@ export default function Home() {
                       dark:text-white/50
                     "
                   />
-                  Real property listings
+                  Property listings
                 </span>
 
                 <span className="flex items-center gap-1.5">
@@ -250,14 +245,6 @@ export default function Home() {
                 </span>
               </div>
             </div>
-          </div>
-
-          {/* ===================================================
-              PROPERTY TYPES
-          =================================================== */}
-
-          <div className="relative z-20">
-            <PropertyTypeStrip />
           </div>
         </section>
 
