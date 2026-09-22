@@ -6,7 +6,7 @@ import { ArrowLeft, Star, Share2 } from "lucide-react";
 export default function ListingGallery({
   photos = [],
   rating,
-  title = "Rentora listing",
+  title = "Thegana listing",
 }) {
   const [active, setActive] = useState(0);
   const [shareMessage, setShareMessage] = useState("");
@@ -89,7 +89,7 @@ export default function ListingGallery({
       try {
         await navigator.share({
           title,
-          text: `Check out this property on Rentora: ${title}`,
+          text: `Check out this property on Thegana: ${title}`,
           url,
         });
       } catch (error) {
