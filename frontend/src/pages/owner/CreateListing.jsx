@@ -161,7 +161,7 @@ export default function CreateListing() {
                 "
               >
                 Add the property details, choose its exact location and upload
-                photos before publishing it to Rentora.
+                photos before publishing it to Thegana.
               </p>
             </div>
           </div>
