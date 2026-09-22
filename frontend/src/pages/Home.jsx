@@ -137,17 +137,6 @@ export default function Home() {
 
               <div className="flex items-center justify-center gap-3">
                 <span
-                  aria-hidden="true"
-                  className="
-                    h-px
-                    w-7
-                    bg-ink/20
-
-                    dark:bg-white/20
-                  "
-                />
-
-                <span
                   className="
                     text-[10px]
                     font-semibold
@@ -160,17 +149,6 @@ export default function Home() {
                 >
                   Rental discovery, made simpler
                 </span>
-
-                <span
-                  aria-hidden="true"
-                  className="
-                    h-px
-                    w-7
-                    bg-ink/20
-
-                    dark:bg-white/20
-                  "
-                />
               </div>
 
               {/* TITLE */}
