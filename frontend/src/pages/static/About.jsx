@@ -6,20 +6,20 @@ const pillars = [
   {
     icon: MapPinned,
     number: "01",
-    title: "Map-first search",
-    body: "Every listing shows up as a pin, so you see price, location, and distance together before clicking in.",
+    title: "Know where the property is",
+    body: "Owners mark the property on the map, so you can check the location and rent before opening the full listing.",
   },
   {
     icon: MessagesSquare,
     number: "02",
-    title: "Direct contact",
-    body: "Reach out to owners straight from a listing — no middleman, no broker in between.",
+    title: "Talk to the owner",
+    body: "Interested in a place? Contact the property owner directly instead of going through a middleman.",
   },
   {
     icon: Landmark,
     number: "03",
-    title: "Built for the valley",
-    body: "Designed around how people actually search for housing in Kathmandu — by neighborhood, not zip code.",
+    title: "Search where you want",
+    body: "You're not limited to a fixed list of areas. Search the map around the place where you actually want to live.",
   },
 ];
 
@@ -66,17 +66,17 @@ export default function About() {
             </span>
 
             <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.17em] text-[#2b2d31]/42 dark:text-white/40">
-              About Rentora
+              About Thegana
             </p>
 
             <h1 className="mt-2 max-w-2xl font-display text-[30px] font-bold leading-tight tracking-[-0.045em] text-[#202226] sm:text-[38px] dark:text-white">
-              Finding a rental should start with knowing where it is.
+              Finding a place to rent shouldn't be this difficult.
             </h1>
 
             <p className="mt-4 max-w-2xl text-[14px] leading-6 text-[#2b2d31]/58 dark:text-white/52">
-              Rentora is built around the Kathmandu Valley rental market,
-              bringing property discovery, location and direct owner contact
-              into one focused experience.
+              Thegana is a place to find rooms, flats, apartments and homes for
+              rent, with the location, photos and property details available
+              before you decide whether it's worth visiting.
             </p>
           </div>
         </section>
@@ -98,27 +98,27 @@ export default function About() {
             "
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/38 dark:text-white/35">
-              Why Rentora
+              Why we built it
             </p>
 
             <h2 className="mt-2 font-display text-[22px] font-bold tracking-[-0.035em] text-[#202226] dark:text-white">
-              A clearer way to search.
+              Finding the right rental can take a lot of work.
             </h2>
 
             <div className="mt-5 space-y-5">
               <p className="text-[13px] leading-6 text-[#2b2d31]/56 dark:text-white/47">
-                Rentora is a rental search platform built around the Kathmandu
-                valley housing market. Instead of scrolling endless listings
-                with no sense of where they actually are, Rentora puts the map
-                first — so you can see price, location, and commute distance
-                together before you ever click into a listing.
+                Finding a place to rent often means checking scattered posts,
+                asking around, calling different owners and visiting properties
+                without knowing much about them beforehand. Sometimes even
+                figuring out exactly where a property is can be difficult.
               </p>
 
               <p className="text-[13px] leading-6 text-[#2b2d31]/56 dark:text-white/47">
-                We're just getting started, and we're building this with renters
-                and property owners in the valley in mind — from students
-                looking for a shared room near Koteshwor to families searching
-                for a flat in Boudha.
+                Thegana puts the useful information in one place. Owners can
+                mark the actual location of their property when they create a
+                listing, and renters can search around the area where they want
+                to live. You can check the rent, photos, location and property
+                details before contacting the owner.
               </p>
             </div>
           </div>
@@ -143,20 +143,20 @@ export default function About() {
 
             <div className="relative flex h-full min-h-[250px] flex-col">
               <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/35">
-                Built around the essentials
+                Before you visit
               </p>
 
               <p className="mt-8 font-display text-[27px] font-bold leading-[1.2] tracking-[-0.045em]">
-                See the place.
+                Check the photos.
                 <br />
-                Understand the area.
+                Check the rent.
                 <br />
-                Contact the owner.
+                Check the location.
               </p>
 
               <p className="mt-auto pt-8 text-[11px] leading-5 text-white/42">
-                Fewer unnecessary steps between discovering a property and
-                deciding whether it's right for you.
+                Then talk to the owner and decide if the place is worth seeing
+                in person.
               </p>
             </div>
           </div>
