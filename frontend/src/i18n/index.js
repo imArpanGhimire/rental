@@ -31,7 +31,7 @@ i18n
     detection: {
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
-      lookupLocalStorage: "rentora-language",
+      lookupLocalStorage: "Thegana-language",
     },
 
     react: {
