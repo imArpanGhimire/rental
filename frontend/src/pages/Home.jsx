@@ -1,6 +1,7 @@
 import { Check, MapPin, ShieldCheck } from "lucide-react";
 
 import AppShell from "../components/layout/AppShell.jsx";
+import DemoListingNotice from "../components/ui/DemoListingNotice.jsx";
 
 import FeaturedHomes from "../features/home/components/FeaturedHomes.jsx";
 import MapSearchShowcase from "../features/home/components/MapSearchShowcase.jsx";
@@ -8,6 +9,9 @@ import MapSearchShowcase from "../features/home/components/MapSearchShowcase.jsx
 export default function Home() {
   return (
     <AppShell>
+      {/* DEMO LISTING NOTICE */}
+      <DemoListingNotice />
+
       <div className="space-y-8 sm:space-y-10">
         {/* =====================================================
             HERO
