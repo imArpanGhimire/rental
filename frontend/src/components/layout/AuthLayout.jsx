@@ -82,7 +82,7 @@ function RegisterArtPanel() {
         aria-hidden="true"
       >
         <defs>
-          <linearGradient id="rentoraGlow" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id="TheganaGlow" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="rgba(255,255,255,0.13)" />
             <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
           </linearGradient>
@@ -90,7 +90,7 @@ function RegisterArtPanel() {
 
         <path
           d="M128 694V340L350 172L575 340V694"
-          fill="url(#rentoraGlow)"
+          fill="url(#TheganaGlow)"
           stroke="rgba(255,255,255,0.10)"
           strokeWidth="2"
         />
@@ -303,7 +303,7 @@ function LoginArtPanel({ active, setActive }) {
               Good places start with a good search.
             </p>
             <p className="mt-1 text-[9px] text-white/28">
-              Welcome back to Rentora.
+              Welcome back to Thegana.
             </p>
           </div>
 
@@ -397,7 +397,7 @@ export default function AuthLayout({
               >
                 <div className="border-b border-white/[0.07] px-6 pb-4 pt-5 sm:px-7">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/34">
-                    Rentora account
+                    Thegana account
                   </p>
 
                   <h1 className="mt-2 font-display text-[31px] font-bold tracking-[-0.045em] text-white sm:text-[36px]">
@@ -414,7 +414,7 @@ export default function AuthLayout({
                 <div className="flex-1 px-6 py-5 sm:px-7">{children}</div>
 
                 <div className="border-t border-white/[0.06] px-6 py-3.5 text-center text-[9px] leading-4 text-white/25 sm:px-7">
-                  By continuing, you agree to use Rentora responsibly and keep
+                  By continuing, you agree to use Thegana responsibly and keep
                   your account information secure.
                 </div>
               </section>
@@ -470,7 +470,7 @@ export default function AuthLayout({
             >
               <div className="border-b border-white/[0.07] px-6 pb-5 pt-6 sm:px-7 sm:pt-7">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/34">
-                  Rentora account
+                  Thegana account
                 </p>
 
                 <h1 className="mt-2 font-display text-[31px] font-bold tracking-[-0.045em] text-white sm:text-[36px]">
@@ -489,7 +489,7 @@ export default function AuthLayout({
               </div>
 
               <div className="border-t border-white/[0.06] px-6 py-3.5 text-center text-[9px] leading-4 text-white/25 sm:px-7">
-                By continuing, you agree to use Rentora responsibly and keep
+                By continuing, you agree to use Thegana responsibly and keep
                 your account information secure.
               </div>
             </section>
