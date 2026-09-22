@@ -827,7 +827,7 @@ export default function ForOwners() {
             </p>
 
             <h2 className="mt-2 max-w-sm font-display text-[29px] font-bold leading-[1.08] tracking-[-0.045em] text-[#202226] dark:text-white">
-              List once. Manage everything from Rentora.
+              List once. Manage everything from Thegana.
             </h2>
 
             <p className="mt-4 max-w-md text-[13px] leading-6 text-[#2b2d31]/50 dark:text-white/44">
@@ -875,7 +875,7 @@ export default function ForOwners() {
             <WorkflowStep
               number="02"
               title="Let renters discover it"
-              description="Your listing becomes available through Rentora's browsing and map-based property discovery."
+              description="Your listing becomes available through Thegana's browsing and map-based property discovery."
             />
 
             <WorkflowStep
@@ -934,7 +934,7 @@ export default function ForOwners() {
             </div>
 
             <h2 className="mt-3 font-display text-[27px] font-bold tracking-[-0.04em] text-white sm:text-[31px]">
-              Ready to put your property on Rentora?
+              Ready to put your property on Thegana?
             </h2>
 
             <p className="mt-2 max-w-xl text-[13px] leading-6 text-white/52">
