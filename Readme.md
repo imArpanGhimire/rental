@@ -1,4 +1,4 @@
-# Rentora — Frontend
+# Thegana — Frontend
 
 A rental platform for Nepal — hostel rooms, rental rooms, and flats — connecting renters directly with owners, no middlemen. This is a ground-up rebuild: a refined design system and a folder structure built to grow past auth pages into a full listings marketplace.
 
@@ -23,18 +23,19 @@ A rental platform for Nepal — hostel rooms, rental rooms, and flats — connec
 
 **Palette — "Ink & Brass"**
 
-| Token | Hex | Use |
-|---|---|---|
-| `--ink` | `#1B1A17` | Primary text, headings |
-| `--ivory` | `#F7F4EE` | Page background (light) |
-| `--charcoal` | `#111110` | Page background (dark) |
-| `--brass` | `#A9812E` | Accent — CTAs, active states, links |
+| Token           | Hex       | Use                                     |
+| --------------- | --------- | --------------------------------------- |
+| `--ink`         | `#1B1A17` | Primary text, headings                  |
+| `--ivory`       | `#F7F4EE` | Page background (light)                 |
+| `--charcoal`    | `#111110` | Page background (dark)                  |
+| `--brass`       | `#A9812E` | Accent — CTAs, active states, links     |
 | `--brass-light` | `#F1E7D0` | Accent tint — badges, hover backgrounds |
-| `--stone` | `#DCD5C6` | Borders, dividers |
+| `--stone`       | `#DCD5C6` | Borders, dividers                       |
 
 All colors are defined once, as CSS custom properties, in `src/styles/tokens.css` — never hardcoded in components. Light/dark mode swaps the same token names, so components never need `dark:` conditionals for color.
 
 **Typography**
+
 - Display: a serif with real presence (e.g. **Fraunces** or **Source Serif 4**) for headings — this carries the "luxury" feel
 - Body/UI: a clean grotesk (e.g. **Inter** or **General Sans**) for everything functional
 - One scale, used consistently: `text-xs` (labels/eyebrows) → `text-sm` (body/UI) → `text-2xl`/`text-4xl` (headings)
@@ -47,16 +48,16 @@ All colors are defined once, as CSS custom properties, in `src/styles/tokens.css
 
 ## Tech Stack
 
-| Layer | Choice | Why |
-|---|---|---|
-| Framework | React + Vite | Fast dev loop, what you know already |
-| Routing | React Router v6 | |
-| Styling | Tailwind CSS v4 (CSS-first `@theme`) | Single token source, no config file needed |
-| Data fetching | **Axios + TanStack Query** *(new)* | Previously there was no real API layer — this gives caching, loading/error states, and retries for free instead of hand-rolled `useState`/`setTimeout` |
-| Forms | **React Hook Form** *(new)* | Manual `useState` per field works for 2 fields, not for a listing form with 15+ |
-| i18n | `i18next` + `react-i18next` | English / Nepali |
-| Icons | `lucide-react` | |
-| Auth state | React Context (`AuthContext`) | Fine at this scale — revisit only if state sharing gets genuinely complex |
+| Layer         | Choice                               | Why                                                                                                                                                    |
+| ------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Framework     | React + Vite                         | Fast dev loop, what you know already                                                                                                                   |
+| Routing       | React Router v6                      |                                                                                                                                                        |
+| Styling       | Tailwind CSS v4 (CSS-first `@theme`) | Single token source, no config file needed                                                                                                             |
+| Data fetching | **Axios + TanStack Query** _(new)_   | Previously there was no real API layer — this gives caching, loading/error states, and retries for free instead of hand-rolled `useState`/`setTimeout` |
+| Forms         | **React Hook Form** _(new)_          | Manual `useState` per field works for 2 fields, not for a listing form with 15+                                                                        |
+| i18n          | `i18next` + `react-i18next`          | English / Nepali                                                                                                                                       |
+| Icons         | `lucide-react`                       |                                                                                                                                                        |
+| Auth state    | React Context (`AuthContext`)        | Fine at this scale — revisit only if state sharing gets genuinely complex                                                                              |
 
 **Worth deciding now, before you build listings pages:** rental listings benefit a lot from SEO (people search "hostel room Baneshwor" on Google). Plain Vite SPAs don't get indexed well. If discoverability matters, consider **Next.js** for the rebuild instead of Vite — same React code, but pages are server-rendered/indexable. If listings will mostly be found through the app itself (shared links, word of mouth) rather than search, Vite is simpler and fine. Worth a deliberate choice rather than a default.
 
@@ -64,7 +65,7 @@ All colors are defined once, as CSS custom properties, in `src/styles/tokens.css
 
 ## Folder Structure
 
-The old structure split `pages/owner/` and `pages/renter/` as if they were separate apps. But "listings," "favorites," and "reviews" are used by *both* roles — that split forces duplication as features grow. This structure groups by **feature domain** instead:
+The old structure split `pages/owner/` and `pages/renter/` as if they were separate apps. But "listings," "favorites," and "reviews" are used by _both_ roles — that split forces duplication as features grow. This structure groups by **feature domain** instead:
 
 ```
 frontend/
@@ -141,6 +142,7 @@ Same pattern as before (it worked well): `i18next` + `react-i18next`, language a
 ## Feature Roadmap
 
 **Now**
+
 - [ ] Auth: login / register (owner + renter roles), forgot password
 - [ ] Browse listings: hostel rooms, rental rooms, flats
 - [ ] Listing detail page: photos, amenities, location, price
@@ -151,6 +153,7 @@ Same pattern as before (it worked well): `i18next` + `react-i18next`, language a
 - [ ] English / Nepali toggle
 
 **Next**
+
 - [ ] Search + filters (price range, room type, location)
 - [ ] Owner dashboard: manage all listings, view inquiries
 - [ ] Renter dashboard: saved listings, past inquiries
@@ -183,6 +186,7 @@ npm run dev
 ```
 
 Environment variables (create `.env`):
+
 ```
 VITE_API_BASE_URL=http://localhost:5000/api
 ```
@@ -195,4 +199,4 @@ VITE_API_BASE_URL=http://localhost:5000/api
 - **New feature:** add a folder under `features/`, not new top-level folders
 - **API calls:** always go through `src/api/`, never `fetch`/`axios` directly inside a component
 - **Forms with 3+ fields:** use React Hook Form, not manual `useState` per field
-- **i18n:** no hardcoded UI strings — every label goes through `t()`, even if English-only for now# Rentora
+- **i18n:** no hardcoded UI strings — every label goes through `t()`, even if English-only for now# Thegana
