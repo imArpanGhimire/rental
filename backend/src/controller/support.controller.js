@@ -93,7 +93,7 @@ async function sendSupportReport(
             new Date();
 
         const emailText = `
-RENTORA SUPPORT REPORT
+Thegana SUPPORT REPORT
 ======================
 
 Issue type:
@@ -137,7 +137,7 @@ ${user._id}
 
         await transporter.sendMail({
             from: {
-                name: "Rentora Support",
+                name: "Thegana Support",
                 address:
                     process.env.SMTP_USER,
             },
@@ -149,7 +149,7 @@ ${user._id}
                 user.email,
 
             subject:
-                `[Rentora Support] ${issueLabel} — ${safeSubject}`,
+                `[Thegana Support] ${issueLabel} — ${safeSubject}`,
 
             text: emailText,
         });
@@ -157,7 +157,7 @@ ${user._id}
         return res.status(200).json({
             success: true,
             message:
-                "Your report has been sent to the Rentora support team.",
+                "Your report has been sent to the Thegana support team.",
         });
     } catch (error) {
         console.error(
