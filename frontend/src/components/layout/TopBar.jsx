@@ -90,7 +90,7 @@ function LogoutConfirmModal({ onConfirm, onCancel }) {
               dark:text-white
             "
           >
-            Log out of Rentora?
+            Log out of Thegana?
           </h2>
 
           <p
@@ -171,7 +171,7 @@ function getSeenNotificationKeys(userId) {
   }
 
   try {
-    const stored = localStorage.getItem(`rentora-notifications-seen-${userId}`);
+    const stored = localStorage.getItem(`Thegana-notifications-seen-${userId}`);
 
     if (!stored) {
       return new Set();
@@ -190,7 +190,7 @@ function saveSeenNotificationKeys(userId, keys) {
 
   try {
     localStorage.setItem(
-      `rentora-notifications-seen-${userId}`,
+      `Thegana-notifications-seen-${userId}`,
       JSON.stringify([...keys]),
     );
   } catch {
@@ -1881,7 +1881,7 @@ export default function TopBar() {
                             <span className="block">Log out</span>
 
                             <span className="mt-0.5 block text-[9px] font-medium text-current opacity-55">
-                              Sign out of Rentora
+                              Sign out of Thegana
                             </span>
                           </span>
                         </button>
