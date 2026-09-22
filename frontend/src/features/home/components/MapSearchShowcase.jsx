@@ -64,7 +64,7 @@ export default function MapSearchShowcase() {
               text-ink/50
             "
           >
-            Draw around the part of the city you want to live in and Rentora
+            Draw around the part of the city you want to live in and Thegana
             will show you the rentals inside it.
           </p>
 
