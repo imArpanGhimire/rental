@@ -14,7 +14,7 @@ function uploadBufferToCloudinary(buffer) {
                 cloudinary.uploader.upload_stream(
                     {
                         folder:
-                            "rentora/listings"
+                            "Thegana/listings"
                     },
 
                     (
