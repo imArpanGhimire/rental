@@ -6,20 +6,20 @@ const steps = [
   {
     icon: SearchCheck,
     number: "01",
-    title: "Search the map, not just a list",
-    body: "Filter by price, location, and property type. Every listing shows up as a pin, so you see exactly where it sits in the valley before you click in.",
+    title: "Search where you want to live",
+    body: "Explore the map or browse available properties. Owners mark their property's location when they list it, so you can search around the area that works for you and narrow the results by rent and property type.",
   },
   {
     icon: BookmarkPlus,
     number: "02",
-    title: "Compare and save",
-    body: "Open a listing to see photos, price, and details. Save the ones you like so you can come back and compare later.",
+    title: "Keep the ones you like",
+    body: "Check the photos, rent, location and property details. Save anything that looks interesting so you can easily come back to it later.",
   },
   {
     icon: PhoneCall,
     number: "03",
-    title: "Contact the owner directly",
-    body: "Reach out to the property owner straight from the listing page — no middleman, no waiting on a broker to call back.",
+    title: "Talk to the owner",
+    body: "When you find a place you're interested in, contact the owner directly and arrange the next step with them.",
   },
 ];
 
@@ -64,16 +64,16 @@ export default function HowItWorks() {
             </span>
 
             <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.17em] text-[#2b2d31]/42 dark:text-white/40">
-              How Rentora works
+              How Thegana works
             </p>
 
             <h1 className="mt-2 font-display text-[30px] font-bold tracking-[-0.045em] text-[#202226] sm:text-[38px] dark:text-white">
-              From search to visit in three steps.
+              Find a place where you want to live.
             </h1>
 
             <p className="mt-3 max-w-xl text-[14px] leading-6 text-[#2b2d31]/58 dark:text-white/52">
-              Discover the right area, save the places worth considering and
-              contact the property owner directly.
+              Search an area, check the available properties and contact the
+              owner when you find something that works for you.
             </p>
           </div>
         </section>
@@ -160,7 +160,7 @@ export default function HowItWorks() {
           </div>
         </section>
 
-        {/* END STATEMENT */}
+        {/* END */}
         <section
           className="
             relative overflow-hidden
@@ -177,12 +177,12 @@ export default function HowItWorks() {
 
           <div className="relative">
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/35">
-              The idea
+              That's it
             </p>
 
             <p className="mt-3 max-w-2xl font-display text-[21px] font-bold leading-8 tracking-[-0.035em]">
-              Spend less time figuring out where a property is and more time
-              deciding whether it actually works for you.
+              Pick an area, see what's available and talk directly to the owner
+              when you find the right place.
             </p>
           </div>
         </section>
