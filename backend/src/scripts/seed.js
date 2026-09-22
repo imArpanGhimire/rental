@@ -73,12 +73,12 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  let owner = await User.findOne({ email: "owner.seed@rentora.test" });
+  let owner = await User.findOne({ email: "owner.seed@Thegana.test" });
   if (!owner) {
     const hash = await bcrypt.hash("password123", 10);
     owner = await User.create({
       name: "Seed Owner",
-      email: "owner.seed@rentora.test",
+      email: "owner.seed@Thegana.test",
       password: hash,
       role: "owner",
       phone: "9812345678",
