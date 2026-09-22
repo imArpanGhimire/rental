@@ -43,7 +43,7 @@ export default function FeaturedHomes() {
       <div className="mb-6 flex items-end justify-between gap-5">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brass">
-            Fresh on Rentora
+            Fresh on Thegana
           </p>
 
           <h2 className="mt-2 font-display text-[26px] font-bold tracking-[-0.045em] text-ink sm:text-[32px]">
@@ -51,7 +51,7 @@ export default function FeaturedHomes() {
           </h2>
 
           <p className="mt-1.5 max-w-xl text-sm text-ink/50">
-            A few rentals currently available on Rentora.
+            A few rentals currently available on Thegana.
           </p>
         </div>
 
@@ -152,7 +152,7 @@ export default function FeaturedHomes() {
                   ) : (
                     <div className="flex h-full items-center justify-center">
                       <span className="font-display text-sm font-semibold text-ink/25">
-                        Rentora
+                        Thegana
                       </span>
                     </div>
                   )}
