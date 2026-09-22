@@ -1055,7 +1055,7 @@ export default function ProfileSettings() {
           <SettingsSection
             eyebrow="Identity"
             title="Profile picture"
-            description="This photo appears alongside your account across Rentora."
+            description="This photo appears alongside your account across Thegana."
             icon={Camera}
             className="h-full"
           >
