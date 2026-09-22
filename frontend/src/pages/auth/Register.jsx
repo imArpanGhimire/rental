@@ -5,7 +5,7 @@ export default function Register() {
   return (
     <AuthLayout
       title="Create your account"
-      subtitle="Choose how you'll use Rentora, then add your account details."
+      subtitle="Choose how you'll use Thegana, then add your account details."
       topLinkLabel="Already have an account?"
       topLinkText="Log in"
       topLinkTo="/login"
