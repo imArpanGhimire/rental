@@ -1,4 +1,10 @@
+import AppShell from "../../components/layout/AppShell.jsx";
+import AccordionItem from "../../components/ui/AccordionItem.jsx";
+
+import { Link } from "react-router-dom";
+
 import {
+  ArrowUpRight,
   Bookmark,
   Home as HomeIcon,
   LifeBuoy,
@@ -6,47 +12,44 @@ import {
   Wallet,
 } from "lucide-react";
 
-import AppShell from "../../components/layout/AppShell.jsx";
-import AccordionItem from "../../components/ui/AccordionItem.jsx";
-
 const faqs = [
   {
     icon: Search,
     q: "How do I contact a property owner?",
-    a: "Open any listing and use the contact details or message option on the listing page.",
+    a: "Open the property you're interested in and use the contact option on the listing page. You'll be able to get in touch with the owner directly.",
   },
   {
     icon: HomeIcon,
-    q: "How do I list my own property?",
-    a: "Log in as a property owner and select \"List your property\" from the footer or navigation. If you don't have an account yet, you'll be asked to sign up first.",
+    q: "How do I add my property?",
+    a: 'Log in with an owner account and choose "List your property." Add the property details, mark its location on the map, upload your photos and publish the listing when you\'re ready.',
   },
   {
     icon: Bookmark,
-    q: "Can I save listings to look at later?",
-    a: "Yes — use the save option on any listing card. You can view your saved listings from your dashboard.",
+    q: "Can I save a property and come back to it later?",
+    a: "Yes. Use the save button on a listing and you'll find it again under your saved listings.",
   },
   {
     icon: Wallet,
-    q: "Is Rentora free to use?",
-    a: "Yes, browsing and contacting owners is free for renters. There's no fee to list a property either.",
+    q: "Do I have to pay to use Thegana?",
+    a: "No. Renters can browse properties and contact owners for free. Owners can also list their properties without a listing fee.",
   },
 ];
 
 const topics = [
   {
     icon: Search,
-    title: "Finding rentals",
-    body: "Search, map browsing and property filters.",
+    title: "Looking for a place",
+    body: "Search the listings, explore the map and narrow things down with filters.",
   },
   {
     icon: Bookmark,
-    title: "Saved listings",
-    body: "Keep properties you want to revisit later.",
+    title: "Saving properties",
+    body: "Keep the places you like together so you can check them again later.",
   },
   {
     icon: HomeIcon,
-    title: "For owners",
-    body: "Create and manage your rental properties.",
+    title: "Listing a property",
+    body: "Add a rental, mark its location and manage your existing listings.",
   },
 ];
 
@@ -95,12 +98,12 @@ export default function Help() {
             </p>
 
             <h1 className="mt-2 font-display text-[30px] font-bold tracking-[-0.045em] text-[#202226] sm:text-[38px] dark:text-white">
-              Quick answers when you need them.
+              Need help with something?
             </h1>
 
             <p className="mt-3 max-w-xl text-[14px] leading-6 text-[#2b2d31]/58 dark:text-white/52">
-              Find help with searching for properties, saving listings,
-              contacting owners and managing your Rentora account.
+              Here are answers to some of the things people usually want to know
+              when using Thegana.
             </p>
           </div>
         </section>
@@ -169,15 +172,15 @@ export default function Help() {
         >
           <div className="border-b border-black/[0.06] px-5 py-5 sm:px-6 dark:border-white/[0.07]">
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#2b2d31]/38 dark:text-white/35">
-              Frequently asked
+              Common questions
             </p>
 
             <h2 className="mt-1 font-display text-xl font-bold tracking-[-0.035em] text-[#202226] dark:text-white">
-              Common questions
+              You might find the answer here
             </h2>
 
             <p className="mt-1 text-[11px] leading-5 text-[#2b2d31]/46 dark:text-white/40">
-              Click a question to view its answer.
+              Open a question to read the answer.
             </p>
           </div>
 
@@ -193,7 +196,7 @@ export default function Help() {
           </div>
         </section>
 
-        {/* SUPPORT STRIP */}
+        {/* SUPPORT */}
         <section
           className="
             flex flex-col gap-5
@@ -209,30 +212,41 @@ export default function Help() {
         >
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/35">
-              Need more help?
+              Still stuck?
             </p>
 
             <h3 className="mt-2 font-display text-lg font-bold tracking-[-0.03em]">
-              Check the answers above first.
+              Send us a report.
             </h3>
 
             <p className="mt-1 max-w-lg text-[11px] leading-5 text-white/43">
-              We're keeping Rentora simple, so most common account and property
-              questions should be covered here.
+              If something isn't working properly, tell us what happened through
+              the Support & Feedback page.
             </p>
           </div>
-
-          <span
+          <Link
+            to="/support"
             className="
-              inline-flex shrink-0 items-center
-              rounded-full border border-white/[0.09]
-              bg-white/[0.06]
-              px-4 py-2
-              text-[10px] font-semibold text-white/65
-            "
+    inline-flex
+    items-center
+    gap-2
+    rounded-full
+    border border-white/10
+    bg-white
+    px-5
+    py-2.5
+    text-xs
+    font-semibold
+    text-black
+    no-underline
+    transition-colors
+    duration-200
+    hover:bg-white/90
+  "
           >
-            Rentora Help
-          </span>
+            Support & feedback
+            <ArrowUpRight size={13} strokeWidth={1.8} />
+          </Link>
         </section>
       </div>
     </AppShell>
