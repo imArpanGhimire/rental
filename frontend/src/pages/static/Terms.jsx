@@ -10,32 +10,32 @@ import AppShell from "../../components/layout/AppShell.jsx";
 
 const sections = [
   {
-    id: "using-rentora",
+    id: "using-thegana",
     number: "01",
     icon: ListChecks,
-    title: "Using Rentora",
-    body: "Rentora connects renters and property owners in the Kathmandu valley. By using the site, you agree to provide accurate information in your account and listings.",
+    title: "Using Thegana",
+    body: "Thegana is a place for renters and property owners to find and contact each other. When you create an account or post a property, please make sure the information you provide is accurate.",
   },
   {
     id: "listings",
     number: "02",
     icon: ShieldAlert,
-    title: "Listings",
-    body: "Property owners are responsible for the accuracy of their listings, including price, photos, and availability. Rentora does not verify listings and is not a party to any rental agreement made between users.",
+    title: "Property listings",
+    body: "Owners are responsible for the information in their listings, including the rent, photos, location and availability. Please don't list a property you don't own or don't have permission to advertise.",
   },
   {
     id: "account-responsibility",
     number: "03",
     icon: KeyRound,
-    title: "Account responsibility",
-    body: "You're responsible for keeping your login credentials secure and for any activity that happens under your account.",
+    title: "Your account",
+    body: "Keep your login details private and let us know if you think someone else has gained access to your account. Activity carried out through your account is your responsibility.",
   },
   {
     id: "rental-agreements",
     number: "04",
     icon: Scale,
-    title: "Rental agreements",
-    body: "Any rental agreement, deposit, payment arrangement or other transaction is made directly between the renter and property owner. Rentora provides the platform for discovery and connection but is not a party to the agreement.",
+    title: "Renting a property",
+    body: "Thegana helps renters and owners find and contact each other, but we're not part of the rental agreement between them. Rent, deposits, payments and other arrangements should be confirmed directly between the renter and the owner.",
   },
 ];
 
@@ -80,7 +80,7 @@ export default function Terms() {
             </span>
 
             <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.17em] text-[#2b2d31]/42 dark:text-white/40">
-              Legal
+              Terms
             </p>
 
             <h1 className="mt-2 font-display text-[30px] font-bold tracking-[-0.045em] text-[#202226] sm:text-[38px] dark:text-white">
@@ -88,7 +88,8 @@ export default function Terms() {
             </h1>
 
             <p className="mt-3 max-w-xl text-[14px] leading-6 text-[#2b2d31]/58 dark:text-white/52">
-              The basic rules for using Rentora as a renter or property owner.
+              A few basic rules to keep Thegana useful and safe for both renters
+              and property owners.
             </p>
 
             <p className="mt-4 text-[10px] font-medium text-[#2b2d31]/36 dark:text-white/32">
@@ -99,7 +100,6 @@ export default function Terms() {
 
         {/* DOCUMENT */}
         <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)]">
-          {/* INDEX */}
           <aside className="hidden lg:block">
             <div
               className="
@@ -147,7 +147,6 @@ export default function Terms() {
             </div>
           </aside>
 
-          {/* SECTIONS */}
           <div className="space-y-4">
             {sections.map((section) => {
               const Icon = section.icon;
