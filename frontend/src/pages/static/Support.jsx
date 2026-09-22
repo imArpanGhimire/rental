@@ -19,51 +19,40 @@ import {
 import { useLocation } from "react-router-dom";
 
 import AppShell from "../../components/layout/AppShell.jsx";
-
 import { useAuth } from "../../features/auth/AuthContext.jsx";
-
 import { useSendSupportReport } from "../../features/support/hooks/useSendSupportReport.js";
-
-/* =========================================================
-   ISSUE TYPES
-========================================================= */
 
 const ISSUE_TYPES = [
   {
     value: "bug",
     label: "Bug",
-    description: "Something isn't working as expected.",
+    description: "Something isn't working the way it should.",
     icon: Bug,
   },
-
   {
     value: "technical",
     label: "Technical issue",
-    description: "Loading, performance, map or system problems.",
+    description: "Problems with loading, performance, the map or the site.",
     icon: MonitorCog,
   },
-
   {
     value: "listing",
     label: "Listing issue",
-    description: "Problems with a property or listing.",
+    description: "Something seems wrong with a property or its listing.",
     icon: AlertTriangle,
   },
-
   {
     value: "account",
     label: "Account issue",
-    description: "Profile or account-related problems.",
+    description: "Problems with your profile, login or account.",
     icon: UserRound,
   },
-
   {
     value: "feedback",
     label: "Feedback",
-    description: "Ideas or suggestions for Rentora.",
+    description: "Have an idea for Thegana? We'd like to hear it.",
     icon: Lightbulb,
   },
-
   {
     value: "other",
     label: "Other",
@@ -72,31 +61,22 @@ const ISSUE_TYPES = [
   },
 ];
 
-/* =========================================================
-   SUPPORT PAGE
-========================================================= */
-
 export default function Support() {
   const { user, role } = useAuth();
-
   const location = useLocation();
 
   const originalPage = location.state?.from || "";
 
   const [issueType, setIssueType] = useState("bug");
-
   const [subject, setSubject] = useState("");
-
   const [description, setDescription] = useState("");
-
   const [affectedPage, setAffectedPage] = useState(originalPage);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const reportMutation = useSendSupportReport();
+
   const isSubmitting = reportMutation.isPending;
-
-  const [error, setError] = useState("");
-
-  const [success, setSuccess] = useState(false);
 
   const selectedIssue = useMemo(
     () => ISSUE_TYPES.find((item) => item.value === issueType),
@@ -105,42 +85,32 @@ export default function Support() {
 
   const SelectedIcon = selectedIssue?.icon || Bug;
 
-  /* =======================================================
-     SUBMIT
-  ======================================================= */
-
   async function handleSubmit(event) {
     event.preventDefault();
 
     if (subject.trim().length < 3) {
-      setError("Please enter a short subject.");
-
+      setError("Please add a short subject.");
       return;
     }
 
     if (description.trim().length < 10) {
-      setError("Please describe the problem in a little more detail.");
-
+      setError("Tell us a little more about what happened.");
       return;
     }
 
     setError("");
     setSuccess(false);
+
     try {
       await reportMutation.mutateAsync({
         issueType,
-
         subject: subject.trim(),
-
         description: description.trim(),
-
         affectedPage: affectedPage.trim(),
-
         browserInfo: `${navigator.userAgent} | ${window.innerWidth}x${window.innerHeight}`,
       });
 
       setSuccess(true);
-
       setSubject("");
       setDescription("");
     } catch (err) {
@@ -153,10 +123,7 @@ export default function Support() {
   return (
     <AppShell>
       <div className="mx-auto max-w-[1080px] space-y-6">
-        {/* =====================================================
-            HERO
-        ===================================================== */}
-
+        {/* HERO */}
         <section
           className="
             relative
@@ -169,10 +136,8 @@ export default function Support() {
             to-[#e9efec]
             px-6 py-8
             shadow-[0_20px_60px_rgba(20,23,31,0.04)]
-
             sm:px-8
             sm:py-10
-
             dark:border-white/[0.06]
             dark:from-[#1b1e23]
             dark:via-[#17191d]
@@ -180,8 +145,6 @@ export default function Support() {
             dark:shadow-none
           "
         >
-          {/* Background lines */}
-
           <svg
             aria-hidden="true"
             viewBox="0 0 900 300"
@@ -192,7 +155,6 @@ export default function Support() {
               h-full w-[70%]
               text-[#426c64]
               opacity-[0.06]
-
               dark:text-[#8db4aa]
               dark:opacity-[0.06]
             "
@@ -221,7 +183,6 @@ export default function Support() {
               rounded-full
               bg-[#426c64]/[0.055]
               blur-[80px]
-
               dark:bg-[#8db4aa]/[0.045]
             "
           />
@@ -235,7 +196,6 @@ export default function Support() {
                 border border-black/[0.07]
                 bg-white/55
                 px-3 py-2
-
                 dark:border-white/[0.08]
                 dark:bg-white/[0.04]
               "
@@ -247,7 +207,7 @@ export default function Support() {
               />
 
               <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#2b2d31]/50 dark:text-white/45">
-                Rentora support
+                Thegana support
               </span>
             </div>
 
@@ -259,38 +219,23 @@ export default function Support() {
                 font-bold
                 tracking-[-0.05em]
                 text-[#17191d]
-
                 sm:text-[43px]
-
                 dark:text-white
               "
             >
-              Something not working?
+              Found a problem?
             </h1>
 
             <p className="mt-3 max-w-xl text-[14px] leading-7 text-[#2b2d31]/52 dark:text-white/46">
-              Tell us what happened. Bug reports, technical problems and product
-              feedback are sent directly to the Rentora support inbox.
+              Tell us what happened and we'll take a look. You can also use this
+              page if you have an idea or suggestion for Thegana.
             </p>
           </div>
         </section>
 
-        {/* =====================================================
-            MAIN
-        ===================================================== */}
-
-        <div
-          className="
-            grid grid-cols-1
-            gap-5
-
-            lg:grid-cols-[minmax(0,1fr)_300px]
-          "
-        >
-          {/* ===================================================
-              FORM
-          =================================================== */}
-
+        {/* MAIN */}
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+          {/* FORM */}
           <form
             onSubmit={handleSubmit}
             className="
@@ -299,9 +244,7 @@ export default function Support() {
               bg-white/50
               p-5
               shadow-[0_18px_50px_rgba(20,23,31,0.035)]
-
               sm:p-6
-
               dark:border-white/[0.07]
               dark:bg-white/[0.025]
               dark:shadow-none
@@ -313,20 +256,19 @@ export default function Support() {
               </p>
 
               <h2 className="mt-1.5 font-display text-[22px] font-bold tracking-[-0.035em] text-[#202226] dark:text-white">
-                What happened?
+                Tell us what happened
               </h2>
 
               <p className="mt-1 text-[12px] leading-5 text-[#2b2d31]/43 dark:text-white/38">
-                Include enough detail for us to understand and reproduce the
-                issue.
+                A short explanation is usually enough. If you saw an error
+                message, include that too.
               </p>
             </div>
 
             {/* ISSUE TYPE */}
-
             <div className="mt-6">
               <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2b2d31]/48 dark:text-white/43">
-                Issue type
+                What kind of problem is it?
               </label>
 
               <div className="relative">
@@ -339,7 +281,6 @@ export default function Support() {
                     left-4 top-1/2
                     -translate-y-1/2
                     text-[#426c64]
-
                     dark:text-[#8db4aa]
                   "
                 />
@@ -360,7 +301,6 @@ export default function Support() {
                     outline-none
                     transition-colors
                     focus:border-[#426c64]/40
-
                     dark:border-white/[0.09]
                     dark:bg-white/[0.035]
                     dark:text-white
@@ -387,7 +327,6 @@ export default function Support() {
                     right-4 top-1/2
                     -translate-y-1/2
                     text-[#2b2d31]/35
-
                     dark:text-white/35
                   "
                 />
@@ -399,7 +338,6 @@ export default function Support() {
             </div>
 
             {/* SUBJECT */}
-
             <div className="mt-5">
               <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2b2d31]/48 dark:text-white/43">
                 Subject
@@ -410,7 +348,7 @@ export default function Support() {
                 value={subject}
                 maxLength={120}
                 onChange={(event) => setSubject(event.target.value)}
-                placeholder="e.g. Map doesn't load after searching"
+                placeholder="e.g. The map isn't loading"
                 className="
                   h-12 w-full
                   rounded-[15px]
@@ -423,7 +361,6 @@ export default function Support() {
                   transition-colors
                   placeholder:text-[#2b2d31]/28
                   focus:border-[#426c64]/40
-
                   dark:border-white/[0.09]
                   dark:bg-white/[0.035]
                   dark:text-white
@@ -434,17 +371,16 @@ export default function Support() {
             </div>
 
             {/* AFFECTED PAGE */}
-
             <div className="mt-5">
               <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2b2d31]/48 dark:text-white/43">
-                Page or feature
+                Where did it happen?
               </label>
 
               <input
                 type="text"
                 value={affectedPage}
                 onChange={(event) => setAffectedPage(event.target.value)}
-                placeholder="e.g. Browse map, visit requests, reviews"
+                placeholder="e.g. Browse map, saved listings, visit requests"
                 maxLength={300}
                 className="
                   h-12 w-full
@@ -458,7 +394,6 @@ export default function Support() {
                   transition-colors
                   placeholder:text-[#2b2d31]/28
                   focus:border-[#426c64]/40
-
                   dark:border-white/[0.09]
                   dark:bg-white/[0.035]
                   dark:text-white
@@ -469,16 +404,14 @@ export default function Support() {
             </div>
 
             {/* DESCRIPTION */}
-
             <div className="mt-5">
               <div className="mb-2 flex items-center justify-between gap-4">
                 <label className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2b2d31]/48 dark:text-white/43">
-                  Description
+                  What happened?
                 </label>
 
                 <span className="text-[9px] text-[#2b2d31]/30 dark:text-white/28">
-                  {description.length}
-                  /5000
+                  {description.length}/5000
                 </span>
               </div>
 
@@ -487,7 +420,7 @@ export default function Support() {
                 onChange={(event) => setDescription(event.target.value)}
                 rows={8}
                 maxLength={5000}
-                placeholder="What were you trying to do? What happened instead? Include any error message you saw."
+                placeholder="Tell us what you were doing, what went wrong and any error message you saw."
                 className="
                   w-full
                   resize-none
@@ -502,7 +435,6 @@ export default function Support() {
                   transition-colors
                   placeholder:text-[#2b2d31]/28
                   focus:border-[#426c64]/40
-
                   dark:border-white/[0.09]
                   dark:bg-white/[0.035]
                   dark:text-white
@@ -511,8 +443,6 @@ export default function Support() {
                 "
               />
             </div>
-
-            {/* ERROR */}
 
             {error && (
               <div
@@ -526,7 +456,6 @@ export default function Support() {
                   text-[11px]
                   leading-5
                   text-rose-700
-
                   dark:border-rose-400/15
                   dark:bg-rose-400/[0.08]
                   dark:text-rose-300
@@ -542,95 +471,56 @@ export default function Support() {
               </div>
             )}
 
-            {/* SUCCESS */}
-
             {success && (
               <div
                 className="
-      mt-5
-      flex items-center
-      gap-3
-      rounded-[14px]
-      border border-black/[0.07]
-      bg-black/[0.018]
-      px-4 py-3.5
-
-      dark:border-white/[0.07]
-      dark:bg-white/[0.025]
-    "
+                  mt-5
+                  flex items-center
+                  gap-3
+                  rounded-[14px]
+                  border border-black/[0.07]
+                  bg-black/[0.018]
+                  px-4 py-3.5
+                  dark:border-white/[0.07]
+                  dark:bg-white/[0.025]
+                "
               >
                 <div
                   className="
-        flex h-8 w-8
-        shrink-0
-        items-center
-        justify-center
-        rounded-full
-        bg-[#426c64]/10
-        text-[#426c64]
-
-        dark:bg-[#8db4aa]/10
-        dark:text-[#8db4aa]
-      "
+                    flex h-8 w-8
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-[#426c64]/10
+                    text-[#426c64]
+                    dark:bg-[#8db4aa]/10
+                    dark:text-[#8db4aa]
+                  "
                 >
                   <Check size={14} strokeWidth={2.2} />
                 </div>
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p
-                      className="
-            text-[12px]
-            font-semibold
-            text-[#202226]
-
-            dark:text-white/90
-          "
-                    >
-                      Report received
+                    <p className="text-[12px] font-semibold text-[#202226] dark:text-white/90">
+                      Got it
                     </p>
 
-                    <span
-                      className="
-            h-1 w-1
-            rounded-full
-            bg-[#426c64]/40
+                    <span className="h-1 w-1 rounded-full bg-[#426c64]/40 dark:bg-[#8db4aa]/40" />
 
-            dark:bg-[#8db4aa]/40
-          "
-                    />
-
-                    <p
-                      className="
-            text-[10px]
-            font-medium
-            text-[#426c64]
-
-            dark:text-[#8db4aa]
-          "
-                    >
-                      Sent successfully
+                    <p className="text-[10px] font-medium text-[#426c64] dark:text-[#8db4aa]">
+                      Report sent
                     </p>
                   </div>
 
-                  <p
-                    className="
-          mt-0.5
-          text-[11px]
-          leading-5
-          text-[#2b2d31]/45
-
-          dark:text-white/38
-        "
-                  >
-                    Thanks for the report. It has been sent to the Rentora
-                    support team.
+                  <p className="mt-0.5 text-[11px] leading-5 text-[#2b2d31]/45 dark:text-white/38">
+                    Thanks. Your report has been sent to the Thegana support
+                    team.
                   </p>
                 </div>
               </div>
             )}
-
-            {/* SUBMIT */}
 
             <div className="mt-6 flex justify-end">
               <button
@@ -652,7 +542,6 @@ export default function Support() {
                   hover:bg-[#303238]
                   disabled:cursor-not-allowed
                   disabled:opacity-55
-
                   dark:bg-white
                   dark:text-[#17191d]
                   dark:hover:bg-white/90
@@ -673,20 +562,14 @@ export default function Support() {
             </div>
           </form>
 
-          {/* ===================================================
-              SIDEBAR
-          =================================================== */}
-
+          {/* SIDEBAR */}
           <aside className="space-y-4">
-            {/* ACCOUNT */}
-
             <div
               className="
                 rounded-[24px]
                 border border-black/[0.07]
                 bg-white/45
                 p-5
-
                 dark:border-white/[0.07]
                 dark:bg-white/[0.025]
               "
@@ -698,7 +581,6 @@ export default function Support() {
                   rounded-xl
                   bg-[#426c64]/[0.07]
                   text-[#426c64]
-
                   dark:bg-[#8db4aa]/[0.08]
                   dark:text-[#8db4aa]
                 "
@@ -707,7 +589,7 @@ export default function Support() {
               </div>
 
               <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.13em] text-[#2b2d31]/38 dark:text-white/35">
-                Included automatically
+                Sent with your report
               </p>
 
               <h3 className="mt-1.5 text-[14px] font-semibold text-[#202226] dark:text-white">
@@ -721,7 +603,7 @@ export default function Support() {
                   </p>
 
                   <p className="mt-0.5 truncate text-[11px] font-medium text-[#202226] dark:text-white/75">
-                    {user?.name || "Rentora user"}
+                    {user?.name || "Thegana user"}
                   </p>
                 </div>
 
@@ -747,15 +629,12 @@ export default function Support() {
               </div>
             </div>
 
-            {/* PRIVACY */}
-
             <div
               className="
                 rounded-[24px]
                 border border-black/[0.07]
                 bg-[#eef2ef]/70
                 p-5
-
                 dark:border-white/[0.07]
                 dark:bg-[#8db4aa]/[0.045]
               "
@@ -767,16 +646,14 @@ export default function Support() {
               />
 
               <h3 className="mt-3 text-[13px] font-semibold text-[#202226] dark:text-white">
-                Useful details are included.
+                We include a few technical details
               </h3>
 
               <p className="mt-2 text-[11px] leading-5 text-[#2b2d31]/46 dark:text-white/40">
-                Your account, role and basic browser information are attached to
-                the report so technical problems are easier to diagnose.
+                Your account type and basic browser information are included
+                with the report. This helps us figure out what went wrong.
               </p>
             </div>
-
-            {/* EMAIL */}
 
             <div
               className="
@@ -784,7 +661,6 @@ export default function Support() {
                 border border-black/[0.07]
                 bg-white/45
                 p-5
-
                 dark:border-white/[0.07]
                 dark:bg-white/[0.025]
               "
@@ -796,12 +672,12 @@ export default function Support() {
               />
 
               <h3 className="mt-3 text-[13px] font-semibold text-[#202226] dark:text-white">
-                Sent directly to support.
+                Where does the report go?
               </h3>
 
               <p className="mt-2 text-[11px] leading-5 text-[#2b2d31]/46 dark:text-white/40">
-                Your report is emailed directly to the Rentora support inbox.
-                Your email address is attached as the reply address.
+                It's sent to the Thegana support inbox. Your email address is
+                included so we can reply if we need more information.
               </p>
             </div>
           </aside>
