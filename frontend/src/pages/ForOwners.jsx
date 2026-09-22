@@ -23,7 +23,7 @@ function MiniFeature({ icon: Icon, children }) {
       <Icon
         size={13}
         strokeWidth={1.9}
-        className="shrink-0 text-[#426c64] dark:text-[#8db4aa]"
+        className="shrink-0 text-[#202226] dark:text-white/80"
       />
 
       <span>{children}</span>
@@ -45,6 +45,7 @@ function BenefitCard({ icon: Icon, eyebrow, title, description }) {
         p-5
         shadow-[0_16px_46px_rgba(20,23,31,0.035)]
         backdrop-blur
+
         dark:border-white/[0.07]
         dark:bg-white/[0.025]
         dark:shadow-none
@@ -55,12 +56,14 @@ function BenefitCard({ icon: Icon, eyebrow, title, description }) {
           flex h-10 w-10
           items-center justify-center
           rounded-[14px]
-          border border-[#426c64]/10
-          bg-[#426c64]/[0.065]
-          text-[#426c64]
-          dark:border-[#8db4aa]/15
-          dark:bg-[#8db4aa]/[0.08]
-          dark:text-[#8db4aa]
+
+          border border-black/[0.08]
+          bg-black/[0.04]
+          text-[#202226]
+
+          dark:border-white/[0.10]
+          dark:bg-white/[0.06]
+          dark:text-white
         "
       >
         <Icon size={17} strokeWidth={1.8} />
@@ -106,14 +109,17 @@ function WorkflowStep({ number, title, description, last = false }) {
           shrink-0
           items-center justify-center
           rounded-full
-          border border-[#426c64]/15
-          bg-[#eef2ef]
+
+          border border-black/[0.10]
+          bg-black/[0.045]
+
           text-[10px]
           font-bold
-          text-[#426c64]
-          dark:border-[#8db4aa]/15
-          dark:bg-[#8db4aa]/[0.08]
-          dark:text-[#8db4aa]
+          text-[#202226]
+
+          dark:border-white/[0.12]
+          dark:bg-white/[0.07]
+          dark:text-white
         "
       >
         {number}
@@ -157,9 +163,10 @@ function OwnerJourneyIllustration() {
           right-[4%] top-[3%]
           h-[330px] w-[330px]
           rounded-full
-          bg-[#426c64]/[0.035]
+          bg-black/[0.025]
           blur-[80px]
-          dark:bg-[#8db4aa]/[0.04]
+
+          dark:bg-white/[0.025]
         "
       />
 
@@ -169,8 +176,9 @@ function OwnerJourneyIllustration() {
           bottom-[-20%] right-[-8%]
           h-[330px] w-[420px]
           rounded-[50%]
-          bg-[#426c64]/[0.035]
-          dark:bg-[#8db4aa]/[0.025]
+          bg-black/[0.025]
+
+          dark:bg-white/[0.02]
         "
       />
 
@@ -186,21 +194,21 @@ function OwnerJourneyIllustration() {
           d="M37 356C128 292 197 301 264 331C334 362 411 367 497 333C576 302 635 277 732 291"
           stroke="currentColor"
           strokeWidth="2"
-          className="text-[#426c64]/[0.11] dark:text-white/[0.08]"
+          className="text-black/[0.09] dark:text-white/[0.08]"
         />
 
         <path
           d="M94 461C171 392 230 376 303 395C379 414 454 434 527 405C600 376 650 346 739 359"
           stroke="currentColor"
           strokeWidth="2"
-          className="text-[#426c64]/[0.08] dark:text-white/[0.06]"
+          className="text-black/[0.065] dark:text-white/[0.06]"
         />
 
         <path
           d="M160 129C235 88 316 77 405 102C493 127 551 137 619 105C653 89 682 75 720 69"
           stroke="currentColor"
           strokeWidth="2"
-          className="text-[#426c64]/[0.10] dark:text-white/[0.07]"
+          className="text-black/[0.08] dark:text-white/[0.07]"
         />
 
         {/* ROUTE */}
@@ -211,7 +219,7 @@ function OwnerJourneyIllustration() {
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeDasharray="7 9"
-          className="text-[#426c64]/35 dark:text-[#8db4aa]/35"
+          className="text-black/25 dark:text-white/25"
         />
 
         {/* SMALL HOUSE - FAR LEFT */}
@@ -219,7 +227,7 @@ function OwnerJourneyIllustration() {
         <g opacity="0.52">
           <path
             d="M171 156L204 132L237 156V199H171V156Z"
-            className="fill-[#f4f5f1] dark:fill-white/[0.055]"
+            className="fill-[#f1f1f1] dark:fill-white/[0.055]"
           />
 
           <path
@@ -227,7 +235,7 @@ function OwnerJourneyIllustration() {
             stroke="currentColor"
             strokeWidth="6"
             strokeLinejoin="round"
-            className="text-[#759086]/60 dark:text-[#8db4aa]/35"
+            className="text-black/45 dark:text-white/35"
           />
 
           <rect
@@ -236,7 +244,7 @@ function OwnerJourneyIllustration() {
             width="16"
             height="29"
             rx="2"
-            className="fill-[#80998f]/30 dark:fill-[#8db4aa]/20"
+            className="fill-black/20 dark:fill-white/20"
           />
 
           <rect
@@ -245,7 +253,7 @@ function OwnerJourneyIllustration() {
             width="11"
             height="11"
             rx="1.5"
-            className="fill-[#80998f]/25 dark:fill-[#8db4aa]/15"
+            className="fill-black/15 dark:fill-white/15"
           />
 
           <rect
@@ -254,7 +262,7 @@ function OwnerJourneyIllustration() {
             width="11"
             height="11"
             rx="1.5"
-            className="fill-[#80998f]/25 dark:fill-[#8db4aa]/15"
+            className="fill-black/15 dark:fill-white/15"
           />
         </g>
 
@@ -267,7 +275,7 @@ function OwnerJourneyIllustration() {
             width="4"
             height="33"
             rx="2"
-            className="fill-[#738b82]/45"
+            className="fill-black/35 dark:fill-white/30"
           />
 
           <ellipse
@@ -275,7 +283,7 @@ function OwnerJourneyIllustration() {
             cy="185"
             rx="13"
             ry="25"
-            className="fill-[#aebcb6]/55 dark:fill-[#8db4aa]/15"
+            className="fill-black/20 dark:fill-white/15"
           />
         </g>
 
@@ -288,7 +296,7 @@ function OwnerJourneyIllustration() {
             width="4"
             height="36"
             rx="2"
-            className="fill-[#738b82]/45"
+            className="fill-black/35 dark:fill-white/30"
           />
 
           <ellipse
@@ -296,7 +304,7 @@ function OwnerJourneyIllustration() {
             cy="127"
             rx="14"
             ry="27"
-            className="fill-[#aebcb6]/55 dark:fill-[#8db4aa]/15"
+            className="fill-black/20 dark:fill-white/15"
           />
         </g>
 
@@ -321,7 +329,7 @@ function OwnerJourneyIllustration() {
             stroke="currentColor"
             strokeWidth="9"
             strokeLinejoin="round"
-            className="text-[#426c64]/75 dark:text-[#8db4aa]/55"
+            className="text-[#202226]/75 dark:text-white/60"
           />
 
           <rect
@@ -330,7 +338,7 @@ function OwnerJourneyIllustration() {
             width="20"
             height="34"
             rx="2"
-            className="fill-[#426c64]/25 dark:fill-[#8db4aa]/25"
+            className="fill-black/20 dark:fill-white/25"
           />
 
           <rect
@@ -339,7 +347,7 @@ function OwnerJourneyIllustration() {
             width="13"
             height="13"
             rx="2"
-            className="fill-[#426c64]/20 dark:fill-[#8db4aa]/20"
+            className="fill-black/15 dark:fill-white/20"
           />
 
           <rect
@@ -348,14 +356,14 @@ function OwnerJourneyIllustration() {
             width="13"
             height="13"
             rx="2"
-            className="fill-[#426c64]/20 dark:fill-[#8db4aa]/20"
+            className="fill-black/15 dark:fill-white/20"
           />
 
           {/* PIN */}
 
           <path
             d="M615 59C598 59 585 72 585 89C585 111 615 138 615 138C615 138 645 111 645 89C645 72 632 59 615 59Z"
-            className="fill-[#426c64] dark:fill-[#8db4aa]"
+            className="fill-[#202226] dark:fill-white"
           />
 
           <circle
@@ -375,7 +383,7 @@ function OwnerJourneyIllustration() {
             width="4"
             height="45"
             rx="2"
-            className="fill-[#738b82]/45"
+            className="fill-black/35 dark:fill-white/30"
           />
 
           <ellipse
@@ -383,7 +391,7 @@ function OwnerJourneyIllustration() {
             cy="141"
             rx="17"
             ry="33"
-            className="fill-[#aebcb6]/65 dark:fill-[#8db4aa]/18"
+            className="fill-black/20 dark:fill-white/18"
           />
 
           <rect
@@ -392,7 +400,7 @@ function OwnerJourneyIllustration() {
             width="4"
             height="34"
             rx="2"
-            className="fill-[#738b82]/45"
+            className="fill-black/35 dark:fill-white/30"
           />
 
           <ellipse
@@ -400,7 +408,7 @@ function OwnerJourneyIllustration() {
             cy="156"
             rx="13"
             ry="25"
-            className="fill-[#aebcb6]/55 dark:fill-[#8db4aa]/16"
+            className="fill-black/20 dark:fill-white/16"
           />
         </g>
 
@@ -413,21 +421,21 @@ function OwnerJourneyIllustration() {
             cx="25"
             cy="8"
             r="8"
-            className="fill-[#4a5551] dark:fill-[#b8c3bf]"
+            className="fill-[#3f4145] dark:fill-white/75"
           />
 
           {/* BODY */}
 
           <path
             d="M22 18C32 18 38 26 39 41L39 63H18L15 38C15 25 17 18 22 18Z"
-            className="fill-[#789087]"
+            className="fill-[#66686d] dark:fill-white/55"
           />
 
           {/* BACKPACK */}
 
           <path
             d="M14 25C8 29 7 39 8 49L11 58H20V26L14 25Z"
-            className="fill-[#566961] dark:fill-[#60766d]"
+            className="fill-[#44464a] dark:fill-white/40"
           />
 
           {/* ARM */}
@@ -437,7 +445,7 @@ function OwnerJourneyIllustration() {
             stroke="currentColor"
             strokeWidth="5"
             strokeLinecap="round"
-            className="text-[#4f5e59] dark:text-[#9daaa5]"
+            className="text-[#44464a] dark:text-white/65"
           />
 
           {/* LEG 1 */}
@@ -447,7 +455,7 @@ function OwnerJourneyIllustration() {
             stroke="currentColor"
             strokeWidth="6"
             strokeLinecap="round"
-            className="text-[#4f5e59] dark:text-[#a7b2ae]"
+            className="text-[#44464a] dark:text-white/70"
           />
 
           {/* LEG 2 */}
@@ -457,7 +465,7 @@ function OwnerJourneyIllustration() {
             stroke="currentColor"
             strokeWidth="6"
             strokeLinecap="round"
-            className="text-[#4f5e59] dark:text-[#a7b2ae]"
+            className="text-[#44464a] dark:text-white/70"
           />
 
           {/* SUITCASE HANDLE */}
@@ -466,7 +474,7 @@ function OwnerJourneyIllustration() {
             d="M5 45L-1 61"
             stroke="currentColor"
             strokeWidth="2"
-            className="text-[#566961] dark:text-[#91a09a]"
+            className="text-[#44464a] dark:text-white/55"
           />
 
           {/* SUITCASE */}
@@ -478,24 +486,35 @@ function OwnerJourneyIllustration() {
             height="27"
             rx="3"
             transform="rotate(10 -13 59)"
-            className="fill-[#61786f] dark:fill-[#789087]"
+            className="fill-[#55575c] dark:fill-white/45"
           />
 
-          <circle cx="-9" cy="89" r="2" className="fill-[#4f5e59]" />
-          <circle cx="3" cy="91" r="2" className="fill-[#4f5e59]" />
+          <circle
+            cx="-9"
+            cy="89"
+            r="2"
+            className="fill-[#33353a] dark:fill-white/65"
+          />
+
+          <circle
+            cx="3"
+            cy="91"
+            r="2"
+            className="fill-[#33353a] dark:fill-white/65"
+          />
 
           {/* BAG */}
 
           <path
             d="M47 47H60L63 61H45L47 47Z"
-            className="fill-[#55655f] dark:fill-[#738980]"
+            className="fill-[#44464a] dark:fill-white/45"
           />
 
           <path
             d="M50 47C50 40 58 40 58 47"
             stroke="currentColor"
             strokeWidth="2"
-            className="text-[#55655f] dark:text-[#8da098]"
+            className="text-[#44464a] dark:text-white/55"
           />
         </g>
 
@@ -507,7 +526,7 @@ function OwnerJourneyIllustration() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeDasharray="2 9"
-          className="text-[#426c64]/20 dark:text-[#8db4aa]/20"
+          className="text-black/15 dark:text-white/15"
         />
       </svg>
     </div>
@@ -550,11 +569,11 @@ export default function ForOwners() {
               bg-gradient-to-br
               from-[#f8f7f3]
               via-[#f7f6f2]
-              to-[#edf1ee]
+              to-[#eeeeec]
 
               dark:from-[#17191d]
               dark:via-[#15171b]
-              dark:to-[#19201e]
+              dark:to-[#1a1b1f]
             "
           />
 
@@ -615,8 +634,10 @@ export default function ForOwners() {
                 px-6 py-11
 
                 sm:px-8
+
                 lg:px-11
                 lg:py-14
+
                 xl:px-12
               "
             >
@@ -631,7 +652,9 @@ export default function ForOwners() {
                   text-[#17191d]
 
                   sm:text-[58px]
+
                   lg:text-[62px]
+
                   xl:text-[67px]
 
                   dark:text-white
@@ -760,7 +783,7 @@ export default function ForOwners() {
 
         <section>
           <div className="mb-5">
-            <p className="text-[11px] font-medium tracking-[-0.01em] text-[#426c64] dark:text-[#8db4aa]">
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-[#202226]/60 dark:text-white/55">
               Built for owners
             </p>
 
@@ -822,7 +845,7 @@ export default function ForOwners() {
           "
         >
           <div>
-            <p className="text-[11px] font-medium tracking-[-0.01em] text-[#426c64] dark:text-[#8db4aa]">
+            <p className="text-[11px] font-medium tracking-[-0.01em] text-[#202226]/60 dark:text-white/55">
               How it works
             </p>
 
@@ -919,13 +942,13 @@ export default function ForOwners() {
               -right-20 -top-28
               h-72 w-72
               rounded-full
-              bg-[#8db4aa]/[0.12]
+              bg-white/[0.06]
               blur-[80px]
             "
           />
 
           <div className="relative">
-            <div className="flex items-center gap-2 text-[#8db4aa]">
+            <div className="flex items-center gap-2 text-white/70">
               <CheckCircle2 size={14} strokeWidth={1.9} />
 
               <span className="text-[11px] font-medium tracking-[-0.01em]">
