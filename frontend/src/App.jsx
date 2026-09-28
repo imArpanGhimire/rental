@@ -87,8 +87,14 @@ function HomeRoute() {
 function App() {
   const location = useLocation();
 
+  /* =========================================================
+     ROUTES WITHOUT GLOBAL FOOTER
+  ========================================================= */
+
   const hideFooter =
-    location.pathname === "/login" || location.pathname === "/register";
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
+    location.pathname === "/forgot-password";
 
   return (
     <div className="flex min-h-screen flex-col bg-bg">
@@ -233,6 +239,15 @@ function App() {
           </Routes>
         </AnimatePresence>
       </main>
+
+      {/* =====================================================
+          GLOBAL FOOTER
+
+          Hidden on:
+          - Login
+          - Register
+          - Forgot Password
+      ===================================================== */}
 
       {!hideFooter && <Footer />}
     </div>
